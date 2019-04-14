@@ -1,0 +1,32 @@
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #4684ee;
+}
+
+.loader {
+  color: #fff;
+
+  font-family: Consolas, Menlo, Monaco, monospace;
+  font-weight: bold;
+  font-size: 30vh;
+  opacity: 0.8;
+}
+
+span {
+  display: inline-block;
+  animation: pulse 0.5s alternate infinite ease-in-out;
+}
+
+:nth-child(odd) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+  to {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+}
