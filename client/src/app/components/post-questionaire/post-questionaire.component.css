@@ -1,0 +1,14 @@
+.form {
+    margin-left : 15px; margin-right : 15px;
+}
+
+.gender-btn-group {
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0;
+}
+
+.gender-radio-button {
+    margin: 5px;
+}
+

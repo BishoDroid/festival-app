@@ -30,13 +30,7 @@ export class PreQuestionaireComponent implements OnInit {
         // connectionWithOthersScale: Number,
         tuningWithPeopleScale: Number,
         happinessScale: Number,
-        lonelinessScale: Number } = {
-        "age" : this.age,
-        "gender" : this.gender,
-        "tuningWithPeopleScale" : this.tuningWithPeopleScale,
-        "lonelinessScale" : this.lonelinessScale ,
-        "happinessScale" : this.happinessScale
-    }
+        lonelinessScale: Number } ;
 
 
     constructor(private dataSvc: DataService) {
@@ -46,6 +40,14 @@ export class PreQuestionaireComponent implements OnInit {
     }
 
     sendData() {
+
+       this.data = {
+            "age" : this.age,
+            "gender" : this.gender,
+            "tuningWithPeopleScale" : this.tuningWithPeopleScale,
+            "lonelinessScale" : this.lonelinessScale ,
+            "happinessScale" : this.happinessScale
+        };
         console.log(this.data);
         this.dataSvc.sendPreQuestionnair(this.data).subscribe(res => {
             console.log(res);
