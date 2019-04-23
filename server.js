@@ -2,13 +2,14 @@
  * Main server
  * @author bishodroid
  */
-
 const express = require('express');
+const httpContext = require('request-context');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
 //These routes will handle requests coming to them
 const index = require('./server/routes/index');
+const user = require('./server/routes/user');
 
 const corsOptions = [
   {
@@ -24,13 +25,12 @@ const port = 3001;
 const app = express();
 
 //body parser middleware
-app.use(bodyParser({limit: '2mb'}));
-app.use(bodyParser.json({limit: '2mb'}));
-app.use(bodyParser.urlencoded({extended: false, limit: '2mb'}));
 app.use(cors(corsOptions));
-
+app.use(bodyParser());
+app.use(httpContext.middleware('request'));
 // api end points
 app.use('/',index);
+app.use('/api',user);
 
 app.listen(port,function () {
     console.log("Server started on port "+port);

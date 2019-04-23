@@ -4,17 +4,21 @@
 
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var PreQuestionaire = require('PreQuestionaire');
-var PostQuestionaire = require('server/models/PostQuestionnaire');
-var SensorData = require('SensorData');
-
-var preQuest = new PreQuestionaire();
-var data = new SensorData();
-var postQuest = new PostQuestionaire();
 
 var user = new Schema({
     userId: Number,
-    children: [preQuest, data, postQuest]
+    preQuest: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PreQuestionnaire'
+    },
+    data: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'SensorData'
+    },
+    postQuest: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PostQuestionnaire'
+    }
 });
 
 module.exports = mongoose.model('User', user);

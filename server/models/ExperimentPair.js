@@ -5,16 +5,37 @@
  */
 
 var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-var User = require('User');
-var SensorData = require('SensorData');
+var user = {
+    age: Number,
+    preQuest: {
+        age: Number,
+        gender: String,
+        connectionWithOthersScale: Number,
+        tuningWithPeopleScale: Number,
+        happinessScale: Number,
+        lonelinessScale: Number
+    },
+    data: {
+        readingType: String,
+        value: Number,
+        timestamp: Date
+    },
+    postQuest: {
+        singingPartnerFamiliarity: String,
+        symbiosisRoomFamiliarity: String,
+        connectionWithOthersScale: Number,
+        tuningWithPeopleScale: Number,
+        happinessScale: Number,
+        lonelinessScale: Number
+    }
+};
 
-var user1 = new User();
-var user2 = new User();
-var harmonyData = new SensorData();
-
-var experimentPair = new Schema({
-    children: [user1, harmonyData, user2]
+module.exports = mongoose.model('ExperimentPair', {
+    user1: user,
+    harmonyData: {
+        readingType: String,
+        value: Number,
+        timestamp: Date
+    },
+    user2: user,
 });
-
-module.exports = mongoose.model('ExperimentPair', experimentPair);
