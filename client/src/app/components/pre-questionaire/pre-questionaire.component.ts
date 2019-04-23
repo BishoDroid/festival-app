@@ -47,10 +47,10 @@ export class PreQuestionaireComponent implements OnInit {
 
     sendData() {
         console.log(this.data);
-        this.dataSvc.sendPostQuestionnair(this.data).subscribe(res => {
+        this.dataSvc.sendPreQuestionnair(this.data).subscribe(res => {
             console.log(res);
         }, error => {
-
+            console.log(error);
         });
     }
 }
