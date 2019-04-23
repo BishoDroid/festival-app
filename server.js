@@ -3,7 +3,6 @@
  * @author bishodroid
  */
 const express = require('express');
-const httpContext = require('request-context');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
@@ -27,7 +26,6 @@ const app = express();
 //body parser middleware
 app.use(cors(corsOptions));
 app.use(bodyParser());
-app.use(httpContext.middleware('request'));
 // api end points
 app.use('/',index);
 app.use('/api',user);
