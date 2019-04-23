@@ -1,11 +1,12 @@
 /**
  * Created by bisho on 29/01/2017.
  */
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
+const uuidv4 = require('uuid/v4');
 // in memory db for storing pairs temporarily
-var dirty = require('dirty');
+const dirty = require('dirty');
 var data = dirty('pair');
 
 require('../db/festival-app-db');
@@ -23,13 +24,15 @@ router.route('/user/pre-quest')
  */
     .post(function (req, res) {
 
-        // data.rm('pair');
-
         var body = req.body;
         var preQuestSchema = convertPreQuestionnaireBodyToSchema(body);
+
         var clientId = req.header('client-id');
+        var pairId = req.header('pairId');
+        // data.rm(pairId);
+
         var originPair = new ExperimentPair();
-        var pair = data.get('pair');
+        var pair = data.get(pairId);
         var user1 = null;
         var user2 = null;
 
@@ -38,10 +41,11 @@ router.route('/user/pre-quest')
             console.log("FIRST");
             originPair.user1.preQuest = preQuestSchema;
             pair = originPair;
+            pairId = uuidv4();
             pair.save(function (err) {
                 if (err) return res.json({status: 'ERR', code: 500, msg: err});
-                data.set('pair', pair);
-                return res.json({status: 'OK', code: 200, msg: 'Saved data: ' + pair.user1});
+                data.set(pairId, pair);
+                return res.json({status: 'OK', code: 200, msg: 'Saved data', pairId: pairId});
             });
 
         } else if (pair.user1 && !pair.user2) {
@@ -57,10 +61,10 @@ router.route('/user/pre-quest')
             ExperimentPair.findOneAndUpdate({'_id': pair._id}, {$set: {user2: pair.user2}}, function (err, doc) {
                 console.log("Updating...")
                 if (err) return res.json({status: 'ERR', code: 500, msg: err});
-                data.update('pair', function (data) {
+                data.update(pairId, function (data) {
                     return data;
                 });
-                return res.json({status: 'OK', code: 200, msg: 'Saved data: ' + user2});
+                return res.json({status: 'OK', code: 200, msg: 'Saved data', pairId: pairId});
             });
 
 
