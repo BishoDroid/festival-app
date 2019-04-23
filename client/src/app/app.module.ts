@@ -9,7 +9,9 @@ import {PreQuestionaireComponent} from "./components/pre-questionaire/pre-questi
 import {PostQuestionaireComponent} from "./components/post-questionaire/post-questionaire.component";
 import {DashboardComponent} from "./components/dashboard/dashboard.component";
 import {DataService} from "./data.service";
-
+import { Ng5SliderModule } from 'ng5-slider';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MatButtonModule, MatCheckboxModule, MatRadioModule} from '@angular/material';
 
 @NgModule({
     declarations: [
@@ -23,7 +25,10 @@ import {DataService} from "./data.service";
         FormsModule,
         HttpClientModule,
         AppRoutingModule,
-        NgbModule
+        NgbModule,
+        Ng5SliderModule,
+        BrowserAnimationsModule,
+        MatButtonModule, MatCheckboxModule, MatRadioModule
     ],
     providers: [DataService],
     bootstrap: [AppComponent]

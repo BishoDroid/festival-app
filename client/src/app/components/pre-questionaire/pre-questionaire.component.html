@@ -1,3 +1,36 @@
-<p>
-  pre-questionaire works!
-</p>
+<title>Festival App</title>
+<h1>Festival App Pre Questionnaire</h1>
+<form class="form">
+  <div class="form-group">
+  <label for="ageRange">1) Age: </label>
+    <ng5-slider [(value)]="age" [options]="ageRange" id="ageRange"></ng5-slider>
+  </div>
+  <div class="form-group">
+    <label for="genderRadioBtn">2) Gender: </label>
+    <mat-radio-group class="gender-btn-group" aria-label="Select an option" id="genderRadioBtn">
+      <mat-radio-button class="gender-radio-button" value="male">Male</mat-radio-button>
+      <mat-radio-button class="gender-radio-button" value="female">Female</mat-radio-button>
+      <mat-radio-button class="gender-radio-button" value="other">Other</mat-radio-button>
+      <mat-radio-button class="gender-radio-button" value="not_say">Would rather not say</mat-radio-button>
+    </mat-radio-group>
+  </div>
+  <div class="form-group">
+    <label>3) Please circle sthe picture that best describes how connected to others you feel right now</label>
+  </div>
+  <div class="form-group">
+    <label>4) Using the sliding scale below, please indicate the extent to which these statements describe how you feel right now: </label>
+
+    <label for="tuningWithOthers">I feel in tune with the people around me </label>
+  <ng5-slider [(value)]="tuningWithOthers" [options]="feelingsRange" id="tuningWithOthers"></ng5-slider>
+</div>
+  <div class="form-group">
+    <label for="loneliness">I feel lonely </label>
+    <ng5-slider [(value)]="loneliness" [options]="feelingsRange" id="loneliness"></ng5-slider>
+  </div>
+
+  <div class="form-group">
+    <label for="happiness">I feel happy </label>
+    <ng5-slider [(value)]="happiness" [options]="feelingsRange" id="happiness"></ng5-slider>
+  </div>
+  <button type="submit" class="btn btn-danger btn-sm waves-effect waves-light">Submit</button>
+</form>
