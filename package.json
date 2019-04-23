@@ -49,6 +49,7 @@
     "ngx-popover": "0.0.16",
     "ngx-schema-form": "^2.3.2",
     "rxjs": "^6.0.0",
+    "s": "^0.1.1",
     "ts-helpers": "^1.1.2",
     "zone.js": "^0.8.26"
   },
