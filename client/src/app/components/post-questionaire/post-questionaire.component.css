@@ -2,13 +2,13 @@
     margin-left : 15px; margin-right : 15px;
 }
 
-.gender-btn-group {
+.btn-group {
     display: flex;
     flex-direction: column;
     margin: 15px 0;
 }
 
-.gender-radio-button {
+.radio-button {
     margin: 5px;
 }
 

@@ -9,13 +9,8 @@ import {DataService} from "../../data.service";
 })
 export class PostQuestionaireComponent implements OnInit {
 
-  age: number = 18;
-  gender: string = 'male';
-  ageRange: Options = {
-    floor: 10,
-    ceil: 70
-  };
-
+  singingPartnerFamiliarity: string = 'yes';
+  symbiosisRoomFamiliarity: string = 'one';
   tuningWithPeopleScale: number = 4;
   lonelinessScale: number =4;
   happinessScale: number =4 ;
@@ -26,8 +21,8 @@ export class PostQuestionaireComponent implements OnInit {
   };
 
   data: {
-    age: Number,
-    gender: string,
+    singingPartnerFamiliarity: string,
+    symbiosisRoomFamiliarity: string,
     // connectionWithOthersScale: Number,
     tuningWithPeopleScale: Number,
     happinessScale: Number,
@@ -41,18 +36,14 @@ export class PostQuestionaireComponent implements OnInit {
   sendData() {
 
     this.data =  {
-      "age" : this.age,
-      "gender" : this.gender,
+      "singingPartnerFamiliarity" : this.singingPartnerFamiliarity,
+      "symbiosisRoomFamiliarity" : this.symbiosisRoomFamiliarity,
       "tuningWithPeopleScale" : this.tuningWithPeopleScale,
       "lonelinessScale" : this.lonelinessScale ,
       "happinessScale" : this.happinessScale
     };
-
     console.log(this.data);
-
-
-    console.log(this.tuningWithPeopleScale);
-    this.dataSvc.sendPreQuestionnair(this.data).subscribe(res => {
+    this.dataSvc.sendPostQuestionnair(this.data).subscribe(res => {
       console.log(res);
     }, error => {
       console.log(error);
