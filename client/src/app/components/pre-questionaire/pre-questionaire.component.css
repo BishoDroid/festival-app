@@ -11,4 +11,20 @@ margin-left : 15px; margin-right : 15px;
 .radio-button {
     margin: 5px;
 }
+.question-image {
+    border: 1px solid blueviolet;
+    padding: 15px;
+    margin : 1px;
+    height: 100px ;
+
+
+}
+
+.pinky {
+    color : #FF4081;
+}
+
+.blue {
+    color: #0DB9F0;
+}
 
