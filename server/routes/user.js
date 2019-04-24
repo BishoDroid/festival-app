@@ -1,12 +1,17 @@
 /**
  * Created by bisho on 29/01/2017.
  */
-var httpContext = require('request-context');
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
+
+const uuidv4 = require('uuid/v4');
+// in memory db for storing pairs temporarily
+const dirty = require('dirty');
+var data = dirty('pair');
 
 require('../db/festival-app-db');
 var PreQuestionnaire = require('../models/PreQuestionnaire');
+var SensorData = require('../models/SensorData');
 var PostQuestionnaire = require('../models/PostQuestionnaire');
 var ExperimentPair = require('../models/ExperimentPair');
 var User = require('../models/User');
@@ -17,42 +22,56 @@ router.route('/user/pre-quest')
  * @method POST
  * Stores a pre-questionnaire for the given user
  */
-    .post(function (req, res, next) {
+    .post(function (req, res) {
+
         var body = req.body;
         var preQuestSchema = convertPreQuestionnaireBodyToSchema(body);
+
         var clientId = req.header('client-id');
-        var pair = null;
+        var pairId = req.header('pairId');
+        // data.rm(pairId);
+
+        var originPair = new ExperimentPair();
+        var pair = data.get(pairId);
         var user1 = null;
         var user2 = null;
 
-        console.log(body);
-        console.log(pair = httpContext.get('pair'));
         //check if the context has pair
-        if (typeof httpContext.get('pair') === 'undefined') {
-            pair = new ExperimentPair();
-            user1 = new User();
-            user1.preQuest = preQuestSchema;
-            pair.user1 = user1;
+        if (!pair) {
+            console.log("FIRST");
+            originPair.user1.preQuest = preQuestSchema;
+            pair = originPair;
+            pairId = uuidv4();
             pair.save(function (err) {
                 if (err) return res.json({status: 'ERR', code: 500, msg: err});
-                // httpContext.set('request:pair', pair);
-                return res.json({status: 'OK', code: 200, msg: 'Saved data successfully'});
+                data.set(pairId, pair);
+                return res.json({status: 'OK', code: 200, msg: 'Saved data', pairId: pairId});
             });
-        } else {
-            pair = httpContex.get('pair');
-            if (pair.user2 === null) {
-                user2 = new User();
-                user2.preQuest = preQuestSchema;
-                pair.user2 = user2;
-                ExperimentPair.findOneAndUpdate({'_id': pair._id}, pair, {upsert: true}, function (err, doc) {
-                    if (err) return res.json({status: 'ERR', code: 500, msg: err});
-                    // httpContext.set('request:pair', null);
-                    return res.json({status: 'OK', code: 200, msg: 'Saved data successfully'});
+
+        } else if (pair.user1 && !pair.user2) {
+            console.log("SECOND");
+
+            console.log("Inside");
+            user2 = originPair.user2;
+            user2.preQuest = preQuestSchema;
+            pair.user2 = user2;
+
+            console.log(pair.user2);
+
+            ExperimentPair.findOneAndUpdate({'_id': pair._id}, {$set: {user2: pair.user2}}, function (err, doc) {
+                console.log("Updating...")
+                if (err) return res.json({status: 'ERR', code: 500, msg: err});
+                data.update(pairId, function (data) {
+                    return data;
                 });
-            }
+                return res.json({status: 'OK', code: 200, msg: 'Saved data', pairId: pairId});
+            });
+
+
+        } else {
+            console.log("Skipped");
+            return res.json({msg: "Skipped"})
         }
-        //create a pair with user one if empty
-        //add user 2 data if pair exists
     });
 
 router.route('/user/post-quest')

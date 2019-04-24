@@ -10,49 +10,33 @@ import {MatRadioModule} from '@angular/material/radio';
 export class PreQuestionaireComponent implements OnInit {
 
     age: number = 18;
-    gender: String = "male";
     ageRange: Options = {
         floor: 10,
         ceil: 70
     };
 
-    tuningWithPeopleScale: number = 4;
-    lonelinessScale: number =4;
-    happinessScale: number =4 ;
+    tuningWithOthers: number = 4;
+    loneliness: number =4;
+    happiness: number =4 ;
 
     feelingsRange: Options = {
         floor: 1,
         ceil: 7
     };
 
-    data: {  age: Number,
-        gender: String,
-        // connectionWithOthersScale: Number,
-        tuningWithPeopleScale: Number,
-        happinessScale: Number,
-        lonelinessScale: Number } ;
 
-
+    data: any;
     constructor(private dataSvc: DataService) {
     }
 
     ngOnInit() {
     }
 
-    sendData() {
+    getData() {
+        this.dataSvc.sendPostQuestionnair(this.data).subscribe(res => {
 
-       this.data = {
-            "age" : this.age,
-            "gender" : this.gender,
-            "tuningWithPeopleScale" : this.tuningWithPeopleScale,
-            "lonelinessScale" : this.lonelinessScale ,
-            "happinessScale" : this.happinessScale
-        };
-        console.log(this.data);
-        this.dataSvc.sendPreQuestionnair(this.data).subscribe(res => {
-            console.log(res);
         }, error => {
-            console.log(error);
+
         });
     }
 }
