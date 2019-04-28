@@ -62,8 +62,7 @@ router.route('/user/post-quest')
             console.log('Updating post questionnaire for user1');
             processNewPostQuestPair(pair, clientId, postQuestSchema, res);
         } else if (clientId === 'tablet-4') {
-            console.log('Updating post questionnaire for user1');
-            pair.user2.postQuest = postQuestSchema;
+            console.log('Updating post questionnaire for user2');
             processNewPostQuestPair(pair, clientId, postQuestSchema, res);
         } else {
             console.log('Wrong tablet....Skipping');
@@ -119,12 +118,12 @@ var updateExistingPreQuestPair = function (pair, clientId, preQuestSchema, res) 
 };
 
 var processNewPostQuestPair = function (pair, clientId, postQuestSchema, res) {
-    if (clientId === 'tablet-3' && !pair.user1.postQuest) {
+    if (clientId === 'tablet-3') {
         console.log(clientId);
         if(pair.user2.postQuest) pair.postCompleted = 1;
         pair.user1.postQuest = postQuestSchema;
         updatePair(pair, res, 'asc');
-    } else if (clientId === 'tablet-4' && !pair.user1.postQuest) {
+    } else if (clientId === 'tablet-4') {
         console.log(clientId);
         if(pair.user1.postQuest) pair.postCompleted = 1;
         pair.user2.postQuest = postQuestSchema;
@@ -137,17 +136,13 @@ var processNewPostQuestPair = function (pair, clientId, postQuestSchema, res) {
 };
 
 var getLatestPair = function (sorting) {
-    var pairs = null;
-    if (sorting === 'desc')
-        pairs = data.get('activePairs');
-    else if (sorting === 'asc')
-        pairs = data.get('activePairs').reverse();
-
+    var pairs = data.get('activePairs');
     if (!pairs) return null;
     _.sortBy(pairs, function (pair) {
         return pair.timestamp
     });
-    console.log(pairs[0])
+    if(pairs && sorting === 'desc') pairs.reverse();
+    console.log(pairs);
     return pairs[0];
 };
 
@@ -155,10 +150,11 @@ var updatePair = function (myPair, res, order) {
     if(myPair.preCompleted === 1 && myPair.postCompleted === 1){
         myPair.active = 0;
     }
-    ExperimentPair.findOneAndUpdate({'_id': myPair._id}, myPair, {new: true}, function (err, doc) {
+    ExperimentPair.findOneAndUpdate({'_id': getLatestPair('desc')._id}, myPair, {new: true}, function (err, doc) {
         if (err) return res.json({status: 'ERR', code: 500, msg: err});
         updateLatestPair(myPair, order);
         console.log('1');
+        if(myPair.active === 0) removeInactivePair();
         return res.json({status: 'OK', code: 200, msg: 'Saved data'});
     });
 };
@@ -173,8 +169,16 @@ var updateLatestPair = function (pair, order) {
     });
 };
 
-var removeEarliestPair = function (pair, order, res) {
+var removeInactivePair = function (order) {
+    var pairs = order === 'desc' ? data.get('activePairs').reverse() : data.get('activePairs');
+    console.log('BEFORE: '+ pairs);
 
+    var filtered = pairs.filter(p => 1 === p.active);
+    console.log('AFTER: '+ filtered);
+    data.rm('activePairs');
+    data.set('activePairs', filtered, function () {
+        console.log('Removed and saved');
+    });
 };
 
 /**
