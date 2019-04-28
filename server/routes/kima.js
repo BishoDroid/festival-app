@@ -18,7 +18,7 @@ require('../db/festival-app-db');
 var ExperimentPair = require('../models/ExperimentPair');
 var SensorData = require('../models/SensorData');
 var udpPort = new osc.UDPPort({
-    localAddress: "127.0.0.1",
+    localAddress: "192.168.1.103",
     localPort: 5000
 });
 
@@ -86,35 +86,43 @@ udpPort.on("message", function (oscMessage) {
     var data = new SensorData();
     switch (oscMessage.address) {
         case 'frequency1':
+        case 'amplitude1':
             data.readingType = oscMessage.address;
             data.value = oscMessage.args[0];
             data.timestamp = new Date();
-            if(!pair.data || pair.data.length === 0){
-                pair.data = [];
+            if (!pair.user1.data || pair.user1.data.length === 0) {
+                pair.user1.data = [];
             }
-            pair.data.push(data);
+            pair.user1.data.push(data);
             updatePair(pair);
             break;
 
         case 'frequency2':
-            break;
-
-        case 'amplitude1':
-            break;
-
         case 'amplitude2':
+            data.readingType = oscMessage.address;
+            data.value = oscMessage.args[0];
+            data.timestamp = new Date();
+            if (!pair.user2.data || pair.user2.data.length === 0) {
+                pair.user2.data = [];
+            }
+            pair.user2.data.push(data);
+            updatePair(pair);
             break;
 
         case 'third':
-            break;
-
         case 'octave':
-            break;
-
         case 'fifth':
+            data.readingType = oscMessage.address;
+            data.value = oscMessage.args[0];
+            data.timestamp = new Date();
+            if (!pair.harmonyData || pair.harmonyData.length === 0) {
+                pair.harmonyData = [];
+            }
+            pair.harmonyData.push(data);
+            updatePair(pair);
             break;
         default:
-
+            console.log('Unknown data type...ignoring');
     }
 
 });

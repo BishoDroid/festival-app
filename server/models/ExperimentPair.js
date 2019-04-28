@@ -32,11 +32,11 @@ var user = {
 
 module.exports = mongoose.model('ExperimentPair', {
     user1: user,
-    harmonyData: {
+    harmonyData: [{
         readingType: String,
         value: Number,
         timestamp: Date
-    },
+    }],
     user2: user,
     timestamp: Date
 });
