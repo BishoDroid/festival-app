@@ -37,5 +37,6 @@ module.exports = mongoose.model('ExperimentPair', {
         value: Number,
         timestamp: Date
     },
-    user2: user
+    user2: user,
+    timestamp: Date
 });

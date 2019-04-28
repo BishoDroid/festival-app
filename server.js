@@ -9,6 +9,7 @@ const cors = require('cors');
 //These routes will handle requests coming to them
 const index = require('./server/routes/index');
 const user = require('./server/routes/user');
+const pair = require('./server/routes/pair');
 const osc = require('osc');
 //const flock = require("flocking");
 
@@ -31,10 +32,11 @@ app.use(bodyParser());
 // api end points
 app.use('/',index);
 app.use('/api',user);
+app.use('/api',pair);
 
 
 var getIPAddresses = function () {
-  var os = require("os"),
+  var os = require('os'),
       interfaces = os.networkInterfaces(),
       ipAddresses = [];
 

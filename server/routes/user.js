@@ -1,10 +1,9 @@
 /**
- * Created by bisho on 29/01/2017.
+ * Created by bisho.
  */
 const express = require('express');
 const router = express.Router();
 
-const uuidv4 = require('uuid/v4');
 // in memory db for storing pairs temporarily
 const dirty = require('dirty');
 var data = dirty('pair');
@@ -28,54 +27,45 @@ router.route('/user/pre-quest')
         var preQuestSchema = convertPreQuestionnaireBodyToSchema(body);
 
         var clientId = req.header('client-id');
-        var pairId = 'pair';
-        // data.rm(pairId);
-
-        var originPair = new ExperimentPair();
+        var pairId = req.header('pair-id');
         var pair = data.get(pairId);
 
         //check if the context has pair
         if (!pair) {
-            console.log("FIRST");
-            pair = originPair;
+            console.log("No pair exist, creating new one");
+            pair = new ExperimentPair();
             if (clientId === 'tablet-1') {
-                originPair.user1.preQuest = preQuestSchema;
-                pair.user1 = originPair.user1;
+                pair.user1.preQuest = preQuestSchema;
             } else if (clientId === 'tablet-2') {
-                originPair.user2.preQuest = preQuestSchema;
-                pair.user2 = originPair.user2;
+                pair.user2.preQuest = preQuestSchema
+            }
+            else {
+                console.log('Not creating pre-questionnaire, new pair but tablet is neither 1 nor 2, skipping...')
             }
 
-            // pairId = uuidv4();
+            pairId = pair._id;
+            pair.timestamp = new Date();
             pair.save(function (err) {
                 if (err) return res.json({status: 'ERR', code: 500, msg: err});
                 data.set(pairId, pair);
+                console.log('Successfully created new pair with id: ' + pairId);
                 return res.json({status: 'OK', code: 200, msg: 'Saved data', pairId: pairId});
             });
-
         }
         else {
-            if (clientId === 'tablet-1' && !pair.user1) {
-                originPair.user1.preQuest = preQuestSchema;
-                pair.user1 = originPair.user1;
-            } else if (clientId === 'tablet-2' && !pair.user2) {
-                originPair.user2.preQuest = preQuestSchema;
-                pair.user2 = originPair.user2;
+            console.log('Found an existing pair. only one user updated, updating the second....')
+            if (clientId === 'tablet-1') {
+                console.log('Updating pre questionnaire for user1 in pair with ID: ' + pair._id);
+                pair.user1.preQuest = preQuestSchema;
+                updatePair(pair, res);
+            } else if (clientId === 'tablet-2') {
+                console.log('Updating pre questionnaire for user1 in pair with ID: ' + pair._id);
+                pair.user2.preQuest = preQuestSchema;
+                updatePair(pair, res);
+
             } else {
-                console.log("Skipped");
-                return res.json({msg: "Skipped"})
+                return res.json({status: 'OK', code: 200, msg: 'Pair already exists and both users have filled their pre-questionnaire'})
             }
-
-            ExperimentPair.findOneAndUpdate({'_id': pair._id}, pair, function (err, doc) {
-                console.log("Updating...");
-                if (err) return res.json({status: 'ERR', code: 500, msg: err});
-                data.update(pairId, function (data) {
-                    return data;
-                });
-                return res.json({status: 'OK', code: 200, msg: 'Saved data', pairId: pairId});
-            });
-
-
         }
     });
 
@@ -88,36 +78,48 @@ router.route('/user/post-quest')
     .post(function (req, res) {
         var body = req.body;
         var postQuestSchema = convertPostQuestionnaireBodyToSchema(body);
-        var originPair = new ExperimentPair();
 
         var clientId = req.header('client-id');
-        var pairId = 'pair';
+        var pairId = req.header('pair-id');
         var pair = data.get(pairId);
-        // data.rm(pairId);
 
-        if (clientId === 'tablet-3' && pair.user1) {
-            originPair.user1.postQuest = postQuestSchema;
-            pair.user1.postQuest = originPair.user1.postQuest = postQuestSchema;
-        } else if (clientId === 'tablet-4' && pair.user2) {
-            originPair.user2.postQuest = postQuestSchema;
-            pair.user2.postQuest = originPair.user2.postQuest = postQuestSchema;
+        if (clientId === 'tablet-3') {
+            console.log('Updating post questionnaire for user1 in pair with ID: ' + pair._id);
+            pair.user1.postQuest = postQuestSchema;
+            updatePair(pair, res);
+        } else if (clientId === 'tablet-4') {
+            console.log('Updating post questionnaire for user1 in pair with ID: ' + pair._id);
+            pair.user2.postQuest = postQuestSchema;
+            updatePair(pair, res);
         } else {
-            console.log("Skipped");
-            return res.json({msg: "Skipped"})
+            console.log('Wrong tablet....Skipping');
+            return res.json({code: 200, msg: 'Tablet requested ' + clientId + '. tablets expected [tablet-3, tablet-4'})
         }
 
-        ExperimentPair.findOneAndUpdate({'_id': pair._id}, pair, function (err, doc) {
-            console.log("Updating Post...");
-            if (err) return res.json({status: 'ERR', code: 500, msg: err});
-            return res.json({status: 'OK', code: 200, msg: 'Saved data', pairId: pairId});
-        });
-
-        if((pair.user1.preQuest && pair.user1.postQuest) && (pair.user2.preQuest && pair.user2.postQuest )){
-            //remove the pair from in memory db
-            data.rm(pairId);
-        }
     });
 
+
+/**
+ * Updates the pair with the given pair._id
+ * @param pair - the pair to update
+ * @param res - the  response object
+ */
+var updatePair = function (pair, res) {
+    ExperimentPair.findOneAndUpdate({'_id': pair._id}, pair, {new: true}, function (err, doc) {
+        if (err) return res.json({status: 'ERR', code: 500, msg: err});
+        data.update(pair._id, function (data) {
+            return data;
+        });
+
+        return res.json({status: 'OK', code: 200, msg: 'Saved data', pairId: pair._id});
+    });
+};
+
+/**
+ * Converts  the request body into PreQuestionnaire
+ * @param preQuest -  request body
+ * @returns {*}
+ */
 var convertPreQuestionnaireBodyToSchema = function (preQuest) {
     var schema = new PreQuestionnaire();
     schema.age = preQuest.age;
@@ -129,6 +131,11 @@ var convertPreQuestionnaireBodyToSchema = function (preQuest) {
     return schema;
 };
 
+/**
+ * Converts  the request body into PostQuestionnaire
+ * @param postQuest
+ * @returns {*}
+ */
 var convertPostQuestionnaireBodyToSchema = function (postQuest) {
     var schema = new PostQuestionnaire();
     schema.singingPartnerFamiliarity = postQuest.singingPartnerFamiliarity;
