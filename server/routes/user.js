@@ -120,12 +120,21 @@ var updateExistingPreQuestPair = function (pair, clientId, preQuestSchema, res) 
 var processNewPostQuestPair = function (pair, clientId, postQuestSchema, res) {
     if (clientId === 'tablet-3') {
         console.log(clientId);
-        if(pair.user2.postQuest) pair.postCompleted = 1;
+        console.log("WHY THE FUCKKKK") ;
+        console.log(pair.user2.postQuest) ;
+        if(typeof pair.user2.postQuest !== 'undefined') {
+            console.log("Iam being set because am tablet 3 and tablet 4 already submitted");
+            pair.postCompleted = 1;
+        }
         pair.user1.postQuest = postQuestSchema;
         updatePair(pair, res, 'asc');
     } else if (clientId === 'tablet-4') {
+
         console.log(clientId);
-        if(pair.user1.postQuest) pair.postCompleted = 1;
+        if(typeof pair.user1.postQuest !== 'undefined'){
+            console.log("Iam being set because am tablet 4 and tablet 3 already submitted");
+            pair.postCompleted = 1;
+        }
         pair.user2.postQuest = postQuestSchema;
         updatePair(pair, res, 'asc');
     }
@@ -137,12 +146,14 @@ var processNewPostQuestPair = function (pair, clientId, postQuestSchema, res) {
 
 var getLatestPair = function (sorting) {
     var pairs = data.get('activePairs');
+    console.log('START==================================================');
+    console.log(pairs);
+    console.log('END==================================================');
     if (!pairs) return null;
     _.sortBy(pairs, function (pair) {
         return pair.timestamp
     });
-    if(pairs && sorting === 'desc') pairs.reverse();
-    console.log(pairs);
+    if(sorting === 'desc') pairs = pairs.reverse();
     return pairs[0];
 };
 
