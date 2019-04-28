@@ -12,13 +12,15 @@ import {DataService} from "./data.service";
 import { Ng5SliderModule } from 'ng5-slider';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatButtonModule, MatCheckboxModule, MatRadioModule} from '@angular/material';
+import { AdminComponent } from './components/admin/admin.component';
 
 @NgModule({
     declarations: [
         AppComponent,
         PreQuestionaireComponent,
         PostQuestionaireComponent,
-        DashboardComponent
+        DashboardComponent,
+        AdminComponent
     ],
     imports: [
         BrowserModule,

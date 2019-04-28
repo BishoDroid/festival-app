@@ -3,7 +3,7 @@ import {RouterModule, Routes} from "@angular/router";
 import {PreQuestionaireComponent} from "./components/pre-questionaire/pre-questionaire.component";
 import {PostQuestionaireComponent} from "./components/post-questionaire/post-questionaire.component";
 import {DashboardComponent} from "./components/dashboard/dashboard.component";
-
+import {AdminComponent} from "./components/admin/admin.component";
 /**
  * Created by bisho on 14/04/2019.
  */
@@ -11,6 +11,7 @@ import {DashboardComponent} from "./components/dashboard/dashboard.component";
 const appRouting: Routes = [
     {path: 'pre-quest', component: PreQuestionaireComponent},
     {path: 'post-quest', component: PostQuestionaireComponent},
+    {path: 'admin', component: AdminComponent},
     {path: 'dashboard', component: DashboardComponent},
     {path: '', redirectTo: 'pre-quest', pathMatch: 'full'}
 ];
