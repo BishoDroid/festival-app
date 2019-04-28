@@ -14,11 +14,15 @@ export class DataService {
 
     }
 
-    sendPreQuestionnair(data: any): Observable<any> {
-        return this.http.post('http://localhost:3001/api/user/pre-quest', data, {headers: {"client-id" : "client-1"}});
+    sendPreQuestionnair(data: any, header: any): Observable<any> {
+        return this.http.post('http://localhost:3001/api/user/pre-quest', data, {headers: header});
     }
 
-    sendPostQuestionnair(data: any): Observable<any> {
-        return this.http.post('http://localhost:3001/api/user/post-quest', data, {headers: {"client-id" : "client-1"}});
+    sendPostQuestionnair(data: any, header: any): Observable<any> {
+        return this.http.post('http://localhost:3001/api/user/post-quest', data, {headers: header});
+    }
+
+    getActivePairs(): Observable<any> {
+        return this.http.get('http://localhost:3001/api/pairs/all');
     }
 }

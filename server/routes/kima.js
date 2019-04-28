@@ -11,7 +11,8 @@ const osc = require('osc');
 // in memory db for storing pairs temporarily
 const dirty = require('dirty');
 var data = dirty('pair');
-
+var config = dirty('config') ;
+config.set('canRecord',false) ;
 var pairId = null;
 
 require('../db/festival-app-db');
@@ -30,8 +31,11 @@ router.route('/kima/:command')
 
         switch (command) {
             case 'start':
-                console.log(pair)
-                udpPort.open();
+                config.update('canRecord',function () {
+                    return true;
+                });
+
+                //console.log(pair)
                 console.log("opening");
                 return res.json({
                     code: 200,
@@ -41,8 +45,10 @@ router.route('/kima/:command')
 
                 break;
             case 'stop':
-                udpPort.close();
-                console.log(pair)
+                config.update('canRecord',function () {
+                    return false;
+                });
+                //console.log(pair)
                 return res.json({
                     code: 200,
                     status: 'OK',
@@ -71,7 +77,7 @@ var getIPAddresses = function () {
 
     return ipAddresses;
 };
-
+udpPort.open();
 udpPort.on("ready", function () {
     var ipAddresses = getIPAddresses();
 
@@ -82,11 +88,17 @@ udpPort.on("ready", function () {
 });
 
 udpPort.on("message", function (oscMessage) {
+
     console.log('Received new message');
+    let canRecord = config.get('canRecord');
+    console.log(canRecord);
+    if (!canRecord) {
+        return ;
+    }
     var data = new SensorData();
     switch (oscMessage.address) {
-        case 'frequency1':
-        case 'amplitude1':
+        case '/frequency1':
+        case '/amplitude1':
             data.readingType = oscMessage.address;
             data.value = oscMessage.args[0];
             data.timestamp = new Date();
@@ -97,8 +109,8 @@ udpPort.on("message", function (oscMessage) {
             updatePair(pair);
             break;
 
-        case 'frequency2':
-        case 'amplitude2':
+        case '/frequency2':
+        case '/amplitude2':
             data.readingType = oscMessage.address;
             data.value = oscMessage.args[0];
             data.timestamp = new Date();
@@ -109,9 +121,9 @@ udpPort.on("message", function (oscMessage) {
             updatePair(pair);
             break;
 
-        case 'third':
-        case 'octave':
-        case 'fifth':
+        case '/third':
+        case '/octave':
+        case '/fifth':
             data.readingType = oscMessage.address;
             data.value = oscMessage.args[0];
             data.timestamp = new Date();

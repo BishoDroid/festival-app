@@ -27,6 +27,7 @@ export class PostQuestionaireComponent implements OnInit {
     tuningWithPeopleScale: Number,
     happinessScale: Number,
     lonelinessScale: Number } ;
+  clientId: String = "client-";
 
   constructor(private dataSvc: DataService) { }
 
