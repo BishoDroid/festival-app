@@ -72,7 +72,8 @@ udpPort.on("ready", function () {
 });
 
 udpPort.on("message", function (oscMessage) {
-    console.log(oscMessage);
+    console.log('Received new message');
+    var mic = oscMessage
 
 });
 
