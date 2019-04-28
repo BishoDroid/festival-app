@@ -18,7 +18,7 @@ require('../db/festival-app-db');
 var ExperimentPair = require('../models/ExperimentPair');
 var SensorData = require('../models/SensorData');
 var udpPort = new osc.UDPPort({
-    localAddress: "192.168.1.103",
+    localAddress: "127.0.0.1",
     localPort: 5000
 });
 

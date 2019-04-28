@@ -38,5 +38,8 @@ module.exports = mongoose.model('ExperimentPair', {
         timestamp: Date
     }],
     user2: user,
-    timestamp: Date
+    timestamp: Date,
+    active: Number,
+    preCompleted: 0,
+    postCompleted: 0
 });
