@@ -24,6 +24,7 @@ router.route('/kima/:command')
         switch (command) {
             case 'start':
                 udpPort.open();
+                console.log("opening");
                 return res.json({
                     code: 200,
                     status: 'OK',
