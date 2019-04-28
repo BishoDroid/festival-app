@@ -15,11 +15,11 @@ var user = {
         happinessScale: Number,
         lonelinessScale: Number
     },
-    data: {
+    data: [{
         readingType: String,
         value: Number,
         timestamp: Date
-    },
+    }],
     postQuest: {
         singingPartnerFamiliarity: String,
         symbiosisRoomFamiliarity: String,
