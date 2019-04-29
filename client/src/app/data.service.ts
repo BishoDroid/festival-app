@@ -1,6 +1,7 @@
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs/index";
+import {RequestOptions} from "@angular/http";
 /**
  * Created by bisho on 14/04/2019.
  */
@@ -24,5 +25,9 @@ export class DataService {
 
     getActivePairs(): Observable<any> {
         return this.http.get('http://localhost:3001/api/pairs/all');
+    }
+
+    startRecording(header: any): Observable<any> {
+        return this.http.get('http://localhost:3001/api/kima/start', {headers: header});
     }
 }

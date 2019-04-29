@@ -9,10 +9,10 @@ var ExperimentPair = require('../models/ExperimentPair');
 
 router.route('/pairs/all')
     .get(function (req, res) {
-        ExperimentPair.find({}).sort({timestamp: 'desc'}).exec(function (err, pairs) {
+        ExperimentPair.find({}).sort({timestamp: 'asc'}).exec(function (err, pairs) {
             if(pairs){
                 console.log('Found '+pairs.length + ' pairs');
-                return res.json({status: 'OK',  code: 200, pairs: pairs});
+                return res.json( pairs);
             }
         })
     });

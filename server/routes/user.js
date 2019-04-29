@@ -4,10 +4,11 @@
 const express = require('express');
 const router = express.Router();
 const _ = require('underscore');
-
+const lodash = require('lodash');
 // in memory db for storing pairs temporarily
 const dirty = require('dirty');
-var data = dirty('pair');
+var pairsFile = dirty('pairsFile');
+
 
 require('../db/festival-app-db');
 var PreQuestionnaire = require('../models/PreQuestionnaire');
@@ -27,9 +28,10 @@ router.route('/user/pre-quest')
         var body = req.body;
         var preQuestSchema = convertPreQuestionnaireBodyToSchema(body);
         var clientId = req.header('client-id');
+        console.log("CLIENT ID " + clientId);
         var pair = getLatestPair('desc');
 
-        //check if the context has pair
+        //check if the context has un complete pair
         if (!pair) {
             console.log("No pair exist, creating new one");
             pair = new ExperimentPair();
@@ -57,7 +59,8 @@ router.route('/user/post-quest')
 
         var clientId = req.header('client-id');
         var pair = getLatestPair('asc');
-
+        console.log("THE PAIR");
+        console.log(pair);
         if (clientId === 'tablet-3') {
             console.log('Updating post questionnaire for user1');
             processNewPostQuestPair(pair, clientId, postQuestSchema, res);
@@ -75,9 +78,11 @@ router.route('/user/post-quest')
 var processNewPreQuestPair = function (pair, clientId, preQuestSchema, res) {
     if (clientId === 'tablet-1') {
         console.log(clientId);
+        console.log('saving the pre questionaire data');
         pair.user1.preQuest = preQuestSchema;
     } else if (clientId === 'tablet-2') {
         console.log(clientId);
+        console.log('saving the pre questionaire data');
         pair.user2.preQuest = preQuestSchema
     }
     else {
@@ -90,21 +95,37 @@ var processNewPreQuestPair = function (pair, clientId, preQuestSchema, res) {
     pair.save(function (err) {
         console.log('saving');
         if (err) return res.json({status: 'ERR', code: 500, msg: err});
-        data.set('activePairs', [pair]);
+        let existingPairs = pairsFile.get('activePairs');
+        pairsFile.update('activePairs',function() {
+            existingPairs.push(pair);
+            return existingPairs;
+        });
+
         console.log('Successfully created new pair');
         return res.json({status: 'OK', code: 200, msg: 'Saved data'});
     });
 };
 
+var isEmpty = function (obj) {
+    return Object.keys(obj).length === 0 && obj.constructor === Object;
+}
+
+
 var updateExistingPreQuestPair = function (pair, clientId, preQuestSchema, res) {
     if (clientId === 'tablet-1') {
         console.log('Updating pre questionnaire for user1 in pair with ID: ' + pair._id);
-        if(pair.user2.preQuest) pair.preCompleted = 1;
+        if(!isEmpty(pair.user2.preQuest)){
+            pair.preCompleted = 1;
+            console.log("set completed");
+        }
         pair.user1.preQuest = preQuestSchema;
         updatePair(pair, res, 'desc');
     } else if (clientId === 'tablet-2') {
         console.log('Updating pre questionnaire for user1 in pair with ID: ' + pair._id);
-        if(pair.user1.preQuest) pair.preCompleted = 1;
+        if(!isEmpty(pair.user1.preQuest)) {
+            pair.preCompleted = 1;
+            console.log("set completed");
+        }
         pair.user2.preQuest = preQuestSchema;
         updatePair(pair, res, 'desc');
 
@@ -117,12 +138,12 @@ var updateExistingPreQuestPair = function (pair, clientId, preQuestSchema, res) 
     }
 };
 
+
 var processNewPostQuestPair = function (pair, clientId, postQuestSchema, res) {
+
     if (clientId === 'tablet-3') {
-        console.log(clientId);
-        console.log("WHY THE FUCKKKK") ;
-        console.log(pair.user2.postQuest) ;
-        if(typeof pair.user2.postQuest !== 'undefined') {
+
+        if(pair.user2.postQuest.happinessScale !== undefined) {
             console.log("Iam being set because am tablet 3 and tablet 4 already submitted");
             pair.postCompleted = 1;
         }
@@ -130,8 +151,7 @@ var processNewPostQuestPair = function (pair, clientId, postQuestSchema, res) {
         updatePair(pair, res, 'asc');
     } else if (clientId === 'tablet-4') {
 
-        console.log(clientId);
-        if(typeof pair.user1.postQuest !== 'undefined'){
+        if(!pair.user1.postQuest.happinessScale !== undefined){
             console.log("Iam being set because am tablet 4 and tablet 3 already submitted");
             pair.postCompleted = 1;
         }
@@ -145,50 +165,50 @@ var processNewPostQuestPair = function (pair, clientId, postQuestSchema, res) {
 };
 
 var getLatestPair = function (sorting) {
-    var pairs = data.get('activePairs');
-    console.log('START==================================================');
-    console.log(pairs);
-    console.log('END==================================================');
-    if (!pairs) return null;
-    _.sortBy(pairs, function (pair) {
+    let activePairs = pairsFile.get('activePairs');
+
+    if (!activePairs) return null;
+    _.sortBy(activePairs, function (pair) {
         return pair.timestamp
     });
-    if(sorting === 'desc') pairs = pairs.reverse();
-    return pairs[0];
+    if(sorting === 'desc')  {
+        activePairs.reverse();
+    }
+
+    console.log("the latest pair BEING RETURNED");
+    return activePairs[0];
 };
 
 var updatePair = function (myPair, res, order) {
     if(myPair.preCompleted === 1 && myPair.postCompleted === 1){
         myPair.active = 0;
     }
-    ExperimentPair.findOneAndUpdate({'_id': getLatestPair('desc')._id}, myPair, {new: true}, function (err, doc) {
+
+    ExperimentPair.findOneAndUpdate({'_id': myPair._id}, myPair, {new: true}, function (err, doc) {
         if (err) return res.json({status: 'ERR', code: 500, msg: err});
         updateLatestPair(myPair, order);
-        console.log('1');
-        if(myPair.active === 0) removeInactivePair();
+
+        if(myPair.active === 0) removeInactivePair(myPair);
         return res.json({status: 'OK', code: 200, msg: 'Saved data'});
     });
 };
 
 var updateLatestPair = function (pair, order) {
-    var latest = getLatestPair(order);
-    var index = data.get('activePairs').findIndex(pair => pair._id === latest._id);
-    latest = pair;
-    data.get('activePairs')[index] = latest;
-    data.update('activePairs', function (data) {
-        return data;
+
+    let activePairs = pairsFile.get('activePairs');
+
+    pairsFile.update('activePairs', function () {
+      return  activePairs;
     });
 };
 
-var removeInactivePair = function (order) {
-    var pairs = order === 'desc' ? data.get('activePairs').reverse() : data.get('activePairs');
-    console.log('BEFORE: '+ pairs);
+var removeInactivePair = function (myPair) {
+    let activePairs = pairsFile.get('activePairs');
+    activePairs = activePairs.filter(item => item !== myPair);
 
-    var filtered = pairs.filter(p => 1 === p.active);
-    console.log('AFTER: '+ filtered);
-    data.rm('activePairs');
-    data.set('activePairs', filtered, function () {
-        console.log('Removed and saved');
+
+    pairsFile.update('activePairs', function () {
+        return activePairs;
     });
 };
 

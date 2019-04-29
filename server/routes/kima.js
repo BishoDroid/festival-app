@@ -10,11 +10,11 @@ const router = express.Router();
 const osc = require('osc');
 // in memory db for storing pairs temporarily
 const dirty = require('dirty');
-var data = dirty('pair');
+var pairsFile = dirty('pairsFile');
 var config = dirty('config') ;
 config.set('canRecord',false) ;
 var pairId = null;
-
+var pair = undefined;
 require('../db/festival-app-db');
 var ExperimentPair = require('../models/ExperimentPair');
 var SensorData = require('../models/SensorData');
@@ -26,7 +26,19 @@ var udpPort = new osc.UDPPort({
 router.route('/kima/:command')
     .get(function (req, res) {
         pairId = req.header('pair-id');
-        var pair = data.get(pairId)
+        console.log ("PAIR ID ======================");
+        console.log (pairId);
+
+
+        console.log ("PAIR TO RECORD ======================");
+
+        let activePairs = pairsFile.get('activePairs');
+        console.log("PAIRS")
+        console.log(activePairs);
+        let filtered =  activePairs.filter( pairToCheck =>  pairToCheck._id === pairId );
+         pair = filtered[0];
+        console.log("FILTERED ")
+        console.log (filtered);
         var command = req.params.command;
 
         switch (command) {
@@ -146,9 +158,9 @@ udpPort.on("error", function (err) {
 var updatePair = function (pair) {
     ExperimentPair.findOneAndUpdate({'_id': pair._id}, pair, {new: true}, function (err, doc) {
         if (err) return res.json({status: 'ERR', code: 500, msg: err});
-        data.update(pair._id, function (data) {
+ /*       data.update(pair._id, function (data) {
             return data;
-        });
+        });*/
         console.log('Saved record');
     });
 };

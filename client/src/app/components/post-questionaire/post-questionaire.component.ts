@@ -27,7 +27,8 @@ export class PostQuestionaireComponent implements OnInit {
     tuningWithPeopleScale: Number,
     happinessScale: Number,
     lonelinessScale: Number } ;
-  clientId: String = "client-";
+  clientId: String = "tablet-";
+  private header: { "client-id": String };
 
   constructor(private dataSvc: DataService) { }
 
@@ -44,7 +45,9 @@ export class PostQuestionaireComponent implements OnInit {
       "happinessScale" : this.happinessScale
     };
     console.log(this.data);
-    this.dataSvc.sendPostQuestionnair(this.data).subscribe(res => {
+    console.log(this.clientId);
+    this.header = {"client-id" : this.clientId};
+    this.dataSvc.sendPostQuestionnair(this.data, this.header).subscribe(res => {
       console.log(res);
     }, error => {
       console.log(error);
