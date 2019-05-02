@@ -5,19 +5,25 @@
  * Created by bisho on 28/04/2019.
  */
 const express = require('express');
-const mongoose = require('mongoose');
+
 const router = express.Router();
 const osc = require('osc');
 // in memory db for storing pairs temporarily
-const dirty = require('dirty');
-var pairsFile = dirty('pairsFile');
-var config = dirty('config') ;
-config.set('canRecord',false) ;
+
+
+const lokiSingleton = require('../db/festival-app-db-in-loki');
+
+var db = lokiSingleton.getInstance();
+
+var pairs = db.getCollection('pairs');
+var conf = db.getCollection('config');
+
 var pairId = null;
 var pair = undefined;
 require('../db/festival-app-db');
 var ExperimentPair = require('../models/ExperimentPair');
 var SensorData = require('../models/SensorData');
+
 var udpPort = new osc.UDPPort({
     localAddress: "127.0.0.1",
     localPort: 5000
@@ -26,29 +32,22 @@ var udpPort = new osc.UDPPort({
 router.route('/kima/:command')
     .get(function (req, res) {
         pairId = req.header('pair-id');
-        console.log ("PAIR ID ======================");
-        console.log (pairId);
 
+        let canRecord = conf.findOne({type : 'canRecord'});
+        let currentMicPair = conf.findOne({type : 'currentMicPair'});
 
-        console.log ("PAIR TO RECORD ======================");
+        pair =  pairs.findOne({ 'sessionId' : pairId });
 
-        let activePairs = pairsFile.get('activePairs');
-        console.log("PAIRS")
-        console.log(activePairs);
-        let filtered =  activePairs.filter( pairToCheck =>  pairToCheck._id === pairId );
-         pair = filtered[0];
-        console.log("FILTERED ")
-        console.log (filtered);
-        var command = req.params.command;
+        let command = req.params.command;
 
         switch (command) {
             case 'start':
-                config.update('canRecord',function () {
-                    return true;
-                });
+                currentMicPair.value = pairId;
+                conf.update(currentMicPair);
+                canRecord.value = true;
+                conf.update(canRecord);
+                console.log("start recording for session : " + pair.sessionId);
 
-                //console.log(pair)
-                console.log("opening");
                 return res.json({
                     code: 200,
                     status: 'OK',
@@ -57,16 +56,19 @@ router.route('/kima/:command')
 
                 break;
             case 'stop':
-                config.update('canRecord',function () {
-                    return false;
-                });
-                //console.log(pair)
+                currentMicPair.value = null;
+                conf.update(currentMicPair);
+                canRecord.value = false;
+                conf.update(canRecord);
+                console.log("start recording for session : " + pair.sessionId);
+
                 return res.json({
                     code: 200,
                     status: 'OK',
                     msg: 'Successfully stopped listening to UPD events'
                 });
                 break;
+
             default:
         }
 
@@ -89,7 +91,9 @@ var getIPAddresses = function () {
 
     return ipAddresses;
 };
+
 udpPort.open();
+
 udpPort.on("ready", function () {
     var ipAddresses = getIPAddresses();
 
@@ -101,10 +105,10 @@ udpPort.on("ready", function () {
 
 udpPort.on("message", function (oscMessage) {
 
-    console.log('Received new message');
-    let canRecord = config.get('canRecord');
-    console.log(canRecord);
-    if (!canRecord) {
+    //console.log('Received new message');
+    let canRecord = conf.findOne({type : 'canRecord'});
+    //console.log(canRecord);
+    if (!canRecord.value || !pair) {
         return ;
     }
     var data = new SensorData();
@@ -158,9 +162,7 @@ udpPort.on("error", function (err) {
 var updatePair = function (pair) {
     ExperimentPair.findOneAndUpdate({'_id': pair._id}, pair, {new: true}, function (err, doc) {
         if (err) return res.json({status: 'ERR', code: 500, msg: err});
- /*       data.update(pair._id, function (data) {
-            return data;
-        });*/
+
         console.log('Saved record');
     });
 };

@@ -31,6 +31,7 @@ var user = {
 };
 
 module.exports = mongoose.model('ExperimentPair', {
+    sessionId: String,
     user1: user,
     harmonyData: [{
         readingType: String,

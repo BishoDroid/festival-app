@@ -30,4 +30,12 @@ export class DataService {
     startRecording(header: any): Observable<any> {
         return this.http.get('http://localhost:3001/api/kima/start', {headers: header});
     }
+
+    stopRecording(header: any): Observable<any> {
+        return this.http.get('http://localhost:3001/api/kima/stop', {headers: header});
+    }
+
+    removePair(header: any): Observable <any> {
+        return this.http.post('http://localhost:3001/api/user/remove', null , {headers: header});
+    }
 }

@@ -1,21 +1,37 @@
-/**
- * Created by bisho.
- */
 const express = require('express');
 const router = express.Router();
-const _ = require('underscore');
-const lodash = require('lodash');
-// in memory db for storing pairs temporarily
-const dirty = require('dirty');
-var pairsFile = dirty('pairsFile');
-
 
 require('../db/festival-app-db');
+// in memory db for storing pairs temporarily
+const lokiSingleton = require('../db/festival-app-db-in-loki');
+
+var db = lokiSingleton.getInstance();
+
+var pairs = db.getCollection('pairs');
+var config = db.getCollection('config');
+
 var PreQuestionnaire = require('../models/PreQuestionnaire');
-var SensorData = require('../models/SensorData');
 var PostQuestionnaire = require('../models/PostQuestionnaire');
 var ExperimentPair = require('../models/ExperimentPair');
-var User = require('../models/User');
+
+router.route('/user/remove') // to remove the pair by admin
+
+    .post(function (req, res) {
+        let pairId = req.header('pair-id');
+
+        let pair = pairs.findOne({sessionId: pairId});
+        pair.active = 0;
+
+        ExperimentPair.findOneAndUpdate({'_id': pair._id}, pair, {new: true}, function (err, doc) {
+            if (err) return res.json({status: 'ERR', code: 500, msg: err});
+
+            removeInactivePair(pair);
+            stopRecordingForPair(pair);
+            console.log("session: " + sessionId + " is removed");
+            return res.json({status: 'OK', code: 200, msg: 'Saved data'});
+
+        });
+    });
 
 router.route('/user/pre-quest')
 
@@ -25,16 +41,16 @@ router.route('/user/pre-quest')
  */
     .post(function (req, res) {
 
-        var body = req.body;
-        var preQuestSchema = convertPreQuestionnaireBodyToSchema(body);
-        var clientId = req.header('client-id');
-        console.log("CLIENT ID " + clientId);
-        var pair = getLatestPair('desc');
+        let body = req.body;
+        let preQuestSchema = convertPreQuestionnaireBodyToSchema(body);
+        let clientId = req.header('client-id');
+        let pair = getLatestPair('desc');
 
         //check if the context has un complete pair
-        if (!pair) {
+        if (!pair) { // very first pair
             console.log("No pair exist, creating new one");
             pair = new ExperimentPair();
+            pair.sessionId = "session-1";
             processNewPreQuestPair(pair, clientId, preQuestSchema, res);
         }
         else if (pair && pair.preCompleted === 0) {
@@ -42,7 +58,13 @@ router.route('/user/pre-quest')
             updateExistingPreQuestPair(pair, clientId, preQuestSchema, res)
         } else if (pair && pair.preCompleted === 1) {
             console.log("Pair is full, creating new one...");
-            var newPair = new ExperimentPair();
+            let newPair = new ExperimentPair();
+            let previousSession = pairs.data[pairs.count() - 1];
+            let previousSessionIdString = previousSession.sessionId;
+            let previousSessionId = Number(previousSessionIdString.split('-')[1]);
+            let newSessionIdNumber = previousSessionId + 1;
+            let newSessionId = 'session-' + newSessionIdNumber;
+            newPair.sessionId = newSessionId;
             processNewPreQuestPair(newPair, clientId, preQuestSchema, res);
         }
     });
@@ -54,13 +76,12 @@ router.route('/user/post-quest')
  * Stores a post-questionnaire for the given user
  */
     .post(function (req, res) {
-        var body = req.body;
-        var postQuestSchema = convertPostQuestionnaireBodyToSchema(body);
+        let body = req.body;
+        let postQuestSchema = convertPostQuestionnaireBodyToSchema(body);
 
-        var clientId = req.header('client-id');
-        var pair = getLatestPair('asc');
-        console.log("THE PAIR");
-        console.log(pair);
+        let clientId = req.header('client-id');
+        let pair = getLatestPair('asc');
+
         if (clientId === 'tablet-3') {
             console.log('Updating post questionnaire for user1');
             processNewPostQuestPair(pair, clientId, postQuestSchema, res);
@@ -95,12 +116,8 @@ var processNewPreQuestPair = function (pair, clientId, preQuestSchema, res) {
     pair.save(function (err) {
         console.log('saving');
         if (err) return res.json({status: 'ERR', code: 500, msg: err});
-        let existingPairs = pairsFile.get('activePairs');
-        pairsFile.update('activePairs',function() {
-            existingPairs.push(pair);
-            return existingPairs;
-        });
 
+        pairs.insert(pair);
         console.log('Successfully created new pair');
         return res.json({status: 'OK', code: 200, msg: 'Saved data'});
     });
@@ -113,21 +130,21 @@ var isEmpty = function (obj) {
 
 var updateExistingPreQuestPair = function (pair, clientId, preQuestSchema, res) {
     if (clientId === 'tablet-1') {
-        console.log('Updating pre questionnaire for user1 in pair with ID: ' + pair._id);
+        console.log('Updating pre questionnaire for user1 in pair with ID: ' + pair._id + ", prequestionaire completed");
         if(!isEmpty(pair.user2.preQuest)){
             pair.preCompleted = 1;
-            console.log("set completed");
+
         }
         pair.user1.preQuest = preQuestSchema;
-        updatePair(pair, res, 'desc');
+        updatePair(pair, res);
     } else if (clientId === 'tablet-2') {
-        console.log('Updating pre questionnaire for user1 in pair with ID: ' + pair._id);
+        console.log('Updating pre questionnaire for user1 in pair with ID: ' + pair._id + ", prequestionaire completed");
         if(!isEmpty(pair.user1.preQuest)) {
             pair.preCompleted = 1;
-            console.log("set completed");
+
         }
         pair.user2.preQuest = preQuestSchema;
-        updatePair(pair, res, 'desc');
+        updatePair(pair, res);
 
     } else {
         return res.json({
@@ -143,20 +160,22 @@ var processNewPostQuestPair = function (pair, clientId, postQuestSchema, res) {
 
     if (clientId === 'tablet-3') {
 
-        if(pair.user2.postQuest.happinessScale !== undefined) {
-            console.log("Iam being set because am tablet 3 and tablet 4 already submitted");
+        if (pair.user2.postQuest.happinessScale) {
+            console.log(pair.user2.postQuest);
+            console.log("post questionnaire completed");
             pair.postCompleted = 1;
         }
         pair.user1.postQuest = postQuestSchema;
-        updatePair(pair, res, 'asc');
+        updatePair(pair, res);
     } else if (clientId === 'tablet-4') {
 
-        if(!pair.user1.postQuest.happinessScale !== undefined){
-            console.log("Iam being set because am tablet 4 and tablet 3 already submitted");
+        if (pair.user1.postQuest.happinessScale) {
+            console.log(pair.user1.postQuest.happinessScale);
+            console.log("post questionnaire completed");
             pair.postCompleted = 1;
         }
         pair.user2.postQuest = postQuestSchema;
-        updatePair(pair, res, 'asc');
+        updatePair(pair, res);
     }
     else {
         console.log('Pairs already populated');
@@ -165,52 +184,51 @@ var processNewPostQuestPair = function (pair, clientId, postQuestSchema, res) {
 };
 
 var getLatestPair = function (sorting) {
-    let activePairs = pairsFile.get('activePairs');
+    if (!pairs.data) return null;
+    return sorting === 'asc' ? pairs.data[0] : pairs.data[pairs.count() - 1];
 
-    if (!activePairs) return null;
-    _.sortBy(activePairs, function (pair) {
-        return pair.timestamp
-    });
-    if(sorting === 'desc')  {
-        activePairs.reverse();
-    }
-
-    console.log("the latest pair BEING RETURNED");
-    return activePairs[0];
 };
 
-var updatePair = function (myPair, res, order) {
+var updatePair = function (myPair, res) {
     if(myPair.preCompleted === 1 && myPair.postCompleted === 1){
         myPair.active = 0;
     }
 
     ExperimentPair.findOneAndUpdate({'_id': myPair._id}, myPair, {new: true}, function (err, doc) {
         if (err) return res.json({status: 'ERR', code: 500, msg: err});
-        updateLatestPair(myPair, order);
+        updateLatestPair(myPair);
 
-        if(myPair.active === 0) removeInactivePair(myPair);
+        if (myPair.active === 0) {
+
+            removeInactivePair(myPair);
+            stopRecordingForPair(myPair);
+        }
         return res.json({status: 'OK', code: 200, msg: 'Saved data'});
     });
 };
 
-var updateLatestPair = function (pair, order) {
-
-    let activePairs = pairsFile.get('activePairs');
-
-    pairsFile.update('activePairs', function () {
-      return  activePairs;
-    });
+var updateLatestPair = function (pair) {
+    pairs.update(pair);
 };
 
 var removeInactivePair = function (myPair) {
-    let activePairs = pairsFile.get('activePairs');
-    activePairs = activePairs.filter(item => item !== myPair);
+    pairs.remove(myPair);
 
-
-    pairsFile.update('activePairs', function () {
-        return activePairs;
-    });
 };
+
+var stopRecordingForPair = function (pair) {
+    let canRecord = config.findOne({type: 'canRecord'});
+    let currentMicPair = config.findOne({type: 'currentMicPair'});
+
+    if (currentMicPair.value == pair.sessionId && canRecord.value == true) {
+        currentMicPair.value = null;
+        config.update(currentMicPair);
+        canRecord.value = false;
+        config.update(canRecord);
+    }
+
+};
+
 
 /**
  * Converts  the request body into PreQuestionnaire
