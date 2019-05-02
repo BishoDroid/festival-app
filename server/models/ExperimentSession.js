@@ -34,7 +34,7 @@ module.exports = mongoose.model('ExperimentSession', {
     experimentType : String,
     sessionId: String,
     users : [user],
-    harmonyData: [{
+    sessionData: [{
         readingType: String,
         value: Number,
         timestamp: Date
