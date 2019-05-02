@@ -13,6 +13,7 @@ var config = db.getCollection('config');
 var PreQuestionnaire = require('../models/PreQuestionnaire');
 var PostQuestionnaire = require('../models/PostQuestionnaire');
 var ExperimentSession = require('../models/ExperimentSession');
+var User = require('../models/User');
 
 router.route('/user/remove') // to remove the session by admin
 
@@ -54,6 +55,7 @@ router.route('/user/pre-quest')
             processNewPreQuestSession(session, clientId, preQuestSchema, res);
         }
         else if (session && session.preCompleted === 0) {
+
             console.log('Found an existing session. only one user updated, updating the second....');
             updateExistingPreQuestSession(session, clientId, preQuestSchema, res)
         } else if (session && session.preCompleted === 1) {
@@ -97,14 +99,24 @@ router.route('/user/post-quest')
 
 
 var processNewPreQuestSession = function (session, clientId, preQuestSchema, res) {
+
+    let user = new User();
+    if (!session.users || session.users.length === 0) {
+        session.users = [user , user];
+    }
+
+
+    user.preQuest = preQuestSchema ;
     if (clientId === 'tablet-entrance-1') {
         console.log(clientId);
         console.log('saving the pre questionaire data');
-        session.user1.preQuest = preQuestSchema;
+        session.users[0] = user ;
+
+
     } else if (clientId === 'tablet-entrance-2') {
         console.log(clientId);
         console.log('saving the pre questionaire data');
-        session.user2.preQuest = preQuestSchema
+        session.users[1] = user ;
     }
     else {
         console.log('Not creating pre-questionnaire, new session but tablet is neither 1 nor 2, skipping...')
@@ -129,21 +141,23 @@ var isEmpty = function (obj) {
 
 
 var updateExistingPreQuestSession = function (session, clientId, preQuestSchema, res) {
+
+    let user = new User();
+    user.preQuest = preQuestSchema;
     if (clientId === 'tablet-entrance-1') {
         console.log('Updating pre questionnaire for user1 in session with ID: ' + session._id + ", prequestionaire completed");
-        if(!isEmpty(session.user2.preQuest)){
+        if(!isEmpty(session.users[1].preQuest)){
             session.preCompleted = 1;
-
         }
-        session.user1.preQuest = preQuestSchema;
+        session.users[0] = user;
         updateSession(session, res);
     } else if (clientId === 'tablet-entrance-2') {
         console.log('Updating pre questionnaire for user1 in session with ID: ' + session._id + ", prequestionaire completed");
-        if(!isEmpty(session.user1.preQuest)) {
+        if(!isEmpty(session.users[0].preQuest)) {
             session.preCompleted = 1;
 
         }
-        session.user2.preQuest = preQuestSchema;
+        session.users[1] = user;
         updateSession(session, res);
 
     } else {
@@ -160,21 +174,21 @@ var processNewPostQuestSession = function (session, clientId, postQuestSchema, r
 
     if (clientId === 'tablet-exit-1') {
 
-        if (session.user2.postQuest.happinessScale) {
-            console.log(session.user2.postQuest);
+        if (session.users[1].postQuest.happinessScale) {
+            console.log(session.users[1].postQuest);
             console.log("post questionnaire completed");
             session.postCompleted = 1;
         }
-        session.user1.postQuest = postQuestSchema;
+        session.users[0].postQuest = postQuestSchema;
         updateSession(session, res);
     } else if (clientId === 'tablet-exit-2') {
 
-        if (session.user1.postQuest.happinessScale) {
-            console.log(session.user1.postQuest.happinessScale);
+        if (session.users[0].postQuest.happinessScale) {
+            console.log(session.users[0].postQuest.happinessScale);
             console.log("post questionnaire completed");
             session.postCompleted = 1;
         }
-        session.user2.postQuest = postQuestSchema;
+        session.users[1].postQuest = postQuestSchema;
         updateSession(session, res);
     }
     else {
@@ -190,16 +204,20 @@ var getLatestSession = function (sorting) {
 };
 
 var updateSession = function (mySession, res) {
+
     if(mySession.preCompleted === 1 && mySession.postCompleted === 1){
         mySession.active = 0;
     }
+    console.log("+++++++++++++");
+    console.log(mySession._id);
+    console.log(JSON.stringify(mySession));
+
 
     ExperimentSession.findOneAndUpdate({'_id': mySession._id}, mySession, {new: true}, function (err, doc) {
         if (err) return res.json({status: 'ERR', code: 500, msg: err});
         updateLatestSession(mySession);
 
         if (mySession.active === 0) {
-
             removeInactiveSession(mySession);
             stopRecordingForSession(mySession);
         }

@@ -35,13 +35,11 @@ module.exports = mongoose.model('ExperimentSession', {
     experimentType : String,
     sessionId: String,
     users : [user],
-    user1: user,
     harmonyData: [{
         readingType: String,
         value: Number,
         timestamp: Date
     }],
-    user2: user,
     timestamp: Date,
     active: Number,
     preCompleted: 0,

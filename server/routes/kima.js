@@ -23,7 +23,7 @@ var session = undefined;
 require('../db/festival-app-db');
 var ExperimentSession = require('../models/ExperimentSession');
 var SensorData = require('../models/SensorData');
-
+var User = require('../models/User');
 var udpPort = new osc.UDPPort({
     localAddress: "127.0.0.1",
     localPort: 5000
@@ -37,7 +37,7 @@ router.route('/kima/:command')
         let currentMicSession = conf.findOne({type : 'currentMicSession'});
 
         session =  sessions.findOne({ 'sessionId' : sessionId });
-
+        console.log(session);
         let command = req.params.command;
 
         switch (command) {
@@ -111,17 +111,18 @@ udpPort.on("message", function (oscMessage) {
     if (!canRecord.value || !session) {
         return ;
     }
-    var data = new SensorData();
+    let data = new SensorData();
+    let user = new User();
     switch (oscMessage.address) {
         case '/frequency1':
         case '/amplitude1':
             data.readingType = oscMessage.address;
             data.value = oscMessage.args[0];
             data.timestamp = new Date();
-            if (!session.user1.data || session.user1.data.length === 0) {
-                session.user1.data = [];
+            if (!session.users[0].data || session.users[0].data.length === 0) {
+                session.users[0].data = [];
             }
-            session.user1.data.push(data);
+            session.users[0].data.push(data);
             updateSession(session);
             break;
 
@@ -130,10 +131,10 @@ udpPort.on("message", function (oscMessage) {
             data.readingType = oscMessage.address;
             data.value = oscMessage.args[0];
             data.timestamp = new Date();
-            if (!session.user2.data || session.user2.data.length === 0) {
-                session.user2.data = [];
+            if (!session.users[1].data || session.users[1].data.length === 0) {
+                session.users[1].data = [];
             }
-            session.user2.data.push(data);
+            session.users[1].data.push(data);
             updateSession(session);
             break;
 
@@ -156,7 +157,7 @@ udpPort.on("message", function (oscMessage) {
 });
 
 udpPort.on("error", function (err) {
-    console.log(err);
+   // console.log(err);
 });
 
 var updateSession = function (session) {
