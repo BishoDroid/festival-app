@@ -4,10 +4,9 @@
  * and the level of harmony reached between them
  */
 
-var mongoose = require('mongoose');
-var user = {
+let mongoose = require('mongoose');
+let user = {
     participantsNumber : Number,
-    age: Number,
     preQuest: {
         age: Number,
         gender: String,

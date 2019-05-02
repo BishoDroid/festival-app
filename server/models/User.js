@@ -2,11 +2,11 @@
  * Created by bisho on 14/04/2019.
  */
 
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+let mongoose = require('mongoose');
+let Schema = mongoose.Schema;
 
-var user = new Schema({
-    userId: Number,
+let user = new Schema({
+    participantsNumber : Number,
     preQuest: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'PreQuestionnaire'

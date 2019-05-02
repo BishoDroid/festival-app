@@ -5,15 +5,15 @@ require('../db/festival-app-db');
 // in memory db for storing sessions temporarily
 const lokiSingleton = require('../db/festival-app-db-in-loki');
 
-var db = lokiSingleton.getInstance();
+let db = lokiSingleton.getInstance();
 
-var sessions = db.getCollection('sessions');
-var config = db.getCollection('config');
+let sessions = db.getCollection('sessions');
+let config = db.getCollection('config');
 
-var PreQuestionnaire = require('../models/PreQuestionnaire');
-var PostQuestionnaire = require('../models/PostQuestionnaire');
-var ExperimentSession = require('../models/ExperimentSession');
-var User = require('../models/User');
+let PreQuestionnaire = require('../models/PreQuestionnaire');
+let PostQuestionnaire = require('../models/PostQuestionnaire');
+let ExperimentSession = require('../models/ExperimentSession');
+let User = require('../models/User');
 
 router.route('/user/remove') // to remove the session by admin
 
@@ -98,13 +98,12 @@ router.route('/user/post-quest')
     });
 
 
-var processNewPreQuestSession = function (session, clientId, preQuestSchema, res) {
+let processNewPreQuestSession = function (session, clientId, preQuestSchema, res) {
 
     let user = new User();
     if (!session.users || session.users.length === 0) {
         session.users = [user , user];
     }
-
 
     user.preQuest = preQuestSchema ;
     if (clientId === 'tablet-entrance-1') {
@@ -135,12 +134,12 @@ var processNewPreQuestSession = function (session, clientId, preQuestSchema, res
     });
 };
 
-var isEmpty = function (obj) {
+let isEmpty = function (obj) {
     return Object.keys(obj).length === 0 && obj.constructor === Object;
-}
+};
 
 
-var updateExistingPreQuestSession = function (session, clientId, preQuestSchema, res) {
+let updateExistingPreQuestSession = function (session, clientId, preQuestSchema, res) {
 
     let user = new User();
     user.preQuest = preQuestSchema;
@@ -149,7 +148,7 @@ var updateExistingPreQuestSession = function (session, clientId, preQuestSchema,
         if(!isEmpty(session.users[1].preQuest)){
             session.preCompleted = 1;
         }
-        session.users[0] = user;
+        session.users[0].preQuest = preQuestSchema;
         updateSession(session, res);
     } else if (clientId === 'tablet-entrance-2') {
         console.log('Updating pre questionnaire for user1 in session with ID: ' + session._id + ", prequestionaire completed");
@@ -157,7 +156,7 @@ var updateExistingPreQuestSession = function (session, clientId, preQuestSchema,
             session.preCompleted = 1;
 
         }
-        session.users[1] = user;
+        session.users[1].preQuest = preQuestSchema;
         updateSession(session, res);
 
     } else {
@@ -170,12 +169,10 @@ var updateExistingPreQuestSession = function (session, clientId, preQuestSchema,
 };
 
 
-var processNewPostQuestSession = function (session, clientId, postQuestSchema, res) {
+let processNewPostQuestSession = function (session, clientId, postQuestSchema, res) {
 
     if (clientId === 'tablet-exit-1') {
-
         if (session.users[1].postQuest.happinessScale) {
-            console.log(session.users[1].postQuest);
             console.log("post questionnaire completed");
             session.postCompleted = 1;
         }
@@ -184,7 +181,6 @@ var processNewPostQuestSession = function (session, clientId, postQuestSchema, r
     } else if (clientId === 'tablet-exit-2') {
 
         if (session.users[0].postQuest.happinessScale) {
-            console.log(session.users[0].postQuest.happinessScale);
             console.log("post questionnaire completed");
             session.postCompleted = 1;
         }
@@ -197,26 +193,23 @@ var processNewPostQuestSession = function (session, clientId, postQuestSchema, r
     }
 };
 
-var getLatestSession = function (sorting) {
+let getLatestSession = function (sorting) {
     if (!sessions.data) return null;
     return sorting === 'asc' ? sessions.data[0] : sessions.data[sessions.count() - 1];
 
 };
 
-var updateSession = function (mySession, res) {
+let updateSession = function (mySession, res) {
 
     if(mySession.preCompleted === 1 && mySession.postCompleted === 1){
         mySession.active = 0;
     }
     console.log("+++++++++++++");
-    console.log(mySession._id);
-    console.log(JSON.stringify(mySession));
 
-
-    ExperimentSession.findOneAndUpdate({'_id': mySession._id}, mySession, {new: true}, function (err, doc) {
+    ExperimentSession.findOneAndUpdate({'_id': mySession._id}, mySession, {new: true, upsert: true}, function (err, doc) {
         if (err) return res.json({status: 'ERR', code: 500, msg: err});
         updateLatestSession(mySession);
-
+        console.log(doc);
         if (mySession.active === 0) {
             removeInactiveSession(mySession);
             stopRecordingForSession(mySession);
@@ -225,16 +218,16 @@ var updateSession = function (mySession, res) {
     });
 };
 
-var updateLatestSession = function (session) {
+let updateLatestSession = function (session) {
     sessions.update(session);
 };
 
-var removeInactiveSession = function (mySession) {
+let removeInactiveSession = function (mySession) {
     sessions.remove(mySession);
 
 };
 
-var stopRecordingForSession = function (session) {
+let stopRecordingForSession = function (session) {
     let canRecord = config.findOne({type: 'canRecord'});
     let currentMicSession = config.findOne({type: 'currentMicSession'});
 
@@ -253,8 +246,8 @@ var stopRecordingForSession = function (session) {
  * @param preQuest -  request body
  * @returns {*}
  */
-var convertPreQuestionnaireBodyToSchema = function (preQuest) {
-    var schema = new PreQuestionnaire();
+let convertPreQuestionnaireBodyToSchema = function (preQuest) {
+    let schema = new PreQuestionnaire();
     schema.age = preQuest.age;
     schema.gender = preQuest.gender;
     schema.connectionWithOthersScale = preQuest.connectionWithOthersScale;
@@ -269,8 +262,8 @@ var convertPreQuestionnaireBodyToSchema = function (preQuest) {
  * @param postQuest
  * @returns {*}
  */
-var convertPostQuestionnaireBodyToSchema = function (postQuest) {
-    var schema = new PostQuestionnaire();
+let convertPostQuestionnaireBodyToSchema = function (postQuest) {
+    let schema = new PostQuestionnaire();
     schema.singingPartnerFamiliarity = postQuest.singingPartnerFamiliarity;
     schema.symbiosisRoomFamiliarity = postQuest.symbiosisRoomFamiliarity;
     schema.connectionWithOthersScale = postQuest.connectionWithOthersScale;

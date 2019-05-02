@@ -2,10 +2,10 @@
  * Created by bisho on 14/04/2019.
  */
 
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+let mongoose = require('mongoose');
+let Schema = mongoose.Schema;
 
-var sensorData = new Schema({
+let sensorData = new Schema({
     readingType: String,
     value: Number,
     timestamp: Date
