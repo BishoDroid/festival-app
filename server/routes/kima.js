@@ -8,20 +8,20 @@ const express = require('express');
 
 const router = express.Router();
 const osc = require('osc');
-// in memory db for storing pairs temporarily
+// in memory db for storing sessions temporarily
 
 
 const lokiSingleton = require('../db/festival-app-db-in-loki');
 
 var db = lokiSingleton.getInstance();
 
-var pairs = db.getCollection('pairs');
+var sessions = db.getCollection('sessions');
 var conf = db.getCollection('config');
 
-var pairId = null;
-var pair = undefined;
+var sessionId = null;
+var session = undefined;
 require('../db/festival-app-db');
-var ExperimentPair = require('../models/ExperimentPair');
+var ExperimentSession = require('../models/ExperimentSession');
 var SensorData = require('../models/SensorData');
 
 var udpPort = new osc.UDPPort({
@@ -31,22 +31,22 @@ var udpPort = new osc.UDPPort({
 
 router.route('/kima/:command')
     .get(function (req, res) {
-        pairId = req.header('pair-id');
+        sessionId = req.header('session-id');
 
         let canRecord = conf.findOne({type : 'canRecord'});
-        let currentMicPair = conf.findOne({type : 'currentMicPair'});
+        let currentMicSession = conf.findOne({type : 'currentMicSession'});
 
-        pair =  pairs.findOne({ 'sessionId' : pairId });
+        session =  sessions.findOne({ 'sessionId' : sessionId });
 
         let command = req.params.command;
 
         switch (command) {
             case 'start':
-                currentMicPair.value = pairId;
-                conf.update(currentMicPair);
+                currentMicSession.value = sessionId;
+                conf.update(currentMicSession);
                 canRecord.value = true;
                 conf.update(canRecord);
-                console.log("start recording for session : " + pair.sessionId);
+                console.log("start recording for session : " + session.sessionId);
 
                 return res.json({
                     code: 200,
@@ -56,11 +56,11 @@ router.route('/kima/:command')
 
                 break;
             case 'stop':
-                currentMicPair.value = null;
-                conf.update(currentMicPair);
+                currentMicSession.value = null;
+                conf.update(currentMicSession);
                 canRecord.value = false;
                 conf.update(canRecord);
-                console.log("start recording for session : " + pair.sessionId);
+                console.log("start recording for session : " + session.sessionId);
 
                 return res.json({
                     code: 200,
@@ -108,7 +108,7 @@ udpPort.on("message", function (oscMessage) {
     //console.log('Received new message');
     let canRecord = conf.findOne({type : 'canRecord'});
     //console.log(canRecord);
-    if (!canRecord.value || !pair) {
+    if (!canRecord.value || !session) {
         return ;
     }
     var data = new SensorData();
@@ -118,11 +118,11 @@ udpPort.on("message", function (oscMessage) {
             data.readingType = oscMessage.address;
             data.value = oscMessage.args[0];
             data.timestamp = new Date();
-            if (!pair.user1.data || pair.user1.data.length === 0) {
-                pair.user1.data = [];
+            if (!session.user1.data || session.user1.data.length === 0) {
+                session.user1.data = [];
             }
-            pair.user1.data.push(data);
-            updatePair(pair);
+            session.user1.data.push(data);
+            updateSession(session);
             break;
 
         case '/frequency2':
@@ -130,11 +130,11 @@ udpPort.on("message", function (oscMessage) {
             data.readingType = oscMessage.address;
             data.value = oscMessage.args[0];
             data.timestamp = new Date();
-            if (!pair.user2.data || pair.user2.data.length === 0) {
-                pair.user2.data = [];
+            if (!session.user2.data || session.user2.data.length === 0) {
+                session.user2.data = [];
             }
-            pair.user2.data.push(data);
-            updatePair(pair);
+            session.user2.data.push(data);
+            updateSession(session);
             break;
 
         case '/third':
@@ -143,11 +143,11 @@ udpPort.on("message", function (oscMessage) {
             data.readingType = oscMessage.address;
             data.value = oscMessage.args[0];
             data.timestamp = new Date();
-            if (!pair.harmonyData || pair.harmonyData.length === 0) {
-                pair.harmonyData = [];
+            if (!session.harmonyData || session.harmonyData.length === 0) {
+                session.harmonyData = [];
             }
-            pair.harmonyData.push(data);
-            updatePair(pair);
+            session.harmonyData.push(data);
+            updateSession(session);
             break;
         default:
             console.log('Unknown data type...ignoring');
@@ -159,8 +159,8 @@ udpPort.on("error", function (err) {
     console.log(err);
 });
 
-var updatePair = function (pair) {
-    ExperimentPair.findOneAndUpdate({'_id': pair._id}, pair, {new: true}, function (err, doc) {
+var updateSession = function (session) {
+    ExperimentSession.findOneAndUpdate({'_id': session._id}, session, {new: true}, function (err, doc) {
         if (err) return res.json({status: 'ERR', code: 500, msg: err});
 
         console.log('Saved record');

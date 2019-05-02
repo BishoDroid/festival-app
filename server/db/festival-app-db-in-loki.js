@@ -10,12 +10,12 @@ var Singleton = (function (){
     var instance;
     function databaseInitialize() {
         console.log("IAM BEING INITIALLLASL");
-        var pairs = db.getCollection("pairs");
+        var sessions = db.getCollection("sessions");
 
         var config = db.getCollection("config");
 
-        if (pairs === null){
-            pairs =  db.addCollection ("pairs");
+        if (sessions === null){
+            sessions =  db.addCollection ("sessions");
         }
         if (config === null){
             config = db.addCollection ("config");
@@ -29,17 +29,17 @@ var Singleton = (function (){
             autosaveInterval: 2000 // save every four seconds for our example
         });
 
-        var pairs = db.getCollection("pairs");
+        var sessions = db.getCollection("sessions");
 
         var config = db.getCollection("config");
 
-        if (pairs === null){
-            pairs =  db.addCollection ("pairs");
+        if (sessions === null){
+            sessions =  db.addCollection ("sessions");
         }
         if (config === null){
             config = db.addCollection ("config");
             config.insert({type : 'canRecord' , value: false});
-            config.insert({type : 'currentMicPair' , value: null});
+            config.insert({type : 'currentMicSession' , value: null});
         }
 
 

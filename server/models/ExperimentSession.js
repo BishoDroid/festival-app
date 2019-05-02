@@ -1,11 +1,12 @@
 /**
  * Created by bisho on 14/04/2019.
- * This pair will contain the data of the two users participating in one session
+ * This session will contain the data of the two users participating in one session
  * and the level of harmony reached between them
  */
 
 var mongoose = require('mongoose');
 var user = {
+    participantsNumber : Number,
     age: Number,
     preQuest: {
         age: Number,
@@ -30,8 +31,10 @@ var user = {
     }
 };
 
-module.exports = mongoose.model('ExperimentPair', {
+module.exports = mongoose.model('ExperimentSession', {
+    experimentType : String,
     sessionId: String,
+    users : [user],
     user1: user,
     harmonyData: [{
         readingType: String,

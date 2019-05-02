@@ -9,7 +9,7 @@ const cors = require('cors');
 //These routes will handle requests coming to them
 const index = require('./server/routes/index');
 const user = require('./server/routes/user');
-const pair = require('./server/routes/pair');
+const session = require('./server/routes/session');
 const kima = require('./server/routes/kima');
 
 const corsOptions = [
@@ -27,7 +27,7 @@ app.use(bodyParser());
 // api end points
 app.use('/', index);
 app.use('/api', user);
-app.use('/api', pair);
+app.use('/api', session);
 app.use('/api', kima);
 
 app.listen(port, function () {

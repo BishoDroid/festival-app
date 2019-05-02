@@ -37,7 +37,7 @@ export class PreQuestionaireComponent implements OnInit {
         tuningWithPeopleScale: Number,
         happinessScale: Number,
         lonelinessScale: Number } ;
-    clientId: String = "tablet-";
+    clientId: String = "tablet-entrance-";
     private header: { "client-id": String };
 
 

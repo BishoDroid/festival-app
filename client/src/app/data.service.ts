@@ -23,8 +23,8 @@ export class DataService {
         return this.http.post('http://localhost:3001/api/user/post-quest', data, {headers: header});
     }
 
-    getActivePairs(): Observable<any> {
-        return this.http.get('http://localhost:3001/api/pairs/all');
+    getActiveSessions(): Observable<any> {
+        return this.http.get('http://localhost:3001/api/sessions/all');
     }
 
     startRecording(header: any): Observable<any> {
@@ -35,7 +35,7 @@ export class DataService {
         return this.http.get('http://localhost:3001/api/kima/stop', {headers: header});
     }
 
-    removePair(header: any): Observable <any> {
+    removeSession(header: any): Observable <any> {
         return this.http.post('http://localhost:3001/api/user/remove', null , {headers: header});
     }
 }

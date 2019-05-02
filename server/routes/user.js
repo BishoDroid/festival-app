@@ -2,32 +2,32 @@ const express = require('express');
 const router = express.Router();
 
 require('../db/festival-app-db');
-// in memory db for storing pairs temporarily
+// in memory db for storing sessions temporarily
 const lokiSingleton = require('../db/festival-app-db-in-loki');
 
 var db = lokiSingleton.getInstance();
 
-var pairs = db.getCollection('pairs');
+var sessions = db.getCollection('sessions');
 var config = db.getCollection('config');
 
 var PreQuestionnaire = require('../models/PreQuestionnaire');
 var PostQuestionnaire = require('../models/PostQuestionnaire');
-var ExperimentPair = require('../models/ExperimentPair');
+var ExperimentSession = require('../models/ExperimentSession');
 
-router.route('/user/remove') // to remove the pair by admin
+router.route('/user/remove') // to remove the session by admin
 
     .post(function (req, res) {
-        let pairId = req.header('pair-id');
+        let sessionId = req.header('session-id');
 
-        let pair = pairs.findOne({sessionId: pairId});
-        pair.active = 0;
+        let session = sessions.findOne({sessionId: sessionId});
+        session.active = 0;
 
-        ExperimentPair.findOneAndUpdate({'_id': pair._id}, pair, {new: true}, function (err, doc) {
+        ExperimentSession.findOneAndUpdate({'_id': session._id}, session, {new: true}, function (err, doc) {
             if (err) return res.json({status: 'ERR', code: 500, msg: err});
 
-            removeInactivePair(pair);
-            stopRecordingForPair(pair);
-            console.log("session: " + sessionId + " is removed");
+            removeInactiveSession(session);
+            stopRecordingForSession(session);
+            console.log("session: " + session.sessionId + " is removed");
             return res.json({status: 'OK', code: 200, msg: 'Saved data'});
 
         });
@@ -44,28 +44,28 @@ router.route('/user/pre-quest')
         let body = req.body;
         let preQuestSchema = convertPreQuestionnaireBodyToSchema(body);
         let clientId = req.header('client-id');
-        let pair = getLatestPair('desc');
+        let session = getLatestSession('desc');
 
-        //check if the context has un complete pair
-        if (!pair) { // very first pair
-            console.log("No pair exist, creating new one");
-            pair = new ExperimentPair();
-            pair.sessionId = "session-1";
-            processNewPreQuestPair(pair, clientId, preQuestSchema, res);
+        //check if the context has un complete session
+        if (!session) { // very first ession
+            console.log("No session exist, creating new one");
+            session = new ExperimentSession();
+            session.sessionId = "session-1";
+            processNewPreQuestSession(session, clientId, preQuestSchema, res);
         }
-        else if (pair && pair.preCompleted === 0) {
-            console.log('Found an existing pair. only one user updated, updating the second....');
-            updateExistingPreQuestPair(pair, clientId, preQuestSchema, res)
-        } else if (pair && pair.preCompleted === 1) {
-            console.log("Pair is full, creating new one...");
-            let newPair = new ExperimentPair();
-            let previousSession = pairs.data[pairs.count() - 1];
+        else if (session && session.preCompleted === 0) {
+            console.log('Found an existing session. only one user updated, updating the second....');
+            updateExistingPreQuestSession(session, clientId, preQuestSchema, res)
+        } else if (session && session.preCompleted === 1) {
+            console.log("Session is full, creating new one...");
+            let newSession = new ExperimentSession();
+            let previousSession = sessions.data[sessions.count() - 1];
             let previousSessionIdString = previousSession.sessionId;
             let previousSessionId = Number(previousSessionIdString.split('-')[1]);
             let newSessionIdNumber = previousSessionId + 1;
             let newSessionId = 'session-' + newSessionIdNumber;
-            newPair.sessionId = newSessionId;
-            processNewPreQuestPair(newPair, clientId, preQuestSchema, res);
+            newSession.sessionId = newSessionId;
+            processNewPreQuestSession(newSession, clientId, preQuestSchema, res);
         }
     });
 
@@ -80,45 +80,45 @@ router.route('/user/post-quest')
         let postQuestSchema = convertPostQuestionnaireBodyToSchema(body);
 
         let clientId = req.header('client-id');
-        let pair = getLatestPair('asc');
+        let session = getLatestSession('asc');
 
-        if (clientId === 'tablet-3') {
+        if (clientId === 'tablet-exit-1') {
             console.log('Updating post questionnaire for user1');
-            processNewPostQuestPair(pair, clientId, postQuestSchema, res);
-        } else if (clientId === 'tablet-4') {
+            processNewPostQuestSession(session, clientId, postQuestSchema, res);
+        } else if (clientId === 'tablet-exit-2') {
             console.log('Updating post questionnaire for user2');
-            processNewPostQuestPair(pair, clientId, postQuestSchema, res);
+            processNewPostQuestSession(session, clientId, postQuestSchema, res);
         } else {
             console.log('Wrong tablet....Skipping');
-            return res.json({code: 200, msg: 'Tablet requested ' + clientId + '. tablets expected [tablet-3, tablet-4'})
+            return res.json({code: 200, msg: 'Tablet requested ' + clientId + '. tablets expected [tablet-exit-1, tablet-exit-2'})
         }
 
     });
 
 
-var processNewPreQuestPair = function (pair, clientId, preQuestSchema, res) {
-    if (clientId === 'tablet-1') {
+var processNewPreQuestSession = function (session, clientId, preQuestSchema, res) {
+    if (clientId === 'tablet-entrance-1') {
         console.log(clientId);
         console.log('saving the pre questionaire data');
-        pair.user1.preQuest = preQuestSchema;
-    } else if (clientId === 'tablet-2') {
+        session.user1.preQuest = preQuestSchema;
+    } else if (clientId === 'tablet-entrance-2') {
         console.log(clientId);
         console.log('saving the pre questionaire data');
-        pair.user2.preQuest = preQuestSchema
+        session.user2.preQuest = preQuestSchema
     }
     else {
-        console.log('Not creating pre-questionnaire, new pair but tablet is neither 1 nor 2, skipping...')
+        console.log('Not creating pre-questionnaire, new session but tablet is neither 1 nor 2, skipping...')
     }
 
-    pair.timestamp = new Date();
-    pair.active = 1;
-    pair.preCompleted = 0;
-    pair.save(function (err) {
+    session.timestamp = new Date();
+    session.active = 1;
+    session.preCompleted = 0;
+    session.save(function (err) {
         console.log('saving');
         if (err) return res.json({status: 'ERR', code: 500, msg: err});
 
-        pairs.insert(pair);
-        console.log('Successfully created new pair');
+        sessions.insert(session);
+        console.log('Successfully created new session');
         return res.json({status: 'OK', code: 200, msg: 'Saved data'});
     });
 };
@@ -128,101 +128,101 @@ var isEmpty = function (obj) {
 }
 
 
-var updateExistingPreQuestPair = function (pair, clientId, preQuestSchema, res) {
-    if (clientId === 'tablet-1') {
-        console.log('Updating pre questionnaire for user1 in pair with ID: ' + pair._id + ", prequestionaire completed");
-        if(!isEmpty(pair.user2.preQuest)){
-            pair.preCompleted = 1;
+var updateExistingPreQuestSession = function (session, clientId, preQuestSchema, res) {
+    if (clientId === 'tablet-entrance-1') {
+        console.log('Updating pre questionnaire for user1 in session with ID: ' + session._id + ", prequestionaire completed");
+        if(!isEmpty(session.user2.preQuest)){
+            session.preCompleted = 1;
 
         }
-        pair.user1.preQuest = preQuestSchema;
-        updatePair(pair, res);
-    } else if (clientId === 'tablet-2') {
-        console.log('Updating pre questionnaire for user1 in pair with ID: ' + pair._id + ", prequestionaire completed");
-        if(!isEmpty(pair.user1.preQuest)) {
-            pair.preCompleted = 1;
+        session.user1.preQuest = preQuestSchema;
+        updateSession(session, res);
+    } else if (clientId === 'tablet-entrance-2') {
+        console.log('Updating pre questionnaire for user1 in session with ID: ' + session._id + ", prequestionaire completed");
+        if(!isEmpty(session.user1.preQuest)) {
+            session.preCompleted = 1;
 
         }
-        pair.user2.preQuest = preQuestSchema;
-        updatePair(pair, res);
+        session.user2.preQuest = preQuestSchema;
+        updateSession(session, res);
 
     } else {
         return res.json({
             status: 'OK',
             code: 200,
-            msg: 'Pair already exists and both users have filled their pre-questionnaire'
+            msg: 'Session already exists and both users have filled their pre-questionnaire'
         })
     }
 };
 
 
-var processNewPostQuestPair = function (pair, clientId, postQuestSchema, res) {
+var processNewPostQuestSession = function (session, clientId, postQuestSchema, res) {
 
-    if (clientId === 'tablet-3') {
+    if (clientId === 'tablet-exit-1') {
 
-        if (pair.user2.postQuest.happinessScale) {
-            console.log(pair.user2.postQuest);
+        if (session.user2.postQuest.happinessScale) {
+            console.log(session.user2.postQuest);
             console.log("post questionnaire completed");
-            pair.postCompleted = 1;
+            session.postCompleted = 1;
         }
-        pair.user1.postQuest = postQuestSchema;
-        updatePair(pair, res);
-    } else if (clientId === 'tablet-4') {
+        session.user1.postQuest = postQuestSchema;
+        updateSession(session, res);
+    } else if (clientId === 'tablet-exit-2') {
 
-        if (pair.user1.postQuest.happinessScale) {
-            console.log(pair.user1.postQuest.happinessScale);
+        if (session.user1.postQuest.happinessScale) {
+            console.log(session.user1.postQuest.happinessScale);
             console.log("post questionnaire completed");
-            pair.postCompleted = 1;
+            session.postCompleted = 1;
         }
-        pair.user2.postQuest = postQuestSchema;
-        updatePair(pair, res);
+        session.user2.postQuest = postQuestSchema;
+        updateSession(session, res);
     }
     else {
-        console.log('Pairs already populated');
-        return res.json({code: 200, status: 'OK', msg: 'Pairs already populated'})
+        console.log('Sessions already populated');
+        return res.json({code: 200, status: 'OK', msg: 'Sessions already populated'})
     }
 };
 
-var getLatestPair = function (sorting) {
-    if (!pairs.data) return null;
-    return sorting === 'asc' ? pairs.data[0] : pairs.data[pairs.count() - 1];
+var getLatestSession = function (sorting) {
+    if (!sessions.data) return null;
+    return sorting === 'asc' ? sessions.data[0] : sessions.data[sessions.count() - 1];
 
 };
 
-var updatePair = function (myPair, res) {
-    if(myPair.preCompleted === 1 && myPair.postCompleted === 1){
-        myPair.active = 0;
+var updateSession = function (mySession, res) {
+    if(mySession.preCompleted === 1 && mySession.postCompleted === 1){
+        mySession.active = 0;
     }
 
-    ExperimentPair.findOneAndUpdate({'_id': myPair._id}, myPair, {new: true}, function (err, doc) {
+    ExperimentSession.findOneAndUpdate({'_id': mySession._id}, mySession, {new: true}, function (err, doc) {
         if (err) return res.json({status: 'ERR', code: 500, msg: err});
-        updateLatestPair(myPair);
+        updateLatestSession(mySession);
 
-        if (myPair.active === 0) {
+        if (mySession.active === 0) {
 
-            removeInactivePair(myPair);
-            stopRecordingForPair(myPair);
+            removeInactiveSession(mySession);
+            stopRecordingForSession(mySession);
         }
         return res.json({status: 'OK', code: 200, msg: 'Saved data'});
     });
 };
 
-var updateLatestPair = function (pair) {
-    pairs.update(pair);
+var updateLatestSession = function (session) {
+    sessions.update(session);
 };
 
-var removeInactivePair = function (myPair) {
-    pairs.remove(myPair);
+var removeInactiveSession = function (mySession) {
+    sessions.remove(mySession);
 
 };
 
-var stopRecordingForPair = function (pair) {
+var stopRecordingForSession = function (session) {
     let canRecord = config.findOne({type: 'canRecord'});
-    let currentMicPair = config.findOne({type: 'currentMicPair'});
+    let currentMicSession = config.findOne({type: 'currentMicSession'});
 
-    if (currentMicPair.value == pair.sessionId && canRecord.value == true) {
-        currentMicPair.value = null;
-        config.update(currentMicPair);
+    if (currentMicSession.value == session.sessionId && canRecord.value == true) {
+        currentMicSession.value = null;
+        config.update(currentMicSession);
         canRecord.value = false;
         config.update(canRecord);
     }
