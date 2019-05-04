@@ -1,0 +1,6 @@
+node_modules
+bower_modules
+*.xml
+package-lock.json
+pre.json
+post.json

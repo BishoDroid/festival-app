@@ -6,15 +6,16 @@ const router = express.Router();
 
 require('../db/festival-app-db');
 const lokiSingleton = require('../db/festival-app-db-in-loki');
-var db = lokiSingleton.getInstance();
-var sessions = db.getCollection('sessions');
+let db = lokiSingleton.getInstance();
+let sessions = db.getCollection('sessions');
 
 router.route('/sessions/all')
     .get(function (req, res) {
-            if(sessions.data) {
+            if (sessions.data) {
                 console.log('Found ' + sessions.data.length + ' sessions');
                 return res.json(sessions.data);
-            }}
-            );
+            }
+        }
+    );
 
 module.exports = router;
