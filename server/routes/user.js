@@ -46,31 +46,53 @@ router.route('/user/pre-quest')
         let preQuestSchema = convertPreQuestionnaireBodyToSchema(body);
         let clientId = req.header('client-id');
         let session = getLatestSession('desc');
+        let sessionType = clientId.includes("entrance") ? 'kima' : 'symbiosis' ;
+        let maxNumberOfParticipants = sessionType === 'kima'  ? 3 : 8 ;
+        let userNumber = clientId.match(/\d+/)[0] ;
+        let userIndex = userNumber -1 ;
 
+        let sessionWithCompletePreQuestionair = session && session.preCompleted === 1 ;
         //check if the context has un complete session
-        if (!session) { // very first ession
-            console.log("No session exist, creating new one");
-            session = new ExperimentSession();
-            session.sessionId = "session-1";
-            processNewPreQuestSession(session, clientId, preQuestSchema, res);
-        }
-        else if (session && session.preCompleted === 0) {
-
-            console.log('Found an existing session. only one user updated, updating the second....');
-            updateExistingPreQuestSession(session, clientId, preQuestSchema, res)
-        } else if (session && session.preCompleted === 1) {
-            console.log("Session is full, creating new one...");
+        if (!session || sessionWithCompletePreQuestionair ) { // very first session
+            console.log("creating new session");
             let newSession = new ExperimentSession();
-            let previousSession = sessions.data[sessions.count() - 1];
-            let previousSessionIdString = previousSession.sessionId;
-            let previousSessionId = Number(previousSessionIdString.split('-')[1]);
-            let newSessionIdNumber = previousSessionId + 1;
-            let newSessionId = 'session-' + newSessionIdNumber;
-            newSession.sessionId = newSessionId;
-            processNewPreQuestSession(newSession, clientId, preQuestSchema, res);
+            newSession.sessionId = getNextSessionId(sessions);
+            processNewPreQuestSession(newSession, clientId, preQuestSchema, res,maxNumberOfParticipants,userIndex);
+        }
+
+        else if (session && session.preCompleted === 0) {
+            console.log('Found an existing session. only one user updated, updating the second....');
+            updateExistingPreQuestSession(session, clientId, preQuestSchema, res,maxNumberOfParticipants,userIndex)
         }
     });
 
+let updateExistingPreQuestSession = function (session, clientId, preQuestSchema, res,maxNumberOfParticipants,userIndex) {
+
+    session.users[userIndex].preQuest = preQuestSchema;
+    session.preCompleted = getNumberOfUsersCompletedPreQuestionair(session) == maxNumberOfParticipants ? 1 : 0;
+    updateSession(session, res);
+
+
+};
+    function getNextSessionId (sessions) {
+        if (sessions.count() === 0 ) {
+            return "session-1" ;
+        }
+        let previousSession = sessions.data[sessions.count() - 1];
+        let previousSessionIdString = previousSession.sessionId;
+        let previousSessionId = Number(previousSessionIdString.split('-')[1]);
+        let newSessionIdNumber = previousSessionId + 1;
+        let newSessionId = 'session-' + newSessionIdNumber;
+        return newSessionId;
+    }
+
+    function getNumberOfUsersCompletedPreQuestionair(session){
+        return session.users.filter(user => user.preQuest.happinessScale ).length;
+    }
+
+function getNumberOfUsersCompletedPostQuestionair(session){
+    return session.users.filter(user => user.postQuest.happinessScale ).length;
+}
 router.route('/user/post-quest')
 
 /**
@@ -84,42 +106,33 @@ router.route('/user/post-quest')
         let clientId = req.header('client-id');
         let session = getLatestSession('asc');
 
-        if (clientId === 'tablet-exit-1') {
-            console.log('Updating post questionnaire for user1');
-            processNewPostQuestSession(session, clientId, postQuestSchema, res);
-        } else if (clientId === 'tablet-exit-2') {
-            console.log('Updating post questionnaire for user2');
-            processNewPostQuestSession(session, clientId, postQuestSchema, res);
-        } else {
-            console.log('Wrong tablet....Skipping');
-            return res.json({code: 200, msg: 'Tablet requested ' + clientId + '. tablets expected [tablet-exit-1, tablet-exit-2'})
-        }
+        let sessionType = clientId.includes("exit") ? 'kima' : 'symbiosis' ;
+        let maxNumberOfParticipants = sessionType === 'kima'  ? 3 : 8 ;
+        let userNumber = clientId.match(/\d+/)[0] ;
+        let userIndex = userNumber -1 ;
+
+        processNewPostQuestSession(session, clientId, postQuestSchema, res,maxNumberOfParticipants,userIndex);
+
+
 
     });
 
 
-let processNewPreQuestSession = function (session, clientId, preQuestSchema, res) {
+let processNewPreQuestSession = function (session, clientId, preQuestSchema, res,maxNumberOfParticipants,userIndex) {
 
     let user = new User();
+
     if (!session.users || session.users.length === 0) {
-        session.users = [user , user];
+        for (let i = 1 ; i <= maxNumberOfParticipants ; i++){
+            session.users.push(user) ;
+        }
     }
+
 
     user.preQuest = preQuestSchema ;
-    if (clientId === 'tablet-entrance-1') {
-        console.log(clientId);
-        console.log('saving the pre questionaire data');
-        session.users[0] = user ;
 
+    session.users[userIndex] = user ;
 
-    } else if (clientId === 'tablet-entrance-2') {
-        console.log(clientId);
-        console.log('saving the pre questionaire data');
-        session.users[1] = user ;
-    }
-    else {
-        console.log('Not creating pre-questionnaire, new session but tablet is neither 1 nor 2, skipping...')
-    }
 
     session.timestamp = new Date();
     session.active = 1;
@@ -127,70 +140,21 @@ let processNewPreQuestSession = function (session, clientId, preQuestSchema, res
     session.save(function (err) {
         console.log('saving');
         if (err) return res.json({status: 'ERR', code: 500, msg: err});
-
-        sessions.insert(session);
+        sessions.insert(session); // in memory database
         console.log('Successfully created new session');
         return res.json({status: 'OK', code: 200, msg: 'Saved data'});
     });
 };
 
-let isEmpty = function (obj) {
-    return Object.keys(obj).length === 0 && obj.constructor === Object;
-};
 
 
-let updateExistingPreQuestSession = function (session, clientId, preQuestSchema, res) {
+let processNewPostQuestSession = function (session, clientId, postQuestSchema, res,maxNumberOfParticipants,userIndex) {
 
-    let user = new User();
-    user.preQuest = preQuestSchema;
-    if (clientId === 'tablet-entrance-1') {
-        console.log('Updating pre questionnaire for user1 in session with ID: ' + session._id + ", prequestionaire completed");
-        if(!isEmpty(session.users[1].preQuest)){
-            session.preCompleted = 1;
-        }
-        session.users[0].preQuest = preQuestSchema;
-        updateSession(session, res);
-    } else if (clientId === 'tablet-entrance-2') {
-        console.log('Updating pre questionnaire for user1 in session with ID: ' + session._id + ", prequestionaire completed");
-        if(!isEmpty(session.users[0].preQuest)) {
-            session.preCompleted = 1;
+    session.users[userIndex].postQuest = postQuestSchema;
+    console.log("completed post questionair" + getNumberOfUsersCompletedPostQuestionair(session));
+    session.postCompleted = getNumberOfUsersCompletedPostQuestionair(session) == maxNumberOfParticipants ? 1 : 0;
+    updateSession(session, res);
 
-        }
-        session.users[1].preQuest = preQuestSchema;
-        updateSession(session, res);
-
-    } else {
-        return res.json({
-            status: 'OK',
-            code: 200,
-            msg: 'Session already exists and both users have filled their pre-questionnaire'
-        })
-    }
-};
-
-
-let processNewPostQuestSession = function (session, clientId, postQuestSchema, res) {
-
-    if (clientId === 'tablet-exit-1') {
-        if (session.users[1].postQuest.happinessScale) {
-            console.log("post questionnaire completed");
-            session.postCompleted = 1;
-        }
-        session.users[0].postQuest = postQuestSchema;
-        updateSession(session, res);
-    } else if (clientId === 'tablet-exit-2') {
-
-        if (session.users[0].postQuest.happinessScale) {
-            console.log("post questionnaire completed");
-            session.postCompleted = 1;
-        }
-        session.users[1].postQuest = postQuestSchema;
-        updateSession(session, res);
-    }
-    else {
-        console.log('Sessions already populated');
-        return res.json({code: 200, status: 'OK', msg: 'Sessions already populated'})
-    }
 };
 
 let getLatestSession = function (sorting) {
@@ -204,7 +168,6 @@ let updateSession = function (mySession, res) {
     if(mySession.preCompleted === 1 && mySession.postCompleted === 1){
         mySession.active = 0;
     }
-    console.log("+++++++++++++");
 
     ExperimentSession.findOneAndUpdate({'_id': mySession._id}, mySession, {new: true, upsert: true}, function (err, doc) {
         if (err) return res.json({status: 'ERR', code: 500, msg: err});

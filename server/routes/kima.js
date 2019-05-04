@@ -100,56 +100,44 @@ udpPort.on("ready", function () {
     });
 });
 
+function hasNumber(myString) {
+    return /\d/.test(myString);
+}
+
 udpPort.on("message", function (oscMessage) {
 
-    //console.log('Received new message');
     let canRecord = conf.findOne({type : 'canRecord'});
-    //console.log(canRecord);
     if (!canRecord.value || !session) {
         return ;
     }
+
     let data = new SensorData();
-    let user = new User();
-    switch (oscMessage.address) {
-        case '/frequency1':
-        case '/amplitude1':
-            data.readingType = oscMessage.address;
-            data.value = oscMessage.args[0];
-            data.timestamp = new Date();
-            if (!session.users[0].data || session.users[0].data.length === 0) {
-                session.users[0].data = [];
-            }
-            session.users[0].data.push(data);
-            updateSession(session);
-            break;
+    data.readingType = oscMessage.address;
+    data.value = oscMessage.args[0];
+    data.timestamp = new Date();
 
-        case '/frequency2':
-        case '/amplitude2':
-            data.readingType = oscMessage.address;
-            data.value = oscMessage.args[0];
-            data.timestamp = new Date();
-            if (!session.users[1].data || session.users[1].data.length === 0) {
-                session.users[1].data = [];
-            }
-            session.users[1].data.push(data);
-            updateSession(session);
-            break;
+   let isAttachedToUser = hasNumber(oscMessage.address) ;
+    if (isAttachedToUser) {
 
-        case '/third':
-        case '/octave':
-        case '/fifth':
-            data.readingType = oscMessage.address;
-            data.value = oscMessage.args[0];
-            data.timestamp = new Date();
-            if (!session.harmonyData || session.harmonyData.length === 0) {
-                session.harmonyData = [];
-            }
-            session.harmonyData.push(data);
-            updateSession(session);
-            break;
-        default:
-            console.log('Unknown data type...ignoring');
+        let userNumber = oscMessage.address.match(/\d+/)[0] ;
+        let userIndex = userNumber -1 ;
+
+        if (!session.users[userIndex].data || session.users[userIndex].data.length === 0) {
+            session.users[userIndex].data = [];
+        }
+
+        session.users[userIndex].data.push(data);
     }
+    else {
+
+        if (!session.sessionData || session.sessionData.length === 0) {
+            session.sessionData = [];
+        }
+        session.sessionData.push(data);
+
+    }
+
+    updateSession(session);
 
 });
 
