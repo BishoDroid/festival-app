@@ -6,23 +6,20 @@ const express = require('express');
 
 const router = express.Router();
 const osc = require('osc');
-// in memory db for storing sessions temporarily
-
-
 const lokiSingleton = require('../db/festival-app-db-in-loki');
 
-var db = lokiSingleton.getInstance();
+let db = lokiSingleton.getInstance();
 
-var sessions = db.getCollection('sessions');
-var conf = db.getCollection('config');
+let sessions = db.getCollection('sessions');
+let conf = db.getCollection('config');
 
-var sessionId = null;
-var session = undefined;
+let sessionId = null;
+let session = undefined;
 require('../db/festival-app-db');
-var ExperimentSession = require('../models/ExperimentSession');
-var SensorData = require('../models/SensorData');
-var User = require('../models/User');
-var udpPort = new osc.UDPPort({
+let ExperimentSession = require('../models/ExperimentSession');
+let SensorData = require('../models/SensorData');
+let User = require('../models/User');
+let udpPort = new osc.UDPPort({
     localAddress: "127.0.0.1",
     localPort: 5000
 });
@@ -72,15 +69,15 @@ router.route('/kima/:command')
 
     });
 
-var getIPAddresses = function () {
-    var os = require('os'),
+let getIPAddresses = function () {
+    let os = require('os'),
         interfaces = os.networkInterfaces(),
         ipAddresses = [];
 
-    for (var deviceName in interfaces) {
-        var addresses = interfaces[deviceName];
-        for (var i = 0; i < addresses.length; i++) {
-            var addressInfo = addresses[i];
+    for (let deviceName in interfaces) {
+        let addresses = interfaces[deviceName];
+        for (let i = 0; i < addresses.length; i++) {
+            let addressInfo = addresses[i];
             if (addressInfo.family === "IPv4" && !addressInfo.internal) {
                 ipAddresses.push(addressInfo.address);
             }
@@ -93,7 +90,7 @@ var getIPAddresses = function () {
 udpPort.open();
 
 udpPort.on("ready", function () {
-    var ipAddresses = getIPAddresses();
+    let ipAddresses = getIPAddresses();
 
     console.log("Listening for OSC over UDP.");
     ipAddresses.forEach(function (address) {
@@ -146,7 +143,7 @@ udpPort.on("error", function (err) {
    // console.log(err);
 });
 
-var updateSession = function (session) {
+let updateSession = function (session) {
     ExperimentSession.findOneAndUpdate({'_id': session._id}, session, {new: true}, function (err, doc) {
         if (err) return res.json({status: 'ERR', code: 500, msg: err});
 
