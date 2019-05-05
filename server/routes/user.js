@@ -113,8 +113,6 @@ router.route('/user/post-quest')
 
         processNewPostQuestSession(session, clientId, postQuestSchema, res,maxNumberOfParticipants,userIndex);
 
-
-
     });
 
 
@@ -128,11 +126,9 @@ let processNewPreQuestSession = function (session, clientId, preQuestSchema, res
         }
     }
 
-
     user.preQuest = preQuestSchema ;
 
     session.users[userIndex] = user ;
-
 
     session.timestamp = new Date();
     session.active = 1;

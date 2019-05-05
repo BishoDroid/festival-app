@@ -2,7 +2,11 @@
   "name": "bishodroid",
   "version": "0.0.0",
   "license": "MIT",
-  "angular-cli": {},
+  "angular-cli": {
+    "styles": [
+    "styles.css",
+    "../node_modules/bootstrap/dist/css/bootstrap.css"
+  ]},
   "scripts": {
     "ng": "ng",
     "start": "concurrently --kill-others \"node server\" \"ng serve --proxy-config client/proxy.conf.json\"",
