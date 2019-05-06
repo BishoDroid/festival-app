@@ -17,8 +17,8 @@ export class AdminComponent implements OnInit {
     public defaultTablet: any = {
         type: 'none', tabletId: 'free-tablet', isTaken: false
     };
-    public kTablets: any = [{title: 'Entrance 1', value: 'tablet-entrance-1'}, {title: 'Entrance 2', value: 'tablet-entrance-2'},
-        {title: 'Entrance 3', value: 'tablet-entrance-3'}, {title: 'Entrance 4', value: 'tablet-entrance-4'}];
+    public kimaChoice: any = {};
+    public choice: string;
     public selectedTablet: any = {};
 
     constructor(public dataSvc: DataService) {
@@ -31,43 +31,41 @@ export class AdminComponent implements OnInit {
                 switchMap(() => this.dataSvc.getActiveSessions()))
             .subscribe(res => {
                 this.sessions = res;
-                console.log(this.sessions);
                 this.sessions.forEach(session => {
                     session.particpantsCompletedPreQuest = this.getNumberOfUsersCompletedPreQuestionair(session);
-                    console.log(session.particpantsCompletedPreQuest);
                 });
             });
         interval(3000)
             .pipe(
                 startWith(0),
                 switchMap(() =>
-                    this.dataSvc.getTablets('all')))
+                    this.dataSvc.getTablets('kima')))
             .subscribe(res => {
                 this.setTablets(res, 'kima');
-                console.log(this.symbTablets);
             });
+
         interval(3000)
             .pipe(
                 startWith(0),
                 switchMap(() =>
-                    this.dataSvc.getTablets('all')))
+                    this.dataSvc.getTablets('symb')))
             .subscribe(res => {
-                this.setTablets(res, 'symb');
-                console.log(this.symbTablets);
+                this.setTablets(res.data, 'symb');
             });
-
         console.log("Im getting data");
     }
 
 
     setTablets(data: any, type: string) {
+        console.log(data);
         let limit = type === 'kima' ? 4 : 8;
         let start = data.length > 0 ? data.length : 0;
         for (let i = start; i < limit; i++) {
             if (data[i]) {
-                type === 'kima' ? this.kimaTablets[i] = data[i] : this.symbTablets[i] = data[i];
+                console.log('Setting tablets...' + JSON.stringify(data));
+                type === 'kima' && this.kimaTablets.length < 4 ? this.kimaTablets[i] = data[i] : this.symbTablets[i] = data[i];
             } else {
-                type === 'kima' ? this.kimaTablets[i] = this.defaultTablet : this.symbTablets[i] = this.defaultTablet;
+                type === 'kima' && this.kimaTablets.length < 4 ? this.kimaTablets[i] = this.defaultTablet : this.symbTablets[i] = this.defaultTablet;
             }
         }
     }
@@ -114,4 +112,22 @@ export class AdminComponent implements OnInit {
         return isTaken ? 'box-container-disabled' : 'box-container clickable';
     }
 
+    saveChoice(param: string) {
+        const body = {
+            type: param, tabletId: this.choice, isTaken: true
+        };
+        console.log(body)
+        this.dataSvc.saveTablet(body).subscribe(res => {
+            console.log(res)
+            if (res.code === 200) {
+                console.log(res.msg);
+            } else {
+                console.log(res.msg);
+            }
+        });
+    }
+    setChoice(tablet: any) {
+        this.kimaChoice = tablet;
+        this.kimaChoice.type = 'kima';
+    }
 }

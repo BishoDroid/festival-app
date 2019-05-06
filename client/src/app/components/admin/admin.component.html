@@ -64,21 +64,34 @@
 
             <div class="tab-pane" id="2a">
                 <h4>Chose the 4 kima tablets</h4>
-                <ng-container class="row" *ngFor="let tablet of kimaTablets">
+                <ng-container class="row" *ngFor="let tablet of kimaTablets; let index = i">
                     <div class="col-md-3 col-sm-3 col-xs-3 col-lg-3 text-center">
-                        <div [class]="chooseClass(tablet.isTaken)">
+                        <div (click)="setChoice(tablet)" [class]="chooseClass(tablet.isTaken)">
                             <i class="fa fa-tablet fa-5x"></i>
                             <p>
-                                <select class="form-control" name="tablet" [(ngModel)]="selectedTablet">
-                                    <option *ngFor="let tab of kTablets" [value]="tab.value">{{tab.title}}</option>
-                                </select>
+                               {{tablet.tabletId}}
                             </p>
                         </div>
                     </div>
                 </ng-container>
-                <div class="row btn-group">
-                    <button class="btn btn-primary">Save tablet</button>
-                    <button class="btn btn-danger">Reset tablets</button>
+                <div class="row" *ngIf="kimaChoice.type">
+                    <div class="col-md-6">
+                        <label for="type">Type: </label>
+                        <span id="type" class="label label-primary">{{kimaChoice.type}}</span>
+                        <label for="choice">Tablet: </label>
+                        <select id="choice" [(ngModel)]='choice' class='form-control'>
+                            <option value='tablet-entrance-1'>Entrance 1</option>
+                            <option value='tablet-entrance-2'>Entrance 2</option>
+                            <option value='tablet-exit-1'>Exit 1</option>
+                            <option value='tablet-exit-2'>Exit 2</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="btn-group">
+                        <button class="btn btn-primary" (click)="saveChoice('kima')">Save tablet</button>
+                        <button class="btn btn-danger">Reset tablets</button>
+                    </div>
                 </div>
             </div>
             <div class="tab-pane" id="3a">

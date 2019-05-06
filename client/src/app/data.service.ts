@@ -40,4 +40,8 @@ export class DataService {
     getTablets(type: string): Observable<any> {
         return this.http.get('http://localhost:3001/api/admin/tablets/' + type);
     }
+
+    saveTablet(tablet: any): Observable<any> {
+        return this.http.post('http://localhost:3001/api/admin/tablets/' + tablet.type, tablet);
+    }
 }
