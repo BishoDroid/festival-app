@@ -16,7 +16,7 @@ let createFunc = function (force) {
                 if (doc.length > 0) {
                     console.log('We already have tablets created, wont create.');
                 } else {
-                    tablet.tabletId = 'tablet-' + i;
+                    tablet.tabletId = 'free-tablet';
                     tablet.type = 'none';
                     tablet.isTaken = false;
                     tablet.save(function (err) {

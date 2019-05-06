@@ -1,18 +1,102 @@
-<div margin="5%">
-    <ul *ngFor="let session of sessions  ; let index = i">
-        <li><div>{{session.sessionId}} :  <span></span></div>
-            <button  class="btn btn-primary"(click)="startRecording(session.sessionId)">start</button>
-            <button class="btn btn-default" (click)="stopRecording(session.sessionId)">pause</button>
-            <button class="btn btn-danger" (click)="cancelSession(session.sessionId)">delete</button>
-            <div><span> registration time : </span>{{session.timestamp | date:'medium' }}  </div>
-            <div><span> number of particpants completed the pre questionnaire : </span>{{session.particpantsCompletedPreQuest}}  </div>
-            <div><span>participant 1 registered : </span>{{session.users[0].preQuest ? 'yes' : 'no'}}</div>
-            <div><span>participant 2 registered : </span>{{session.users[1].preQuest ? 'yes' : 'no'}}</div>
-            <div><span> pre questioner completed :</span>{{session.preCompleted ? 'yes' : 'no' }} </div>
-            <div><span> post questioner completed :</span>{{session.postCompleted? 'yes' : 'no' }} </div>
+<!-- Navigation -->
+<div class="row">
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top navbar-custom">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand">Admin page</a>
+            </div>
 
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="pre-quest">Pre Questionnaire</a>
+                    </li>
+                    <li>
+                        <a href="post-quest">Post Questionnaire</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<div class="row">
+    <div id="exTab1" class="container">
+        <ul class="nav nav-pills">
+            <li class="active">
+                <a href="#1a" data-toggle="tab">Registered Users</a>
             </li>
+            <li><a href="#2a" data-toggle="tab">Set tablets (Kima)</a>
+            </li>
+            <li><a href="#3a" data-toggle="tab">Set Tablets (Symb)</a>
+            </li>
+        </ul>
 
+        <div class="tab-content clearfix">
+            <div class="tab-pane active" id="1a">
+                <div margin="5%">
+                    <h3>Registered Users </h3>
+                    <ul *ngFor="let session of sessions  ; let index = i">
+                        <li>
+                            <div>{{session.sessionId}} : <span></span></div>
+                            <button class="btn btn-primary" (click)="startRecording(session.sessionId)">start</button>
+                            <button class="btn btn-default" (click)="stopRecording(session.sessionId)">pause</button>
+                            <button class="btn btn-danger" (click)="cancelSession(session.sessionId)">delete</button>
+                            <div><span> registration time : </span>{{session.timestamp | date:'medium' }}</div>
+                            <div><span> number of particpants completed the pre questionnaire : </span>{{session.particpantsCompletedPreQuest}}
+                            </div>
+                            <div><span>participant 1 registered : </span>{{session.users[0].preQuest ? 'yes' : 'no'}}
+                            </div>
+                            <div><span>participant 2 registered : </span>{{session.users[1].preQuest ? 'yes' : 'no'}}
+                            </div>
+                            <div><span> pre questioner completed :</span>{{session.preCompleted ? 'yes' : 'no' }}</div>
+                            <div><span> post questioner completed :</span>{{session.postCompleted? 'yes' : 'no' }}</div>
 
-    </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="2a">
+                <h4>Chose the 4 kima tablets</h4>
+                <ng-container class="row" *ngFor="let tablet of kimaTablets">
+                    <div class="col-md-3 col-sm-3 col-xs-3 col-lg-3 text-center">
+                        <div [class]="chooseClass(tablet.isTaken)">
+                            <i class="fa fa-tablet fa-5x"></i>
+                            <p>
+                                <select class="form-control" name="tablet" [(ngModel)]="selectedTablet">
+                                    <option *ngFor="let tab of kTablets" [value]="tab.value">{{tab.title}}</option>
+                                </select>
+                            </p>
+                        </div>
+                    </div>
+                </ng-container>
+                <div class="row btn-group">
+                    <button class="btn btn-primary">Save tablet</button>
+                    <button class="btn btn-danger">Reset tablets</button>
+                </div>
+            </div>
+            <div class="tab-pane" id="3a">
+                <h4>Chose the 4 kima tablets</h4>
+                <ng-container class="row" *ngFor="let tablet of symbTablets">
+                    <div class="col-md-3 col-sm-3 col-xs-3 col-lg-3 text-center">
+                        <div [class]="chooseClass(tablet.isTaken)">
+                            <i class="fa fa-tablet fa-5x"></i>
+                            <p>{{tablet.tabletId}}</p>
+                        </div>
+                    </div>
+                </ng-container>
+                <div class="row btn-group">
+                    <button class="btn btn-primary">Save tablet</button>
+                    <button class="btn btn-danger">Reset tablets</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>

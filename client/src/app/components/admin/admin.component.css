@@ -1,0 +1,28 @@
+.navbar-custom {
+    background-color: #337ab7;
+    color: #000;
+}
+
+.row{
+    margin-top: 60px;
+}
+
+.box-container {
+    border-radius: 6px;
+    background-color: #578db4;
+    padding: 30px 15px 15px;
+    color: white;
+    margin-bottom: 25px;
+}
+
+.box-container-disabled {
+    border-radius: 6px;
+    background-color: #949494;
+    padding: 30px 15px 15px;
+    color: #424242;
+    margin-bottom: 25px;
+}
+
+.col-md-3 .col-sm-3 .col-xs-3{
+
+}

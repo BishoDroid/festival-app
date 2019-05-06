@@ -17,7 +17,8 @@ require('../db/festival-app-db');
  * @param res - the response object
  */
 let returnTablets = function (type, limit, res) {
-    Tablet.find({type: type}, function (err, docs) {
+    let query = type === 'all' ? {} : {type: type};
+    Tablet.find(query, function (err, docs) {
         if (err) {
             console.log(err);
             return res.json({code: 500, status: 'ERR', msg: err});
@@ -81,7 +82,7 @@ let resetTablets = function (type, res) {
             console.log(err);
             return res.json({code: 500, status: 'ERR', msg: err});
         } else {
-            console.log('Found '+docs.length+ ' '+type+' tablets');
+            console.log('Found ' + docs.length + ' ' + type + ' tablets');
             docs.forEach(function (tablet) {
                 Tablet.findOneAndUpdate({_id: tablet._id}, {
                     $set: {
@@ -108,14 +109,14 @@ let resetTablets = function (type, res) {
 router.route('/admin/tablets/:type')
     .get(function (req, res) {
         let type = req.param('type');
-        let  limit = type === 'kima' ? 4 : 8;
+        let limit = type === 'kima' ? 4 : 8;
         console.log('Getting tablets for ' + type);
         returnTablets(type, limit, res);
     })
     .post(function (req, res) {
         let type = req.param('type');
         let tablet = createTabletFromBody(req.body);
-        let  limit = type === 'kima' ? 4 : 8;
+        let limit = type === 'kima' ? 4 : 8;
         console.log('Creating tablet for ' + type);
         createTablet(tablet, type, limit, res);
     });
@@ -124,5 +125,38 @@ router.route('/admin/tablets/reset/:type')
     .get(function (req, res) {
         let type = req.param('type');
         resetTablets(type, res);
+    });
+router.route('admin/password')
+    .get(function (req, res) {
+        let client = req.header('client-id');
+        if (client.includes('tablet')) {
+            Tablet.findOne({type: 'password'}, function (err, password) {
+                if (err) {
+                    console.log(err);
+                    return res.json({code: 500, status: 'ERR', msg: err});
+                } else {
+                    return res.json({code: 200, status: 'OK', data: {password: password.tabletId}});
+                }
+            })
+        } else {
+            return res.json({code: 401, status: 'AuthErr', msg: 'Unauthorized. Unknown client'});
+        }
+    })
+    .post(function (req, res) {
+        let client = req.header('client-id');
+        let password = req.body.password;
+        if (client.includes('tablet')) {
+            Tablet.findOneAndUpdate({type: 'password'}, {$set: {tabletId: password}}, {
+                upsert: true,
+                new: true
+            }, function (err, pass) {
+                if (err) {
+                    console.log(err);
+                    return res.json({code: 500, status: 'ERR', msg: err});
+                } else if (pass) {
+                    return res.json({code: 200, status: 'OK', data: {password: pass}});
+                }
+            });
+        }
     });
 module.exports = router;
