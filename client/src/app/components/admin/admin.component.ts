@@ -34,6 +34,7 @@ export class AdminComponent implements OnInit {
                 console.log(this.sessions);
                 this.sessions.forEach(session => {
                     session.particpantsCompletedPreQuest = this.getNumberOfUsersCompletedPreQuestionair(session);
+                    session.particpantsCompletedPostQuest = this.getNumberOfUsersCompletedPostQuestionair(session);
                     console.log(session.particpantsCompletedPreQuest);
                 });
             });
@@ -74,6 +75,10 @@ export class AdminComponent implements OnInit {
 
     getNumberOfUsersCompletedPreQuestionair(session) {
         return session.users.filter(user => user.preQuest !== undefined).length;
+    }
+
+    getNumberOfUsersCompletedPostQuestionair(session) {
+        return session.users.filter(user => user.postQuest !== undefined).length;
     }
 
 

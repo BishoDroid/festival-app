@@ -48,14 +48,10 @@
                             <button class="btn btn-default" (click)="stopRecording(session.sessionId)">pause</button>
                             <button class="btn btn-danger" (click)="cancelSession(session.sessionId)">delete</button>
                             <div><span> registration time : </span>{{session.timestamp | date:'medium' }}</div>
-                            <div><span> number of particpants completed the pre questionnaire : </span>{{session.particpantsCompletedPreQuest}}
+                            <div><span> number of participants completed the pre questionnaire : </span>{{session.particpantsCompletedPreQuest}}
                             </div>
-                            <div><span>participant 1 registered : </span>{{session.users[0].preQuest ? 'yes' : 'no'}}
+                            <div><span> number of participants completed the post questionnaire : </span>{{session.particpantsCompletedPostQuest}}
                             </div>
-                            <div><span>participant 2 registered : </span>{{session.users[1].preQuest ? 'yes' : 'no'}}
-                            </div>
-                            <div><span> pre questioner completed :</span>{{session.preCompleted ? 'yes' : 'no' }}</div>
-                            <div><span> post questioner completed :</span>{{session.postCompleted? 'yes' : 'no' }}</div>
 
                         </li>
                     </ul>

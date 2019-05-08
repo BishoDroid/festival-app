@@ -5,32 +5,40 @@ import {DataService} from "../../data.service";
 @Component({
   selector: 'app-post-questionaire',
   templateUrl: './post-questionaire.component.html',
-  styleUrls: ['./post-questionaire.component.css']
+  styleUrls: ['./post-questionaire.component.css', '../../app.component.css']
 })
 export class PostQuestionaireComponent implements OnInit {
+   selectedImage: number;
 
-  singingPartnerFamiliarity: string = 'yes';
-  symbiosisRoomFamiliarity: string = 'one';
-  tuningWithPeopleScale: number = 4;
-  lonelinessScale: number =4;
-  happinessScale: number =4 ;
+  constructor(private dataSvc: DataService) { }
+  connectednessWithOthers: any = ['11.png', '22.png', '33.png', '44.png', '55.png', '66.png', '77.png'];
+
+  singingPartnerFamiliarity = 'yes';
+  symbiosisRoomFamiliarity = 'one';
+  tuningWithPeopleScale = 4;
+  lonelinessScale = 4;
+  happinessScale = 4 ;
 
   feelingsRange: Options = {
     floor: 1,
     ceil: 7
   };
+  private connectionWithOthersScale: number;
 
   data: {
     singingPartnerFamiliarity: string,
     symbiosisRoomFamiliarity: string,
-    // connectionWithOthersScale: Number,
+    connectionWithOthersScale: Number,
     tuningWithPeopleScale: Number,
     happinessScale: Number,
     lonelinessScale: Number } ;
   clientId: String = "tablet-exit-";
   private header: { "client-id": String };
 
-  constructor(private dataSvc: DataService) { }
+  onImageClick(i: number, imagePath: String) {
+    this.connectionWithOthersScale = i + 1;
+    this.selectedImage = i;
+  }
 
   ngOnInit() {
   }
@@ -38,6 +46,7 @@ export class PostQuestionaireComponent implements OnInit {
   sendData() {
 
     this.data =  {
+      "connectionWithOthersScale" : this.connectionWithOthersScale,
       "singingPartnerFamiliarity" : this.singingPartnerFamiliarity,
       "symbiosisRoomFamiliarity" : this.symbiosisRoomFamiliarity,
       "tuningWithPeopleScale" : this.tuningWithPeopleScale,
