@@ -12,8 +12,9 @@ export class AdminComponent implements OnInit {
     public data: any = [];
     public sessionsObservable: Observable<any>;
     public sessions: any;
-    public symbTablets: any = [8];
-    public kimaTablets: any = [4];
+    public symbTablets: any = [];
+    public kimaTablets: any = [];
+    public allTablets: any = [];
     public defaultTablet: any = {
         type: 'none', tabletId: 'free-tablet', isTaken: false
     };
@@ -21,7 +22,12 @@ export class AdminComponent implements OnInit {
     public choice: string;
     public selectedTablet: any = {};
 
+    public savedTablet = JSON.parse(localStorage.getItem('tablet'));
+
     constructor(public dataSvc: DataService) {
+        if (this.savedTablet === null) {
+            this.savedTablet = this.defaultTablet;
+        }
     }
 
     ngOnInit() {
@@ -35,40 +41,42 @@ export class AdminComponent implements OnInit {
                     session.particpantsCompletedPreQuest = this.getNumberOfUsersCompletedPreQuestionair(session);
                 });
             });
+
+        this.getData('all');
+
+    }
+
+
+    getData(type: string) {
         interval(3000)
             .pipe(
                 startWith(0),
                 switchMap(() =>
-                    this.dataSvc.getTablets('kima')))
+                    this.dataSvc.getTablets(type)))
             .subscribe(res => {
-                this.setTablets(res, 'kima');
+                this.allTablets = res.data;
             });
-
-        interval(3000)
-            .pipe(
-                startWith(0),
-                switchMap(() =>
-                    this.dataSvc.getTablets('symb')))
-            .subscribe(res => {
-                this.setTablets(res.data, 'symb');
-            });
-        console.log("Im getting data");
     }
 
+    /*setTablets(data: any, type: string) {
+     this.allTablets  = data;
+     this.kimaTablets = this.allTablets.filter(tablet => tablet.type.indexOf('kima') !== -1);
+     this.symbTablets = this.allTablets.filter(tablet => tablet.type.indexOf('symb') !== -1);
 
-    setTablets(data: any, type: string) {
-        console.log(data);
-        let limit = type === 'kima' ? 4 : 8;
-        let start = data.length > 0 ? data.length : 0;
-        for (let i = start; i < limit; i++) {
-            if (data[i]) {
-                console.log('Setting tablets...' + JSON.stringify(data));
-                type === 'kima' && this.kimaTablets.length < 4 ? this.kimaTablets[i] = data[i] : this.symbTablets[i] = data[i];
-            } else {
-                type === 'kima' && this.kimaTablets.length < 4 ? this.kimaTablets[i] = this.defaultTablet : this.symbTablets[i] = this.defaultTablet;
-            }
-        }
-    }
+     let limit = type === 'kima' ? 4 : 8;
+     for (let i = 0; i < limit; i++) {
+     if (type === 'kima' && !this.kimaTablets[i]) {
+     console.log('Its kima')
+     this.kimaTablets[i] = this.defaultTablet;
+     }
+     if (type === 'symb' && !this.symbTablets[i]) {
+     this.symbTablets[i] = this.defaultTablet;
+     }
+     }
+     if(type ==='kima'){
+     console.log(this.kimaTablets)
+     }
+     }*/
 
     getNumberOfUsersCompletedPreQuestionair(session) {
         return session.users.filter(user => user.preQuest !== undefined).length;
@@ -121,13 +129,17 @@ export class AdminComponent implements OnInit {
             console.log(res)
             if (res.code === 200) {
                 console.log(res.msg);
+                localStorage.setItem('tablet', JSON.stringify(body));
+                this.savedTablet = body;
+                this.kimaChoice.type = 'none';
             } else {
                 console.log(res.msg);
             }
         });
     }
+
     setChoice(tablet: any) {
+        tablet.type = 'kima';
         this.kimaChoice = tablet;
-        this.kimaChoice.type = 'kima';
     }
 }

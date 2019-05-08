@@ -8,40 +8,41 @@ import {Observable} from "rxjs/index";
 @Injectable()
 export class DataService {
 
+    host: string = 'http://localhost:3001';
 
     constructor(private http: HttpClient) {
 
     }
 
     sendPreQuestionnair(data: any, header: any): Observable<any> {
-        return this.http.post('http://localhost:3001/api/user/pre-quest', data, {headers: header});
+        return this.http.post(this.host + '/api/user/pre-quest', data, {headers: header});
     }
 
     sendPostQuestionnair(data: any, header: any): Observable<any> {
-        return this.http.post('http://localhost:3001/api/user/post-quest', data, {headers: header});
+        return this.http.post(this.host + '/api/user/post-quest', data, {headers: header});
     }
 
     getActiveSessions(): Observable<any> {
-        return this.http.get('http://localhost:3001/api/sessions/all');
+        return this.http.get(this.host + '/api/sessions/all');
     }
 
     startRecording(header: any): Observable<any> {
-        return this.http.get('http://localhost:3001/api/kima/start', {headers: header});
+        return this.http.get(this.host + '/api/kima/start', {headers: header});
     }
 
     stopRecording(header: any): Observable<any> {
-        return this.http.get('http://localhost:3001/api/kima/stop', {headers: header});
+        return this.http.get(this.host + '/api/kima/stop', {headers: header});
     }
 
     removeSession(header: any): Observable<any> {
-        return this.http.post('http://localhost:3001/api/user/remove', null, {headers: header});
+        return this.http.post(this.host + '/api/user/remove', null, {headers: header});
     }
 
     getTablets(type: string): Observable<any> {
-        return this.http.get('http://localhost:3001/api/admin/tablets/' + type);
+        return this.http.get(this.host + '/api/admin/tablets/' + type);
     }
 
     saveTablet(tablet: any): Observable<any> {
-        return this.http.post('http://localhost:3001/api/admin/tablets/' + tablet.type, tablet);
+        return this.http.post(this.host + '/api/admin/tablets/' + tablet.type, tablet);
     }
 }

@@ -19,6 +19,10 @@ const corsOptions = [
     {
         origin: 'http://localhost:4200/',
         optionsSuccessStatus: 200
+    },
+    {
+        origin: 'http://192.168.43.145:4200/',
+        optionsSuccessStatus: 200
     }
 ];
 const port = 3001;
@@ -40,6 +44,6 @@ app.use('/api', session);
 app.use('/api', kima);
 app.use('/api', admin);
 
-app.listen(port, function () {
+app.listen(port,function () {
     console.log("Server started on port " + port);
 });

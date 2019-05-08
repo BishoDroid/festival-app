@@ -26,6 +26,7 @@
 </div>
 
 <div class="row">
+    <h2 *ngIf="savedTablet.type !== 'none'">{{savedTablet.tabletId}}</h2>
     <div id="exTab1" class="container">
         <ul class="nav nav-pills">
             <li class="active">
@@ -64,7 +65,7 @@
 
             <div class="tab-pane" id="2a">
                 <h4>Chose the 4 kima tablets</h4>
-                <ng-container class="row" *ngFor="let tablet of kimaTablets; let index = i">
+                <ng-container class="row" *ngFor="let tablet of allTablets | slice:0:4; let i = index">
                     <div class="col-md-3 col-sm-3 col-xs-3 col-lg-3 text-center">
                         <div (click)="setChoice(tablet)" [class]="chooseClass(tablet.isTaken)">
                             <i class="fa fa-tablet fa-5x"></i>
@@ -74,7 +75,7 @@
                         </div>
                     </div>
                 </ng-container>
-                <div class="row" *ngIf="kimaChoice.type">
+                <div class="row" *ngIf="kimaChoice.type !== 'none'">
                     <div class="col-md-6">
                         <label for="type">Type: </label>
                         <span id="type" class="label label-primary">{{kimaChoice.type}}</span>
@@ -89,14 +90,14 @@
                 </div>
                 <div class="row">
                     <div class="btn-group">
-                        <button class="btn btn-primary" (click)="saveChoice('kima')">Save tablet</button>
+                        <button class="btn btn-primary"  [disabled]="savedTablet.type !== 'none'" (click)="saveChoice('kima')">Save tablet</button>
                         <button class="btn btn-danger">Reset tablets</button>
                     </div>
                 </div>
             </div>
             <div class="tab-pane" id="3a">
                 <h4>Chose the 4 kima tablets</h4>
-                <ng-container class="row" *ngFor="let tablet of symbTablets">
+                <ng-container class="row" *ngFor="let tablet of allTablets; let index = i">
                     <div class="col-md-3 col-sm-3 col-xs-3 col-lg-3 text-center">
                         <div [class]="chooseClass(tablet.isTaken)">
                             <i class="fa fa-tablet fa-5x"></i>

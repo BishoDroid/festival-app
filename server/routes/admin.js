@@ -87,7 +87,7 @@ let resetTablets = function (type, res) {
             docs.forEach(function (tablet) {
                 Tablet.findOneAndUpdate({_id: tablet._id}, {
                     $set: {
-                        tabletId: 'tablet-',
+                        tabletId: 'free-tablet',
                         type: 'none',
                         isTaken: false
                     }
