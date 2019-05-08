@@ -5,7 +5,7 @@ import {MatRadioModule} from '@angular/material/radio';
 @Component({
     selector: 'app-pre-questionaire',
     templateUrl: './pre-questionaire.component.html',
-    styleUrls: ['./pre-questionaire.component.css']
+    styleUrls: ['./pre-questionaire.component.css', '../../app.component.css']
 })
 export class PreQuestionaireComponent implements OnInit {
     connectednessWithOthers: any = ['11.png', '22.png', '33.png', '44.png', '55.png', '66.png', '77.png']

@@ -15,11 +15,11 @@
     </mat-radio-group>
   </div>
   <div class="form-group">
-    <label>3) Please circle sthe picture that best describes how connected to others you feel right now</label>
+    <label>3) Please circle the picture that best describes how connected to others you feel right now</label>
     <div margin="5%">
       <img *ngFor="let imagePath of connectednessWithOthers ; let i = index"
            src="assets/images/{{imagePath}}" class="question-image clickable" width="22%"
-      (click)="onImageClick(i,imagePath)" [class.active]="i == selectedImage">
+      (click)="onImageClick(i,imagePath)"   [ngClass] = "{'highlight' : i == selectedImage}">
     </div>
   </div>
   <div class="form-group">
