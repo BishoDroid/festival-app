@@ -30,6 +30,7 @@ let returnTablets = function (type, limit, res) {
 
 let createTabletFromBody = function (body) {
     let tablet = new Tablet();
+    console.log(body);
     tablet.type = body.type;
     tablet.tabletId = body.tabletId;
     tablet.isTaken = true;
