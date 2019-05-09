@@ -34,6 +34,7 @@ export class PostQuestionaireComponent implements OnInit {
     lonelinessScale: Number } ;
   clientId: String = "tablet-exit-";
   private header: { "client-id": String };
+  showMsg: boolean;
 
   onImageClick(i: number, imagePath: String) {
     this.connectionWithOthersScale = i + 1;
@@ -57,6 +58,11 @@ export class PostQuestionaireComponent implements OnInit {
     console.log(this.clientId);
     this.header = {"client-id" : this.clientId};
     this.dataSvc.sendPostQuestionnair(this.data, this.header).subscribe(res => {
+      console.log(res);
+      this.showMsg   = true;
+      setInterval(() => {
+        this.showMsg = false;
+      }, 2000);
       console.log(res);
     }, error => {
       console.log(error);

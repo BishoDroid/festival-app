@@ -42,7 +42,7 @@ router.route('/kima/:command')
                 canRecord.value = true;
                 conf.update(canRecord);
                 console.log("start recording for session : " + session.sessionId);
-
+                session.recordingStartTime = new Date();
                 return res.json({
                     code: 200,
                     status: 'OK',
@@ -56,7 +56,8 @@ router.route('/kima/:command')
                 canRecord.value = false;
                 conf.update(canRecord);
                 console.log("start recording for session : " + session.sessionId);
-
+                session.recordingStopTime = new Date();
+                updateSession(session);
                 return res.json({
                     code: 200,
                     status: 'OK',

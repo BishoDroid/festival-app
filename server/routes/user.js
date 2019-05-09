@@ -111,12 +111,12 @@ router.route('/user/post-quest')
         let userNumber = clientId.match(/\d+/)[0] ;
         let userIndex = userNumber -1 ;
 
-        processNewPostQuestSession(session, clientId, postQuestSchema, res,maxNumberOfParticipants,userIndex);
+        processNewPostQuestSession(session, clientId, postQuestSchema, res,maxNumberOfParticipants,userIndex,sessionType);
 
     });
 
 
-let processNewPreQuestSession = function (session, clientId, preQuestSchema, res,maxNumberOfParticipants,userIndex) {
+let processNewPreQuestSession = function (session, clientId, preQuestSchema, res,maxNumberOfParticipants,userIndex,sessionType) {
 
     let user = new User();
 
@@ -127,6 +127,7 @@ let processNewPreQuestSession = function (session, clientId, preQuestSchema, res
     }
 
     user.preQuest = preQuestSchema ;
+    session.type = sessionType;
 
     session.users[userIndex] = user ;
 
@@ -207,6 +208,7 @@ let stopRecordingForSession = function (session) {
  */
 let convertPreQuestionnaireBodyToSchema = function (preQuest) {
     let schema = new PreQuestionnaire();
+    schema.submissionTime = new Date;
     schema.age = preQuest.age;
     schema.gender = preQuest.gender;
     schema.connectionWithOthersScale = preQuest.connectionWithOthersScale;
@@ -223,6 +225,7 @@ let convertPreQuestionnaireBodyToSchema = function (preQuest) {
  */
 let convertPostQuestionnaireBodyToSchema = function (postQuest) {
     let schema = new PostQuestionnaire();
+    schema.submissionTime = new Date;
     schema.singingPartnerFamiliarity = postQuest.singingPartnerFamiliarity;
     schema.symbiosisRoomFamiliarity = postQuest.symbiosisRoomFamiliarity;
     schema.connectionWithOthersScale = postQuest.connectionWithOthersScale;

@@ -39,6 +39,7 @@ export class PreQuestionaireComponent implements OnInit {
         lonelinessScale: Number } ;
     clientId: String = "tablet-entrance-";
     private header: { "client-id": String };
+    showMsg: boolean;
 
 
     constructor(private dataSvc: DataService) {
@@ -62,6 +63,11 @@ export class PreQuestionaireComponent implements OnInit {
         console.log(this.data);
         console.log(this.header);
         this.dataSvc.sendPreQuestionnair(this.data, this.header).subscribe(res => {
+
+            this.showMsg   = true;
+            setInterval(() => {
+                this.showMsg = false;
+            }, 2000);
             console.log(res);
         }, error => {
             console.log(error);

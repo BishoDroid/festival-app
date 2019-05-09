@@ -6,6 +6,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var postQuestionnaire = new Schema({
+    submissionTime : Date,
     singingPartnerFamiliarity: String,
     symbiosisRoomFamiliarity: String,
     connectionWithOthersScale: Number,

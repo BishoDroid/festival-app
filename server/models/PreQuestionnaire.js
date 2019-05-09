@@ -6,6 +6,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var preQuestionnaire = new Schema({
+    submissionTime : Date,
     age: Number,
     gender: String,
     connectionWithOthersScale: Number,

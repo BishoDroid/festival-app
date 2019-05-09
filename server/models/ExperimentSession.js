@@ -8,6 +8,7 @@ let mongoose = require('mongoose');
 let user = {
     participantsNumber : Number,
     preQuest: {
+        submissionTime : Date,
         age: Number,
         gender: String,
         connectionWithOthersScale: Number,
@@ -21,6 +22,7 @@ let user = {
         timestamp: Date
     }],
     postQuest: {
+        submissionTime : Date,
         singingPartnerFamiliarity: String,
         symbiosisRoomFamiliarity: String,
         connectionWithOthersScale: Number,
@@ -31,7 +33,9 @@ let user = {
 };
 
 module.exports = mongoose.model('ExperimentSession', {
-    experimentType : String,
+    type : String,
+    recordingStartTime : Date,
+    recordingStopTime : Date,
     sessionId: String,
     users : [user],
     sessionData: [{

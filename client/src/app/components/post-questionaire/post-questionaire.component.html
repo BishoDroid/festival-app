@@ -47,4 +47,9 @@
   </div>
   <button type="submit"  class="btn btn-danger btn-sm waves-effect waves-light" value="sendData">Submit</button>
 </form>
-
+<br>
+<div class="row"  *ngIf="showMsg">
+  <p class="alert alert-success">
+    <strong>We hope you had a great time!</strong> Have a nice day
+  </p>
+</div>
