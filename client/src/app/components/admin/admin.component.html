@@ -63,7 +63,7 @@
                 <h4>Chose the 4 kima tablets</h4>
                 <ng-container class="row" *ngFor="let tablet of allTablets | slice:0:4; let i = index">
                     <div class="col-md-3 col-sm-3 col-xs-3 col-lg-3 text-center">
-                        <div (click)="setChoice(tablet)" [class]="chooseClass(tablet.isTaken)">
+                        <div (click)="setChoice(tablet, 'kima')" [class]="chooseClass(tablet.isTaken)">
                             <i class="fa fa-tablet fa-5x"></i>
                             <p>
                                {{tablet.tabletId}}
@@ -87,23 +87,43 @@
                 <div class="row">
                     <div class="btn-group">
                         <button class="btn btn-primary"  [disabled]="savedTablet.type !== 'none'" (click)="saveChoice('kima')">Save tablet</button>
-                        <button class="btn btn-danger">Reset tablets</button>
+                        <button class="btn btn-danger" (click)="resetTablets('kima')">Reset tablets</button>
                     </div>
                 </div>
             </div>
+
             <div class="tab-pane" id="3a">
-                <h4>Chose the 4 kima tablets</h4>
+                <h4>Chose the  8 Symbiosis tablets</h4>
                 <ng-container class="row" *ngFor="let tablet of allTablets; let index = i">
                     <div class="col-md-3 col-sm-3 col-xs-3 col-lg-3 text-center">
-                        <div [class]="chooseClass(tablet.isTaken)">
+                        <div (click)="setChoice(tablet, 'symb')" [class]="chooseClass(tablet.isTaken)">
                             <i class="fa fa-tablet fa-5x"></i>
                             <p>{{tablet.tabletId}}</p>
                         </div>
                     </div>
                 </ng-container>
-                <div class="row btn-group">
-                    <button class="btn btn-primary">Save tablet</button>
-                    <button class="btn btn-danger">Reset tablets</button>
+                <div class="row" *ngIf="symbChoice.type !== 'none'">
+                    <div class="col-md-6">
+                        <label for="type-symb">Type: </label>
+                        <span id="type-symb" class="label label-primary">{{symbChoice.type}}</span>
+                        <label for="choice-symb">Tablet: </label>
+                        <select id="choice-symb" [(ngModel)]='choice' class='form-control'>
+                            <option value='tablet-1'>Tablet 1</option>
+                            <option value='tablet-2'>Tablet 2</option>
+                            <option value='tablet-3'>Tablet 3</option>
+                            <option value='tablet-4'>Tablet 4</option>
+                            <option value='tablet-5'>Tablet 5</option>
+                            <option value='tablet-6'>Tablet 6</option>
+                            <option value='tablet-7'>Tablet 7</option>
+                            <option value='tablet-8'>Tablet 8</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="btn-group">
+                        <button class="btn btn-primary"  [disabled]="savedTablet.type !== 'none'" (click)="saveChoice('symb')">Save tablet</button>
+                        <button class="btn btn-danger" (click)="resetTablets('symb')">Reset tablets</button>
+                    </div>
                 </div>
             </div>
         </div>

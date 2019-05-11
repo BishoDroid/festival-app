@@ -4,3 +4,5 @@ bower_modules
 package-lock.json
 pre.json
 post.json
+dist
+

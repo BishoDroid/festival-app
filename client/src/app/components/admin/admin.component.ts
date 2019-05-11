@@ -19,6 +19,7 @@ export class AdminComponent implements OnInit {
         type: 'none', tabletId: 'free-tablet', isTaken: false
     };
     public kimaChoice: any = {};
+    public symbChoice: any = {};
     public choice: string;
     public selectedTablet: any = {};
 
@@ -60,25 +61,6 @@ export class AdminComponent implements OnInit {
             });
     }
 
-    /*setTablets(data: any, type: string) {
-     this.allTablets  = data;
-     this.kimaTablets = this.allTablets.filter(tablet => tablet.type.indexOf('kima') !== -1);
-     this.symbTablets = this.allTablets.filter(tablet => tablet.type.indexOf('symb') !== -1);
-
-     let limit = type === 'kima' ? 4 : 8;
-     for (let i = 0; i < limit; i++) {
-     if (type === 'kima' && !this.kimaTablets[i]) {
-     console.log('Its kima')
-     this.kimaTablets[i] = this.defaultTablet;
-     }
-     if (type === 'symb' && !this.symbTablets[i]) {
-     this.symbTablets[i] = this.defaultTablet;
-     }
-     }
-     if(type ==='kima'){
-     console.log(this.kimaTablets)
-     }
-     }*/
 
     getNumberOfUsersCompletedPreQuestionair(session) {
         return session.users.filter(user => user.preQuest !== undefined).length;
@@ -130,7 +112,7 @@ export class AdminComponent implements OnInit {
         const body = {
             type: param, tabletId: this.choice, isTaken: true
         };
-        console.log(body)
+
         this.dataSvc.saveTablet(body).subscribe(res => {
             console.log(res)
             if (res.code === 200) {
@@ -144,8 +126,19 @@ export class AdminComponent implements OnInit {
         });
     }
 
-    setChoice(tablet: any) {
-        tablet.type = 'kima';
-        this.kimaChoice = tablet;
+    resetTablets(type: string) {
+        this.dataSvc.resetTablets(type).subscribe(res => {
+            console.log(res);
+            if (res.code === 200) {
+                console.log(res.msg);
+                localStorage.removeItem('tablet');
+                this.savedTablet = this.defaultTablet;
+            }
+        });
+    }
+
+    setChoice(tablet: any, type: string) {
+        tablet.type = type;
+        type === 'kima' ? this.kimaChoice = tablet : this.symbChoice = tablet;
     }
 }

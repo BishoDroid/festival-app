@@ -8,7 +8,8 @@ import {Observable} from "rxjs/index";
 @Injectable()
 export class DataService {
 
-    host: string = 'http://localhost:3001';
+    // host: string = 'http://localhost:3001';
+    host: string = 'http://192.168.43.145:3001'
 
     constructor(private http: HttpClient) {
 
@@ -44,5 +45,9 @@ export class DataService {
 
     saveTablet(tablet: any): Observable<any> {
         return this.http.post(this.host + '/api/admin/tablets/' + tablet.type, tablet);
+    }
+
+    resetTablets(type: string): Observable<any> {
+        return this.http.get(this.host + '/api/admin/tablets/reset/' + type);
     }
 }
