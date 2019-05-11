@@ -9,7 +9,6 @@ import {Observable} from "rxjs/index";
 export class DataService {
 
      host: string = 'http://localhost:3001';
-   // host: string = 'http://192.168.43.145:3001'
 
     constructor(private http: HttpClient) {
 

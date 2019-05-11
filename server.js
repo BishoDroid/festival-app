@@ -6,6 +6,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
+
 //These routes will handle requests coming to them
 const index = require('./server/routes/index');
 const user = require('./server/routes/user');
@@ -14,10 +15,23 @@ const kima = require('./server/routes/kima');
 const admin = require('./server/routes/admin');
 const utils = require('./server/utils/utils');
 
+var env = process.env.NODE_ENV || 'dev';
+// NODE_ENV=production node server , then you can check if env is dev or production
+
+
+
 
 const corsOptions = [
     {
         origin: 'http://localhost:4200/',
+        optionsSuccessStatus: 200
+    },
+    {
+        origin: 'http://localhost:80/',
+        optionsSuccessStatus: 200
+    },
+    {
+        origin: 'http://167.99.85.162:80/',
         optionsSuccessStatus: 200
     }
 ];
