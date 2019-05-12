@@ -1,4 +1,6 @@
 import {Component, OnInit} from "@angular/core";
+import {Router} from "@angular/router";
+import {DataService} from "./data.service";
 
 @Component({
     selector: 'festival-app',
@@ -7,9 +9,16 @@ import {Component, OnInit} from "@angular/core";
 })
 export class AppComponent implements OnInit {
 
-    message: 'App Works'
+    constructor(private router: Router, private dataSvc: DataService) {
+    }
 
     ngOnInit(): void {
+        this.dataSvc.isFirstRun().subscribe(res => {
+            console.log(res)
+            if (res.code === 301) {
+                this.router.navigate(['/first']);
+            }
+        });
     }
 
 }

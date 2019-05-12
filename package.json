@@ -4,9 +4,10 @@
   "license": "MIT",
   "angular-cli": {
     "styles": [
-    "styles.css",
-    "../node_modules/bootstrap/dist/css/bootstrap.css"
-  ]},
+      "styles.css",
+      "../node_modules/bootstrap/dist/css/bootstrap.css"
+    ]
+  },
   "scripts": {
     "ng": "ng",
     "start": "concurrently --kill-others \"node server\" \"ng serve --proxy-config client/proxy.conf.json\"",
@@ -40,6 +41,7 @@
     "concurrently": "^4.1.0",
     "core-js": "^2.5.7",
     "cors": "^2.8.5",
+    "crypto-js": "^3.1.9-1",
     "dirty": "^1.1.0",
     "ejs": "^2.6.1",
     "express": "^4.14.0",
