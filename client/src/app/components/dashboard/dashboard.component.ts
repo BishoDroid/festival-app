@@ -9,10 +9,10 @@ import Chart from "chart.js";
     styleUrls: ['./dashboard.component.css', '../../app.component.css']
 })
 export class DashboardComponent implements OnInit {
-    private sessions: any;
-    private totalNumberOfSessions: number;
-    private totalNumberOfParticipants: number = 0;
-    private totalEngagementTime: number = 0;
+     sessions: any;
+     totalNumberOfSessions: number;
+     totalNumberOfParticipants: number = 0;
+     totalEngagementTime: number = 0;
     currentChart = [];
     selectedChart: number;
     ageChart = [];
