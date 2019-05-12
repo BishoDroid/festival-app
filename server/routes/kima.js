@@ -20,7 +20,8 @@ let ExperimentSession = require('../models/ExperimentSession');
 let SensorData = require('../models/SensorData');
 let User = require('../models/User');
 let udpPort = new osc.UDPPort({
-    localAddress: "127.0.0.1",
+   // localAddress: "127.0.0.1",
+    localAddress :  "167.99.85.162",
     localPort: 5000
 });
 

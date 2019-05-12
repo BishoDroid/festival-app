@@ -10,8 +10,8 @@ import { isDevMode } from '@angular/core';
 export class DataService {
 
 
-    host: string = isDevMode() ? 'http://localhost:3001' : 'http://167.99.85.162';
-   // host: string = 'http://localhost:3001' ;
+   // host: string = isDevMode() ? 'http://localhost:3001' : 'http://167.99.85.162';
+    host: string = 'http://localhost:3001' ;
 
         constructor(private http: HttpClient) {
 
