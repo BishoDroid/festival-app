@@ -1,5 +1,5 @@
 import {Component, OnInit} from "@angular/core";
-import {DataService} from "../data.service";
+import {DataService} from "../../data.service";
 import {Router} from "@angular/router";
 
 @Component({
@@ -22,8 +22,8 @@ export class FirstRunComponent implements OnInit {
     savePassword() {
         if (this.password && this.password.length > 8) {
             this.showError = false;
-            let header = {"client-id": "free-tablet"};
-            console.log('passwordEnc: ' + btoa(this.password))
+            const header = {"client-id": "free-tablet"};
+            console.log('passwordEnc: ' + btoa(this.password));
             this.dataSvc.savePassword(header, {"value": btoa(this.password)})
                 .subscribe(res => {
                     if (res.code === 401) {
@@ -37,7 +37,7 @@ export class FirstRunComponent implements OnInit {
                                 this.errorMessage = res.msg;
                                 this.showError = true;
                             }
-                        })
+                        });
                     }
                 });
         } else {

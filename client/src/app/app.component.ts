@@ -14,7 +14,7 @@ export class AppComponent implements OnInit {
 
     ngOnInit(): void {
         this.dataSvc.isFirstRun().subscribe(res => {
-            console.log(res)
+            console.log(res);
             if (res.code === 301) {
                 this.router.navigate(['/first']);
             }

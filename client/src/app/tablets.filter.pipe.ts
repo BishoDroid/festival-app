@@ -5,8 +5,11 @@ import {Pipe, PipeTransform} from "@angular/core";
 })
 export class TabletsFilterPipe implements PipeTransform {
 
-    transform(items: any[], filter: Object): any {
-       return null;
+    transform(items: any[], filter: String): any {
+        if (!items || !filter) {
+            return items;
+        }
+        return items.filter(item => item.type.indexOf(filter) === -1);
     }
 
 }
