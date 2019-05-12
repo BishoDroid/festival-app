@@ -173,8 +173,8 @@ let updateSession = function (mySession, res) {
         mySession.active = 0;
     }
 
-    if (session.recordingStopTime == undefined) {
-        session.recordingStopTime = new Date();
+    if (mySession.recordingStopTime == undefined) {
+        mySession.recordingStopTime = new Date();
     }
 
 
