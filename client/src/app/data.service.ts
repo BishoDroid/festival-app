@@ -1,6 +1,7 @@
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs/index";
+import { isDevMode } from '@angular/core';
 /**
  * Created by bisho on 14/04/2019.
  */
@@ -8,10 +9,11 @@ import {Observable} from "rxjs/index";
 @Injectable()
 export class DataService {
 
-    host: string = 'http://localhost:3001';
-    // host: string = 'http://192.168.43.145:3001'
 
-    constructor(private http: HttpClient) {
+    host: string = isDevMode() ? 'http://localhost:3001' : 'http://167.99.85.162';
+   // host: string = 'http://localhost:3001' ;
+
+        constructor(private http: HttpClient) {
 
     }
 
@@ -24,6 +26,10 @@ export class DataService {
     }
 
     getActiveSessions(): Observable<any> {
+        return this.http.get(this.host + '/api/sessions/active');
+    }
+
+    getAllSessions(): Observable<any> {
         return this.http.get(this.host + '/api/sessions/all');
     }
 

@@ -1,0 +1,9 @@
+.boxed {
+    border: 1px solid dodgerblue ;
+    background: #2b669a;
+   /*width: 140px;*/
+    /*height: 120px;*/
+    font-size: 20px;
+    text-align: center;
+    vertical-align: middle;
+}

@@ -1,3 +1,62 @@
-<p>
-  dasboard works!
-</p>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="boxed pinky ">
+                <span> <strong> No. Of Sessions        </strong></span><div>{{totalNumberOfSessions}}</div>
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+        <div class="boxed pinky">
+            <span> <strong> No. Of Participants       </strong></span><div>{{totalNumberOfParticipants}}</div>
+        </div>
+        </div>
+
+        <div class="col-sm-4">
+        <div class="boxed pinky col-md-4">
+            <span> <strong> Total Engagement time       </strong></span><div>{{totalEngagementTime}} mins</div>
+        </div>
+        </div>
+
+
+    </div>
+
+
+    <div class="row">
+    <div *ngIf="ageChart">
+        <canvas id="ageChart"></canvas>
+    </div>
+    </div>
+    <div class="row">
+    <div *ngIf="feelingsChart">
+        <canvas id="feelingsChart"></canvas>
+    </div>
+    </div>
+
+    <table mdbTable class="table">
+        <thead>
+        <tr>
+            <th scope="col"> session </th>
+            <th scope="col"> registration time</th>
+            <th scope="col"> participants completed the pre questionnaire</th>
+            <th scope="col"> participants completed the post questionnaire</th>
+            <th scope="col">Session duration</th>
+            <th scope="col">Harmony</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr scope="row" mdbTableCol *ngFor="let session of sessions ; let i = index">
+
+            <td>{{ i + 1  }}</td>
+            <td>{{session.timestamp | date:'medium' }}</td>
+            <td>{{session.particpantsCompletedPreQuest}}</td>
+            <td>{{session.particpantsCompletedPostQuest}}</td>
+            <td>{{session.engagementDuration}}</td>
+            <td>  <button (click)="showGraph(session,i)">harmony</button>
+                <div id="candev" *ngIf="selectedChart ==i" > </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>

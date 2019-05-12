@@ -10,6 +10,10 @@ let db = lokiSingleton.getInstance();
 let sessions = db.getCollection('sessions');
 let config = db.getCollection('config');
 
+let numberOfKimaParticipants = 2;
+let numberOfSymbiosisParticipants = 8 ;
+
+
 let PreQuestionnaire = require('../models/PreQuestionnaire');
 let PostQuestionnaire = require('../models/PostQuestionnaire');
 let ExperimentSession = require('../models/ExperimentSession');
@@ -21,6 +25,9 @@ router.route('/user/remove') // to remove the session by admin
         let sessionId = req.header('session-id');
 
         let session = sessions.findOne({sessionId: sessionId});
+        if (session.recordingStopTime == undefined) {
+            session.recordingStopTime = new Date();
+        }
         session.active = 0;
 
         ExperimentSession.findOneAndUpdate({'_id': session._id}, session, {new: true}, function (err, doc) {
@@ -47,7 +54,7 @@ router.route('/user/pre-quest')
         let clientId = req.header('client-id');
         let session = getLatestSession('desc');
         let sessionType = clientId.includes("entrance") ? 'kima' : 'symbiosis' ;
-        let maxNumberOfParticipants = sessionType === 'kima'  ? 3 : 8 ;
+        let maxNumberOfParticipants = sessionType === 'kima'  ? numberOfKimaParticipants : numberOfSymbiosisParticipants ;
         let userNumber = clientId.match(/\d+/)[0] ;
         let userIndex = userNumber -1 ;
 
@@ -107,7 +114,7 @@ router.route('/user/post-quest')
         let session = getLatestSession('asc');
 
         let sessionType = clientId.includes("exit") ? 'kima' : 'symbiosis' ;
-        let maxNumberOfParticipants = sessionType === 'kima'  ? 3 : 8 ;
+        let maxNumberOfParticipants = sessionType === 'kima'  ? numberOfKimaParticipants : numberOfSymbiosisParticipants ;
         let userNumber = clientId.match(/\d+/)[0] ;
         let userIndex = userNumber -1 ;
 
@@ -166,6 +173,11 @@ let updateSession = function (mySession, res) {
         mySession.active = 0;
     }
 
+    if (session.recordingStopTime == undefined) {
+        session.recordingStopTime = new Date();
+    }
+
+
     ExperimentSession.findOneAndUpdate({'_id': mySession._id}, mySession, {new: true, upsert: true}, function (err, doc) {
         if (err) return res.json({status: 'ERR', code: 500, msg: err});
         updateLatestSession(mySession);
@@ -173,6 +185,7 @@ let updateSession = function (mySession, res) {
         if (mySession.active === 0) {
             removeInactiveSession(mySession);
             stopRecordingForSession(mySession);
+
         }
         return res.json({status: 'OK', code: 200, msg: 'Saved data'});
     });
