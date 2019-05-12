@@ -1,7 +1,8 @@
-<!-- Navigation -->
-<div class="row">
-    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top navbar-custom">
-        <div class="container">
+<div class="container-fluid">
+
+    <div class="row">
+        <nav id="mainNav" class="navbar navbar-default navbar-custom">
+
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse"
@@ -19,138 +20,151 @@
                     <li>
                         <a href="post-quest">Post Questionnaire</a>
                     </li>
+                    <li>
+                        <a href="dashboard">Dashboard</a>
+                    </li>
                 </ul>
             </div>
-        </div>
-    </nav>
-</div>
 
-<div class="row">
-    <h2 *ngIf="savedTablet.type !== 'none'">{{savedTablet.tabletId}}</h2>
-    <div id="exTab1" class="container">
-        <ul class="nav nav-pills">
-            <li class="active">
-                <a href="#1a" data-toggle="tab">Registered Users</a>
-            </li>
-            <li><a href="#2a" data-toggle="tab">Set tablets (Kima)</a>
-            </li>
-            <li><a href="#3a" data-toggle="tab">Set Tablets (Symb)</a>
-            </li>
-            <li><a href="#4a" data-toggle="tab">Reset password</a> </li>
-        </ul>
-
-        <div class="tab-content clearfix">
-            <div class="tab-pane active" id="1a">
-                <div margin="5%">
-                    <h3>Registered Users </h3>
-                    <ul *ngFor="let session of sessions  ; let index = i">
-                        <li>
-                            <div>{{session.sessionId}} : <span></span></div>
-                            <!----><i class="fa fa-user"></i>
-                            <button class="btn btn-primary" (click)="startRecording(session.sessionId)">start</button>
-                            <button class="btn btn-default" (click)="stopRecording(session.sessionId)">pause</button>
-                            <button class="btn btn-danger" (click)="cancelSession(session.sessionId)">delete</button>
-                            <div><span> registration time : </span>{{session.timestamp | date:'medium' }}</div>
-                            <div><span> number of participants completed the pre questionnaire : </span>{{session.particpantsCompletedPreQuest}}
-                            </div>
-                            <div><span> number of participants completed the post questionnaire : </span>{{session.particpantsCompletedPostQuest}}
-                            </div>
-
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="tab-pane" id="2a">
-                <h4>Chose the 4 kima tablets</h4>
-                <ng-container class="row" *ngFor="let tablet of allTablets | tabletsFilter:'symb' |slice:0:4; let i = index">
-                    <div class="col-md-3 col-sm-3 col-xs-3 col-lg-3 text-center">
-                        <div (click)="setChoice(tablet, 'kima')" [class]="chooseClass(tablet.isTaken)">
-                            <i class="fa fa-tablet fa-5x"></i>
-                            <p>
-                               {{tablet.tabletId}}
-                            </p>
-                        </div>
-                    </div>
-                </ng-container>
-                <div class="row" *ngIf="kimaChoice.type !== 'none'">
-                    <div class="col-md-6">
-                        <label for="type">Type: </label>
-                        <span id="type" class="label label-primary">{{kimaChoice.type}}</span>
-                        <label for="choice">Tablet: </label>
-                        <select id="choice" [(ngModel)]='choice' class='form-control'>
-                            <option value='tablet-entrance-1'>Entrance 1</option>
-                            <option value='tablet-entrance-2'>Entrance 2</option>
-                            <option value='tablet-exit-1'>Exit 1</option>
-                            <option value='tablet-exit-2'>Exit 2</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="btn-group">
-                        <button class="btn btn-primary"  [disabled]="savedTablet.type !== 'none'" (click)="saveChoice('kima')">Save tablet</button>
-                        <button class="btn btn-danger" (click)="resetTablets('kima')">Reset tablets</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-pane" id="3a">
-                <h4>Chose the  8 Symbiosis tablets</h4>
-                <ng-container class="row" *ngFor="let tablet of allTablets; let index = i">
-                    <div class="col-md-3 col-sm-3 col-xs-3 col-lg-3 text-center">
-                        <div (click)="setChoice(tablet, 'symb')" [class]="chooseClass(tablet.isTaken)">
-                            <i class="fa fa-tablet fa-5x"></i>
-                            <p>{{tablet.tabletId}}</p>
-                        </div>
-                    </div>
-                </ng-container>
-                <div class="row" *ngIf="symbChoice.type !== 'none'">
-                    <div class="col-md-6">
-                        <label for="type-symb">Type: </label>
-                        <span id="type-symb" class="label label-primary">{{symbChoice.type}}</span>
-                        <label for="choice-symb">Tablet: </label>
-                        <select id="choice-symb" [(ngModel)]='choice' class='form-control'>
-                            <option value='tablet-1'>Tablet 1</option>
-                            <option value='tablet-2'>Tablet 2</option>
-                            <option value='tablet-3'>Tablet 3</option>
-                            <option value='tablet-4'>Tablet 4</option>
-                            <option value='tablet-5'>Tablet 5</option>
-                            <option value='tablet-6'>Tablet 6</option>
-                            <option value='tablet-7'>Tablet 7</option>
-                            <option value='tablet-8'>Tablet 8</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="btn-group">
-                        <button class="btn btn-primary"  [disabled]="savedTablet.type !== 'none'" (click)="saveChoice('symb')">Save tablet</button>
-                        <button class="btn btn-danger" (click)="resetTablets('symb')">Reset tablets</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-pane" id="4a">
-                <div class="row">
-                    <form class="form">
-                        <div class="form-group col-md-8 col-sm-8 col-xs-8">
-                            <label>Current password</label>
-                            <input class="form-control" type="password" name="currentPass" [(ngModel)]="currentPass" placeholder="Current password">
-                        </div>
-                        <hr/>
-                        <br/>
-                        <div class="form-group col-md-8 col-sm-8 col-xs-8">
-                            <label >New password</label>
-                            <input class="form-control" type="password" [(ngModel)]="newPass" name="newPass"  placeholder="New password">
-                        </div>
-                        <div class="form-group col-md-8 col-sm-8 col-xs-8">
-                            <label >Confirm password</label>
-                            <input class="form-control" type="password" [(ngModel)]="confirmPass" name="confirmPass" placeholder="Confirm password">
-                        </div>
-                    </form>
-                </div>
-                <button class="btn btn-primary" (click)="updatePassword()">Update password</button>
-            </div>
-        </div>
-
+        </nav>
     </div>
+
+    <div class="row">
+        <h2 *ngIf="savedTablet.type !== 'none'">{{savedTablet.tabletId}}</h2>
+        <div id="exTab1" class="container">
+            <ul class="nav nav-pills">
+                <li class="active">
+                    <a href="#1a" data-toggle="tab">Registered Users</a>
+                </li>
+                <li><a href="#2a" data-toggle="tab">Set tablets (Kima)</a>
+                </li>
+                <li><a href="#3a" data-toggle="tab">Set Tablets (Symb)</a>
+                </li>
+                <li><a href="#4a" data-toggle="tab">Reset password</a></li>
+            </ul>
+
+            <div class="tab-content clearfix">
+                <div class="tab-pane active" id="1a">
+                    <div margin="5%">
+                        <h3>Registered Users </h3>
+                        <ul *ngFor="let session of sessions  ; let index = i">
+                            <li>
+                                <div>{{session.sessionId}} : <span></span></div>
+                                <!----><i class="fa fa-user"></i>
+                                <button class="btn btn-primary" (click)="startRecording(session.sessionId)">start</button>
+                                <button class="btn btn-default" (click)="stopRecording(session.sessionId)">pause</button>
+                                <button class="btn btn-danger" (click)="cancelSession(session.sessionId)">delete</button>
+                                <div><span> registration time : </span>{{session.timestamp | date:'medium' }}</div>
+                                <div><span> number of participants completed the pre questionnaire : </span>{{session.particpantsCompletedPreQuest}}
+                                </div>
+                                <div><span> number of participants completed the post questionnaire : </span>{{session.particpantsCompletedPostQuest}}
+                                </div>
+
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="2a">
+                    <h4>Chose the 4 kima tablets</h4>
+                    <ng-container class="row"
+                                  *ngFor="let tablet of allTablets | tabletsFilter:'symb' |slice:0:4; let i = index">
+                        <div class="col-md-3 col-sm-3 col-xs-3 col-lg-3 text-center">
+                            <div (click)="setChoice(tablet, 'kima')" [class]="chooseClass(tablet.isTaken)">
+                                <i class="fa fa-tablet fa-5x"></i>
+                                <p>
+                                    {{tablet.tabletId}}
+                                </p>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <div class="row" *ngIf="kimaChoice.type !== 'none'">
+                        <div class="col-md-6">
+                            <label for="type">Type: </label>
+                            <span id="type" class="label label-primary">{{kimaChoice.type}}</span>
+                            <label for="choice">Tablet: </label>
+                            <select id="choice" [(ngModel)]='choice' class='form-control'>
+                                <option value='tablet-entrance-1'>Entrance 1</option>
+                                <option value='tablet-entrance-2'>Entrance 2</option>
+                                <option value='tablet-exit-1'>Exit 1</option>
+                                <option value='tablet-exit-2'>Exit 2</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="btn-group">
+                            <button class="btn btn-primary" [disabled]="savedTablet.type !== 'none'"
+                                    (click)="saveChoice('kima')">Save tablet
+                            </button>
+                            <button class="btn btn-danger" (click)="resetTablets('kima')">Reset tablets</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="3a">
+                    <h4>Chose the 8 Symbiosis tablets</h4>
+                    <ng-container class="row" *ngFor="let tablet of allTablets; let index = i">
+                        <div class="col-md-3 col-sm-3 col-xs-3 col-lg-3 text-center">
+                            <div (click)="setChoice(tablet, 'symb')" [class]="chooseClass(tablet.isTaken)">
+                                <i class="fa fa-tablet fa-5x"></i>
+                                <p>{{tablet.tabletId}}</p>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <div class="row" *ngIf="symbChoice.type !== 'none'">
+                        <div class="col-md-6">
+                            <label for="type-symb">Type: </label>
+                            <span id="type-symb" class="label label-primary">{{symbChoice.type}}</span>
+                            <label for="choice-symb">Tablet: </label>
+                            <select id="choice-symb" [(ngModel)]='choice' class='form-control'>
+                                <option value='tablet-1'>Tablet 1</option>
+                                <option value='tablet-2'>Tablet 2</option>
+                                <option value='tablet-3'>Tablet 3</option>
+                                <option value='tablet-4'>Tablet 4</option>
+                                <option value='tablet-5'>Tablet 5</option>
+                                <option value='tablet-6'>Tablet 6</option>
+                                <option value='tablet-7'>Tablet 7</option>
+                                <option value='tablet-8'>Tablet 8</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="btn-group">
+                            <button class="btn btn-primary" [disabled]="savedTablet.type !== 'none'"
+                                    (click)="saveChoice('symb')">Save tablet
+                            </button>
+                            <button class="btn btn-danger" (click)="resetTablets('symb')">Reset tablets</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="4a">
+                    <div class="row">
+                        <form class="form">
+                            <div class="form-group col-md-8 col-sm-8 col-xs-8">
+                                <label>Current password</label>
+                                <input class="form-control" type="password" name="currentPass" [(ngModel)]="currentPass"
+                                       placeholder="Current password">
+                            </div>
+                            <hr/>
+                            <br/>
+                            <div class="form-group col-md-8 col-sm-8 col-xs-8">
+                                <label>New password</label>
+                                <input class="form-control" type="password" [(ngModel)]="newPass" name="newPass"
+                                       placeholder="New password">
+                            </div>
+                            <div class="form-group col-md-8 col-sm-8 col-xs-8">
+                                <label>Confirm password</label>
+                                <input class="form-control" type="password" [(ngModel)]="confirmPass" name="confirmPass"
+                                       placeholder="Confirm password">
+                            </div>
+                        </form>
+                    </div>
+                    <button class="btn btn-primary" (click)="updatePassword()">Update password</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
 </div>
