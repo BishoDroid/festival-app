@@ -45,6 +45,7 @@
                     <ul *ngFor="let session of sessions  ; let index = i">
                         <li>
                             <div>{{session.sessionId}} : <span></span></div>
+                            <!----><i class="fa fa-user"></i>
                             <button class="btn btn-primary" (click)="startRecording(session.sessionId)">start</button>
                             <button class="btn btn-default" (click)="stopRecording(session.sessionId)">pause</button>
                             <button class="btn btn-danger" (click)="cancelSession(session.sessionId)">delete</button>
