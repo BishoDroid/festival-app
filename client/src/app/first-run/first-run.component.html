@@ -1,0 +1,13 @@
+<div class="container">
+    <h1 class="text-center">Welcome to Festival app</h1>
+    <hr style="color: #cecece">
+
+    <h3 class="text-center">Please set the admin password</h3>
+
+    <input class="form-control" type="password" name="initPassword" [(ngModel)]="password">
+    <br>
+    <button class="btn btn-primary" (click)="savePassword()">Save</button>
+    <hr>
+    <br>
+    <div class="alert alert-danger" *ngIf="showError">{{errorMessage}}</div>
+</div>
