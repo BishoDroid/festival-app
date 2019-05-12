@@ -1,7 +1,6 @@
 import {Component, OnInit} from "@angular/core";
 import {DataService} from "../../data.service";
 import {interval} from "rxjs";
-import *  as Crypto from "crypto-js";
 import {startWith, switchMap} from "rxjs/operators";
 
 @Component({
@@ -131,7 +130,7 @@ export class AdminComponent implements OnInit {
     }
 
     resetTablets(type: string) {
-        this.dataSvc.resetTablets(type).subscribe(res => {
+        this.dataSvc.resetTablets().subscribe(res => {
             console.log(res);
             if (res.code === 200) {
                 console.log(res.msg);

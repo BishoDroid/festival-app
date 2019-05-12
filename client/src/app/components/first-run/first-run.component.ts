@@ -26,15 +26,16 @@ export class FirstRunComponent implements OnInit {
             console.log('passwordEnc: ' + btoa(this.password));
             this.dataSvc.savePassword(header, {"value": btoa(this.password)})
                 .subscribe(res => {
-                    if (res.code === 401) {
+                    console.log(res);
+                    if (401 === res.code) {
                         console.log(res.msg);
                     } else {
                         console.log('Saved password: ' + JSON.stringify(res));
                         this.dataSvc.updateFirstRun(header, {value: [false]}).subscribe(res2 => {
-                            if (res.code === 200) {
+                            if (res2.code === 200) {
                                 this.router.navigate(['/admin']);
                             } else {
-                                this.errorMessage = res.msg;
+                                this.errorMessage = res2.msg;
                                 this.showError = true;
                             }
                         });

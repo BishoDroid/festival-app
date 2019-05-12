@@ -1,5 +1,10 @@
+.navbar-custom {
+    background-color: #337ab7;
+    color: #000;
+}
 .form {
-    margin-left : 15px; margin-right : 15px;
+    margin-left: 15px;
+    margin-right: 15px;
 }
 
 .btn-group {
@@ -11,11 +16,12 @@
 .radio-button {
     margin: 5px;
 }
+
 .question-image {
     border: 1px solid #0DB9F0;
     padding: 15px;
-    margin : 1px;
-    height: 100px ;
+    margin: 1px;
+    height: 100px;
 }
 
 .question-image:hover {
@@ -23,9 +29,8 @@
     background-color: #46b8da;
 }
 
-
 .pinky {
-    color : #FF4081;
+    color: #FF4081;
 }
 
 .blue {
@@ -35,3 +40,4 @@
 .highlight {
     background-color: #46b8da;
 }
+

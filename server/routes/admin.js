@@ -81,12 +81,12 @@ let createTablet = function (tablet, type, limit, res) {
 };
 
 let resetTablets = function (type, res) {
-    Tablet.find({type: type}, function (err, docs) {
+    Tablet.find(function (err, docs) {
         if (err) {
             console.log(err);
             return res.json({code: 500, status: 'ERR', msg: err});
         } else {
-            console.log('Found ' + docs.length + ' ' + type + ' tablets');
+            console.log('Found ' + docs.length + ' tablets');
             docs.forEach(function (tablet) {
                 Tablet.findOneAndUpdate({_id: tablet._id}, {
                     $set: {
@@ -104,7 +104,7 @@ let resetTablets = function (type, res) {
                 })
             });
             utils.sleep(1000).then(() => {
-                return res.json({code: 200, status: 'OK', msg: 'Successfully reset tablets of type ' + type});
+                return res.json({code: 200, status: 'OK', msg: 'Successfully reset tablets'});
             })
         }
     });
@@ -154,6 +154,7 @@ let updateIsFirstRun = function (value, res) {
         }
     })
 };
+
 router.route('/admin/tablets/:type')
     .get(function (req, res) {
         let type = req.param('type');
@@ -174,6 +175,7 @@ router.route('/admin/tablets/reset/:type')
         let type = req.param('type');
         resetTablets(type, res);
     });
+
 router.route('/admin/config/:key')
     .get(function (req, res) {
         let client = req.header('client-id');
@@ -236,4 +238,5 @@ router.route('/admin/config/:key')
             })
         }
     });
+
 module.exports = router;
