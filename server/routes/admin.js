@@ -5,8 +5,11 @@ const express = require('express');
 const _ = require('underscore');
 const router = express.Router();
 const utils = require('../utils/utils');
+const Crypto = require('crypto-js');
 
 let Tablet = require('../models/Tablet');
+let Config = require('../models/Config');
+let encryptionKey = 'FesTiv@l-ApP';
 
 require('../db/festival-app-db');
 
@@ -107,11 +110,55 @@ let resetTablets = function (type, res) {
     });
 };
 
+let updatePassword = function (value, res) {
+    let currentPasswordEnc = value[0]
+    let newPasswordEnc = value[1];
+    console.log('CUR ENC: ' + currentPasswordEnc);
+    console.log('NEW ENC: ' + newPasswordEnc);
+
+    let currentPass = Buffer.from(currentPasswordEnc, 'base64').toString();
+    let newPass = Buffer.from(newPasswordEnc, 'base64').toString();
+    console.log('CUR DEC: ' + currentPass);
+    console.log('NEW DEC: ' + newPass);
+
+    Config.findOne({key: 'password'}, function (err, data) {
+        if (data) {
+            console.log('PASS ENC: ' + data.value);
+            console.log('PASS DEC: ' + Buffer.from(data.value, 'base64').toString());
+            let pass = Buffer.from(data.value, 'base64').toString();
+            if (pass === currentPass) {
+                data.value = newPasswordEnc;
+                data.save(function (err, saved) {
+                    if (!err) {
+                        return res.json({code: 200, status: 'OK', msg: 'Successfully saved'})
+                    }
+                });
+
+            } else {
+                return res.json({code: 401, status: 'ERR', msg: 'Wrong password'})
+            }
+        }
+    });
+
+};
+
+let updateIsFirstRun = function (value, res) {
+    Config.findOneAndUpdate({key: 'is-first-run'}, {$set: {value: value[0]}}, {new: true, upsert: true}, function (err, doc) {
+        console.log('UPDATING');
+        if (!err) {
+            console.log(doc);
+            return res.json({code: 200, status: 'OK', msg: 'Successfully updated config value to ' + value});
+        } else {
+            console.error(err);
+            return res.json({code: 500, status: 'ERR', msg: 'Error: ' + err});
+        }
+    })
+};
 router.route('/admin/tablets/:type')
     .get(function (req, res) {
         let type = req.param('type');
         let limit = type === 'kima' ? 4 : 8;
-        console.log('Getting tablets for ' + type);
+        // console.log('Getting tablets for ' + type);
         returnTablets(type, limit, res);
     })
     .post(function (req, res) {
@@ -127,37 +174,66 @@ router.route('/admin/tablets/reset/:type')
         let type = req.param('type');
         resetTablets(type, res);
     });
-router.route('admin/password')
+router.route('/admin/config/:key')
     .get(function (req, res) {
         let client = req.header('client-id');
+        let key = req.param('key');
+
+        console.log("Client ID: " + client);
+        console.log("Key: " + key);
+
         if (client.includes('tablet')) {
-            Tablet.findOne({type: 'password'}, function (err, password) {
+            Config.findOne({key: key}, function (err, data) {
                 if (err) {
                     console.log(err);
                     return res.json({code: 500, status: 'ERR', msg: err});
-                } else {
-                    return res.json({code: 200, status: 'OK', data: {password: password.tabletId}});
+                } else if(data) {
+                    return res.json({code: 200, status: 'OK', data: {value: data.value}});
+                }else{
+                    return res.json({code: 301, status: 'OK', msg: 'No Data'});
                 }
             })
         } else {
             return res.json({code: 401, status: 'AuthErr', msg: 'Unauthorized. Unknown client'});
         }
     })
+
+    .put(function (req, res) {
+        let key = req.param('key');
+        let client = req.header('client-id');
+
+        if (client.includes('tablet')) {
+            switch (key) {
+                case 'password':
+                    updatePassword(req.body.value, res);
+                    break;
+                case 'is-first-run':
+                    updateIsFirstRun(req.body.value, res);
+                    break;
+                default:
+                    return res.json({code: 404, status: 'NOT FOUND', msg: 'Config' + key + ' Not found'});
+            }
+        } else {
+            return res.json({code: 401, status: 'AuthErr', msg: 'Unauthorized. Unknown client'});
+        }
+    })
+
     .post(function (req, res) {
         let client = req.header('client-id');
-        let password = req.body.password;
+        let key = req.param('key');
+        let value = req.body.value;
         if (client.includes('tablet')) {
-            Tablet.findOneAndUpdate({type: 'password'}, {$set: {tabletId: password}}, {
-                upsert: true,
-                new: true
-            }, function (err, pass) {
-                if (err) {
-                    console.log(err);
-                    return res.json({code: 500, status: 'ERR', msg: err});
-                } else if (pass) {
-                    return res.json({code: 200, status: 'OK', data: {password: pass}});
+            Config.findOneAndUpdate({key: key}, {$set: {value: value}}, {upsert: true}, function (err, doc) {
+                if (!err) {
+                    return res.json({
+                        code: 200,
+                        status: 'OK',
+                        msg: 'Successfully saved config ' + key + ' with value' + value
+                    });
+                } else {
+                    return res.json({code: 500, status: 'ERR', msg: 'Error: ' + err});
                 }
-            });
+            })
         }
     });
 module.exports = router;

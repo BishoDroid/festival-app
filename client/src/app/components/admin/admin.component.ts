@@ -1,6 +1,7 @@
 import {Component, OnInit} from "@angular/core";
 import {DataService} from "../../data.service";
-import {interval, Observable} from "rxjs";
+import {interval} from "rxjs";
+import *  as Crypto from "crypto-js";
 import {startWith, switchMap} from "rxjs/operators";
 
 @Component({
@@ -9,20 +10,23 @@ import {startWith, switchMap} from "rxjs/operators";
     styleUrls: ['./admin.component.css']
 })
 export class AdminComponent implements OnInit {
+    public choice: string;
+    public currentPass: string;
+    public newPass: string = '';
+    public confirmPass: string = '';
+    public showError: boolean = false;
+    public passwordErrorMsg: string = '';
     public data: any = [];
-    public sessionsObservable: Observable<any>;
     public sessions: any;
     public symbTablets: any = [];
     public kimaTablets: any = [];
     public allTablets: any = [];
+    public kimaChoice: any = {};
+    public symbChoice: any = {};
+    public selectedTablet: any = {};
     public defaultTablet: any = {
         type: 'none', tabletId: 'free-tablet', isTaken: false
     };
-    public kimaChoice: any = {};
-    public symbChoice: any = {};
-    public choice: string;
-    public selectedTablet: any = {};
-
     public savedTablet = JSON.parse(localStorage.getItem('tablet'));
 
     constructor(public dataSvc: DataService) {
@@ -140,5 +144,24 @@ export class AdminComponent implements OnInit {
     setChoice(tablet: any, type: string) {
         tablet.type = type;
         type === 'kima' ? this.kimaChoice = tablet : this.symbChoice = tablet;
+    }
+
+    updatePassword() {
+        this.showError = false;
+        console.log("TABLET: " + JSON.stringify(this.savedTablet));
+        const header = {"client-id": this.savedTablet.tabletId};
+
+        const currentEnc = btoa(this.currentPass);
+        const newEnc = btoa(this.newPass);
+
+        if (this.confirmPass === this.newPass) {
+            this.dataSvc.updatePassword(header, {value: [currentEnc, newEnc]}).subscribe(res => {
+                console.log(res);
+            })
+
+        } else {
+            this.passwordErrorMsg = 'New password and current password do not match';
+            this.showError = true;
+        }
     }
 }

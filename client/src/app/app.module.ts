@@ -14,6 +14,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatButtonModule, MatCheckboxModule, MatRadioModule} from '@angular/material';
 import { AdminComponent } from './components/admin/admin.component';
 import { TabletsFilterPipe } from './tablets.filter.pipe';
+import { FirstRunComponent } from './first-run/first-run.component';
 
 @NgModule({
     declarations: [
@@ -22,7 +23,8 @@ import { TabletsFilterPipe } from './tablets.filter.pipe';
         PostQuestionaireComponent,
         DashboardComponent,
         AdminComponent,
-        TabletsFilterPipe
+        TabletsFilterPipe,
+        FirstRunComponent
     ],
     imports: [
         BrowserModule,
