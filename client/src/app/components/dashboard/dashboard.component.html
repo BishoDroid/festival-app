@@ -1,5 +1,12 @@
 <div class="container" style="margin-top: 15px">
     <div class="row">
+        <button (click)="downloadKimaSessions()">download kima sessions report</button>
+        <button (click)="downloadKimaUsers()">download kima users report</button>
+        <button (click)="downloadSymbiosisSessions()">download symbiosis sessions report</button>
+        <button (click)="downloadSymbiosisUsers()">download symbiosis users report</button>
+
+    </div>
+    <div class="row">
         <div class="col-sm-4 col-md-4">
             <div class="boxed">
                 <span> <strong> No. Of Sessions        </strong></span><div>{{totalNumberOfSessions}}</div>
