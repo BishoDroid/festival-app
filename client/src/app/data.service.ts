@@ -1,7 +1,6 @@
-import {Injectable} from "@angular/core";
+import {Injectable, isDevMode} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs/index";
-import { isDevMode } from '@angular/core';
 /**
  * Created by bisho on 14/04/2019.
  */
@@ -10,10 +9,10 @@ import { isDevMode } from '@angular/core';
 export class DataService {
 
 
-   host: string = isDevMode() ? 'http://localhost:3001' : 'http://167.99.85.162';
-   // host: string = 'http://localhost:3001' ;
+    // host: string = isDevMode() ? 'http://localhost:3001' : 'http://167.99.85.162';
+    host: string = 'http://192.168.43.145:3001' ;
 
-        constructor(private http: HttpClient) {
+    constructor(private http: HttpClient) {
 
     }
 
@@ -57,8 +56,8 @@ export class DataService {
         return this.http.get(this.host + '/api/admin/tablets/reset/all');
     }
 
-    getPassword(header: any): Observable<any> {
-        return this.http.get(this.host + '/api/admin/config/password', {headers: header});
+    resetTabletById(tabletId: string): Observable<any> {
+            return this.http.put(this.host + '/api/admin/tablets/reset/' + tabletId, {});
     }
 
     updatePassword(header: any, body: any): Observable<any> {

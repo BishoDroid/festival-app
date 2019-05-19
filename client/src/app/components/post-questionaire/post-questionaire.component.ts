@@ -30,9 +30,9 @@ export class PostQuestionaireComponent implements OnInit {
     symbiosisRoomFamiliarity: string,
     connectionWithOthersScale: Number,
     tuningWithPeopleScale: Number,
-    happinessScale: Number,
-    lonelinessScale: Number } ;
-  clientId: String = "tablet-exit-";
+    happinessScale: number,
+    lonelinessScale: number } ;
+  clientId: string = "";
   private header: { "client-id": String };
   showMsg: boolean;
 
@@ -42,6 +42,8 @@ export class PostQuestionaireComponent implements OnInit {
   }
 
   ngOnInit() {
+    const tablet = JSON.parse(localStorage.getItem('tablet'));
+    this.clientId = tablet.tabletId;
   }
 
   sendData() {

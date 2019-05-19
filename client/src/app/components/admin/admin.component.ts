@@ -14,7 +14,7 @@ export class AdminComponent implements OnInit {
     public newPass: string = '';
     public confirmPass: string = '';
     public showError: boolean = false;
-    public passwordErrorMsg: string = '';
+    public errorMsg: string = '';
     public data: any = [];
     public sessions: any;
     public symbTablets: any = [];
@@ -140,6 +140,21 @@ export class AdminComponent implements OnInit {
         });
     }
 
+    resetMyTablet() {
+        const myTablet = this.savedTablet;
+
+        this.dataSvc.resetTabletById(myTablet.tabletId).subscribe(res => {
+            if (res.code === 200) {
+                console.log(res.msg);
+                localStorage.removeItem('tablet');
+                this.savedTablet = this.defaultTablet;
+            } else {
+                this.errorMsg = 'Something went wrong while trying to reset this tablet. Please try again.';
+                this.showError = true;
+            }
+        });
+    }
+
     setChoice(tablet: any, type: string) {
         tablet.type = type;
         type === 'kima' ? this.kimaChoice = tablet : this.symbChoice = tablet;
@@ -159,7 +174,7 @@ export class AdminComponent implements OnInit {
             })
 
         } else {
-            this.passwordErrorMsg = 'New password and current password do not match';
+            this.errorMsg = 'New password and current password do not match';
             this.showError = true;
         }
     }

@@ -46,6 +46,8 @@ export class PreQuestionaireComponent implements OnInit {
     }
 
     ngOnInit() {
+        const tablet = JSON.parse(localStorage.getItem('tablet'));
+        this.clientId = tablet.tabletId;
     }
 
     sendData() {

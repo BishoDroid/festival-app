@@ -80,6 +80,24 @@ let createTablet = function (tablet, type, limit, res) {
     });
 };
 
+let resetSingleTablet = function (tabletId, res) {
+    Tablet.findOneAndUpdate({tabletId: tabletId}, {
+        $set: {
+            tabletId: 'free-tablet',
+            type: 'none',
+            isTaken: false
+        }
+    }, {new: true}, function (err, newDoc) {
+        if (err) {
+            console.log(err);
+            return res.json({code: 500, status: 'ERR', msg: err});
+        } else {
+            console.log("Successfully reset " + tabletId );
+            return res.json({code: 200, status: 'OK', msg: 'Successfully reset tablet '+tabletId});
+        }
+    })
+};
+
 let resetTablets = function (type, res) {
     Tablet.find(function (err, docs) {
         if (err) {
@@ -174,6 +192,10 @@ router.route('/admin/tablets/reset/:type')
     .get(function (req, res) {
         let type = req.param('type');
         resetTablets(type, res);
+    })
+    .put(function(req, res){
+        let tabletId = req.param('type');
+        resetSingleTablet(tabletId, res);
     });
 
 router.route('/admin/config/:key')

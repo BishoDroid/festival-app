@@ -96,7 +96,8 @@
                             <button class="btn btn-primary" [disabled]="savedTablet.type !== 'none'"
                                     (click)="saveChoice('kima')">Save tablet
                             </button>
-                            <button class="btn btn-danger" (click)="resetTablets('kima')">Reset tablets</button>
+                            <button class="btn btn-danger" (click)="resetMyTablet()">Reset my tablet</button>
+                            <button class="btn btn-danger" (click)="resetTablets('kima')">Reset all tablets</button>
                         </div>
                     </div>
                 </div>
@@ -133,6 +134,7 @@
                             <button class="btn btn-primary" [disabled]="savedTablet.type !== 'none'"
                                     (click)="saveChoice('symb')">Save tablet
                             </button>
+                            <button class="btn btn-danger" (click)="resetMyTablet()">Reset my tablet</button>
                             <button class="btn btn-danger" (click)="resetTablets('symb')">Reset tablets</button>
                         </div>
                     </div>

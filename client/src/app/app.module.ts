@@ -15,6 +15,7 @@ import {MatButtonModule, MatCheckboxModule, MatRadioModule} from '@angular/mater
 import { AdminComponent } from './components/admin/admin.component';
 import { TabletsFilterPipe } from './tablets.filter.pipe';
 import { FirstRunComponent } from './components/first-run/first-run.component';
+import { VideoComponent } from './components/video/video.component';
 
 @NgModule({
     declarations: [
@@ -24,7 +25,8 @@ import { FirstRunComponent } from './components/first-run/first-run.component';
         DashboardComponent,
         AdminComponent,
         TabletsFilterPipe,
-        FirstRunComponent
+        FirstRunComponent,
+        VideoComponent
     ],
     imports: [
         BrowserModule,
