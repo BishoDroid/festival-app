@@ -94,9 +94,7 @@ export class PreQuestionaireComponent implements OnInit {
             this.showMsg = true;
             setInterval(() => {
                 this.showMsg = false;
-                if (this.isKima()) {
-                    this.router.navigate(['waiting']);
-                } else {
+                if (!this.isKima()) {
                     this.router.navigate(['waiting-video']);
                 }
             }, 3000);

@@ -29,8 +29,7 @@ import { WaitingComponent } from './components/waiting/waiting.component';
         AdminComponent,
         TabletsFilterPipe,
         FirstRunComponent,
-        VideoComponent,
-        WaitingComponent
+        VideoComponent
     ],
     imports: [
         BrowserModule,

@@ -18,7 +18,6 @@ const appRouting: Routes = [
     {path: 'dashboard', component: DashboardComponent},
     {path: 'first', component: FirstRunComponent},
     {path: 'waiting-video', component: VideoComponent},
-    {path: 'waiting', component: WaitingComponent},
     {path: '', redirectTo: 'pre-quest', pathMatch: 'full'}
 ];
 
