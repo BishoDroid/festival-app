@@ -9,13 +9,16 @@ import {PreQuestionaireComponent} from "./components/pre-questionaire/pre-questi
 import {PostQuestionaireComponent} from "./components/post-questionaire/post-questionaire.component";
 import {DashboardComponent} from "./components/dashboard/dashboard.component";
 import {DataService} from "./data.service";
-import { Ng5SliderModule } from 'ng5-slider';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {MatButtonModule, MatCheckboxModule, MatRadioModule} from '@angular/material';
-import { AdminComponent } from './components/admin/admin.component';
-import { TabletsFilterPipe } from './tablets.filter.pipe';
-import { FirstRunComponent } from './components/first-run/first-run.component';
-import { VideoComponent } from './components/video/video.component';
+import {Ng5SliderModule} from "ng5-slider";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {MatButtonModule, MatCheckboxModule, MatRadioModule} from "@angular/material";
+import {AdminComponent} from "./components/admin/admin.component";
+import {TabletsFilterPipe} from "./tablets.filter.pipe";
+import {FirstRunComponent} from "./components/first-run/first-run.component";
+import {VideoComponent} from "./components/video/video.component";
+import {BsModalService, ModalModule} from "ngx-bootstrap";
+import { WaitingComponent } from './components/waiting/waiting.component';
+
 
 @NgModule({
     declarations: [
@@ -26,7 +29,8 @@ import { VideoComponent } from './components/video/video.component';
         AdminComponent,
         TabletsFilterPipe,
         FirstRunComponent,
-        VideoComponent
+        VideoComponent,
+        WaitingComponent
     ],
     imports: [
         BrowserModule,
@@ -36,9 +40,12 @@ import { VideoComponent } from './components/video/video.component';
         NgbModule,
         Ng5SliderModule,
         BrowserAnimationsModule,
-        MatButtonModule, MatCheckboxModule, MatRadioModule
+        MatButtonModule,
+        MatCheckboxModule,
+        MatRadioModule,
+        ModalModule.forRoot()
     ],
-    providers: [DataService],
+    providers: [DataService, BsModalService],
     bootstrap: [AppComponent]
 })
 export class AppModule {

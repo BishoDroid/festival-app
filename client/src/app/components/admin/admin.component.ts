@@ -1,7 +1,8 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, OnInit, TemplateRef} from "@angular/core";
 import {DataService} from "../../data.service";
 import {interval} from "rxjs";
 import {startWith, switchMap} from "rxjs/operators";
+import {BsModalRef, BsModalService} from "ngx-bootstrap";
 
 @Component({
     selector: 'app-admin',
@@ -9,6 +10,7 @@ import {startWith, switchMap} from "rxjs/operators";
     styleUrls: ['./admin.component.css']
 })
 export class AdminComponent implements OnInit {
+    public inProgress: boolean = false;
     public choice: string;
     public currentPass: string;
     public newPass: string = '';
@@ -23,12 +25,16 @@ export class AdminComponent implements OnInit {
     public kimaChoice: any = {};
     public symbChoice: any = {};
     public selectedTablet: any = {};
+    modalRef: BsModalRef;
+    public savedTablet = JSON.parse(localStorage.getItem('tablet'));
+    public myModal: any = {
+        title: '', cancelLabel: 'No', submitLabel: 'Yes', content: '', functionName: ''
+    };
     public defaultTablet: any = {
         type: 'none', tabletId: 'free-tablet', isTaken: false
     };
-    public savedTablet = JSON.parse(localStorage.getItem('tablet'));
 
-    constructor(public dataSvc: DataService) {
+    constructor(public dataSvc: DataService, private modalService: BsModalService) {
         if (this.savedTablet === null) {
             this.savedTablet = this.defaultTablet;
         }
@@ -115,42 +121,58 @@ export class AdminComponent implements OnInit {
         const body = {
             type: param, tabletId: this.choice, isTaken: true
         };
-
+        this.inProgress = true;
         this.dataSvc.saveTablet(body).subscribe(res => {
-            console.log(res)
             if (res.code === 200) {
+                this.inProgress = false;
+
                 console.log(res.msg);
                 localStorage.setItem('tablet', JSON.stringify(body));
                 this.savedTablet = body;
                 this.kimaChoice.type = 'none';
             } else {
-                console.log(res.msg);
+                this.errorMsg = 'Something went wrong while trying to save tablet. Please try again.\n' + res.msg;
+                this.showError = true;
+                this.inProgress = false;
+
             }
         });
     }
 
-    resetTablets(type: string) {
+    resetTablets() {
+        this.inProgress = true;
         this.dataSvc.resetTablets().subscribe(res => {
             console.log(res);
             if (res.code === 200) {
+                this.inProgress = false;
+                this.modalRef.hide();
                 console.log(res.msg);
                 localStorage.removeItem('tablet');
                 this.savedTablet = this.defaultTablet;
+            } else {
+                this.errorMsg = 'Something went wrong while trying to reset all tablet. Please try again.';
+                this.showError = true;
+                this.inProgress = false;
+                this.modalRef.hide();
             }
         });
     }
 
     resetMyTablet() {
         const myTablet = this.savedTablet;
-
+        this.inProgress = true;
         this.dataSvc.resetTabletById(myTablet.tabletId).subscribe(res => {
             if (res.code === 200) {
+                this.inProgress = false;
+                this.modalRef.hide();
                 console.log(res.msg);
                 localStorage.removeItem('tablet');
                 this.savedTablet = this.defaultTablet;
             } else {
                 this.errorMsg = 'Something went wrong while trying to reset this tablet. Please try again.';
                 this.showError = true;
+                this.inProgress = false;
+                this.modalRef.hide();
             }
         });
     }
@@ -177,5 +199,16 @@ export class AdminComponent implements OnInit {
             this.errorMsg = 'New password and current password do not match';
             this.showError = true;
         }
+    }
+
+    callFunction(name: string) {
+        name === 'resetMyTablet' ? this.resetMyTablet() : this.resetTablets();
+    }
+
+    openModal(template: TemplateRef<any>, name: string) {
+        this.myModal.title = 'Are you sure?';
+        this.myModal.content = 'Are you sure you want to perform this action?';
+        this.myModal.functionName = name;
+        this.modalRef = this.modalService.show(template);
     }
 }

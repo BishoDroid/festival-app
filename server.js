@@ -19,8 +19,6 @@ var env = process.env.NODE_ENV || 'dev';
 // NODE_ENV=production node server , then you can check if env is dev or production
 
 
-
-
 const corsOptions = [
     {
         origin: 'http://localhost:4200/',
@@ -39,7 +37,6 @@ const port = 3001;
 const app = express();
 
 
-
 let option = process.argv[2]
 utils.createTablets(option);
 
@@ -54,6 +51,6 @@ app.use('/api', session);
 app.use('/api', kima);
 app.use('/api', admin);
 
-app.listen(port,function () {
+app.listen(port, '192.168.43.145', function () {
     console.log("Server started on port " + port);
 });

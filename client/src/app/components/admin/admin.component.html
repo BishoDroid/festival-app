@@ -51,9 +51,12 @@
                             <li>
                                 <div>{{session.sessionId}} : <span></span></div>
                                 <!----><i class="fa fa-user"></i>
-                                <button class="btn btn-primary" (click)="startRecording(session.sessionId)">start</button>
-                                <button class="btn btn-default" (click)="stopRecording(session.sessionId)">pause</button>
-                                <button class="btn btn-danger" (click)="cancelSession(session.sessionId)">delete</button>
+                                <button class="btn btn-primary" (click)="startRecording(session.sessionId)">start
+                                </button>
+                                <button class="btn btn-default" (click)="stopRecording(session.sessionId)">pause
+                                </button>
+                                <button class="btn btn-danger" (click)="cancelSession(session.sessionId)">delete
+                                </button>
                                 <div><span> registration time : </span>{{session.timestamp | date:'medium' }}</div>
                                 <div><span> number of participants completed the pre questionnaire : </span>{{session.particpantsCompletedPreQuest}}
                                 </div>
@@ -96,8 +99,9 @@
                             <button class="btn btn-primary" [disabled]="savedTablet.type !== 'none'"
                                     (click)="saveChoice('kima')">Save tablet
                             </button>
-                            <button class="btn btn-danger" (click)="resetMyTablet()">Reset my tablet</button>
-                            <button class="btn btn-danger" (click)="resetTablets('kima')">Reset all tablets</button>
+                            <button class="btn btn-warning" [disabled]="savedTablet.type === 'none'" (click)="openModal(confimration, 'resetMyTablet')">Reset this tablet</button>
+                            <button class="btn btn-danger" [disabled]="savedTablet.type === 'none'" (click)="openModal(confimration, 'resetTablets')">Reset all tablets</button>
+                            <img width="45" height="45" src="assets/images/loading.gif" *ngIf="inProgress" class="text-center">
                         </div>
                     </div>
                 </div>
@@ -134,8 +138,9 @@
                             <button class="btn btn-primary" [disabled]="savedTablet.type !== 'none'"
                                     (click)="saveChoice('symb')">Save tablet
                             </button>
-                            <button class="btn btn-danger" (click)="resetMyTablet()">Reset my tablet</button>
-                            <button class="btn btn-danger" (click)="resetTablets('symb')">Reset tablets</button>
+                            <button class="btn btn-warning" [disabled]="savedTablet.type === 'none'" (click)="openModal(confimration, 'resetMyTablet')">Reset this tablet</button>
+                            <button class="btn btn-danger" [disabled]="savedTablet.type === 'none'" (click)="openModal(confimration, 'resetTablets')">Reset all tablets</button>
+                            <img width="45" height="45" src="assets/images/loading.gif" *ngIf="inProgress" class="text-center">
                         </div>
                     </div>
                 </div>
@@ -168,5 +173,22 @@
 
         </div>
     </div>
-
 </div>
+
+
+<ng-template #confimration>
+    <div class="modal-header">
+        <h4 class="modal-title pull-left">{{myModal.title}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>{{myModal.content}}</p>
+        <img width="45" height="45" src="assets/images/loading.gif" *ngIf="inProgress" class="text-center">
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-success" [disabled]="inProgress" (click)="callFunction(myModal.functionName)">Yes</button>
+        <button class="btn btn-danger" [disabled]="inProgress" (click)="modalRef.hide()">No</button>
+    </div>
+</ng-template>

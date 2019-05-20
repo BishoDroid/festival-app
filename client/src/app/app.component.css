@@ -18,16 +18,11 @@
 }
 
 .question-image {
-    border: 1px solid #0DB9F0;
     padding: 15px;
     margin: 1px;
     height: 100px;
 }
 
-.question-image:hover {
-
-    background-color: #46b8da;
-}
 
 .pinky {
     color: #FF4081;
@@ -38,6 +33,6 @@
 }
 
 .highlight {
-    background-color: #46b8da;
+    background-color: #dcdcdc;
 }
 
