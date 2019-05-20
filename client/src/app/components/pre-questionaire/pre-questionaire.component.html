@@ -43,10 +43,11 @@
     <ng5-slider [(value)]="happinessScale" [options]="feelingsRange" id="happinessScale"></ng5-slider>
   </div>
   <button type="submit" style="background: #FF4081;" class="btn btn-success btn-lg waves-effect waves-light" value="sendData">Submit</button>
+  <img width="45" height="45" src="assets/images/loading.gif" *ngIf="isLoading" class="text-center">
 </form>
 <br>
 <div class="row"  *ngIf="showMsg">
-    <p class="alert alert-success">
+    <p class="alert alert-success text-center">
       <strong>Thanks for your submission!</strong> Enjoy your time and have fun : )
     </p>
 </div>

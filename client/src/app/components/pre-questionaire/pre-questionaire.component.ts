@@ -10,7 +10,7 @@ import {Router} from "@angular/router";
 export class PreQuestionaireComponent implements OnInit {
     connectednessWithOthers: any = ['11.png', '22.png', '33.png', '44.png', '55.png', '66.png', '77.png']
     age: number = 18;
-    btnEnabled = true;
+    isLoading = false;
     gender: String = "male";
     ageRange: Options = {
         floor: 10,
@@ -87,11 +87,11 @@ export class PreQuestionaireComponent implements OnInit {
         };
 
         this.header = {"client-id": this.clientId};
-        console.log(this.data);
-        console.log(this.header);
+        this.isLoading = true;
         this.dataSvc.sendPreQuestionnair(this.data, this.header).subscribe(res => {
-
+            this.isLoading = false;
             this.showMsg = true;
+            console.log(this.showMsg)
             setInterval(() => {
                 this.showMsg = false;
                 if (!this.isKima()) {
