@@ -17,7 +17,6 @@ import {TabletsFilterPipe} from "./tablets.filter.pipe";
 import {FirstRunComponent} from "./components/first-run/first-run.component";
 import {VideoComponent} from "./components/video/video.component";
 import {BsModalService, ModalModule} from "ngx-bootstrap";
-import { WaitingComponent } from './components/waiting/waiting.component';
 
 
 @NgModule({

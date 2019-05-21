@@ -15,6 +15,7 @@ export class VideoComponent implements OnInit {
     }
 
     goToPostQuestionnaire() {
+        console.log("Clicked")
         this.router.navigate(['post-quest']);
     }
 }

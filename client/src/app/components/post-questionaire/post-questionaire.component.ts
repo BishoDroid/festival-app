@@ -59,6 +59,7 @@ export class PostQuestionaireComponent implements OnInit {
     }
 
     isKima() {
+        console.log('Im on!!')
         console.log(this.clientId)
         return this.clientId.includes('entrance') || this.clientId.includes('exit');
     }
@@ -73,8 +74,6 @@ export class PostQuestionaireComponent implements OnInit {
             "lonelinessScale": this.lonelinessScale,
             "happinessScale": this.happinessScale
         };
-        console.log(this.data);
-        console.log(this.clientId);
         this.header = {"client-id": this.clientId};
         this.dataSvc.sendPostQuestionnair(this.data, this.header).subscribe(res => {
             console.log(res);
