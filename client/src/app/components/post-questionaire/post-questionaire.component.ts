@@ -56,10 +56,10 @@ export class PostQuestionaireComponent implements OnInit {
     ngOnInit() {
         const tablet = JSON.parse(localStorage.getItem('tablet'));
         this.clientId = tablet.tabletId;
+        console.log('Im on!!')
     }
 
     isKima() {
-        console.log('Im on!!')
         console.log(this.clientId)
         return this.clientId.includes('entrance') || this.clientId.includes('exit');
     }
