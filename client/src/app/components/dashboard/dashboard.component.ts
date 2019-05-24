@@ -28,7 +28,7 @@ export class DashboardComponent implements OnInit {
         this.dataSvc.getAllSessions().subscribe(res => {
             this.sessions = res.sessions;
 
-            this.formUsersReport(this.sessions);
+
             let feelingsDataFromSessions = this.getFeelingsDataDataSet(this.sessions);
 
             let beforeEngagement = {
@@ -105,6 +105,10 @@ export class DashboardComponent implements OnInit {
             console.log(this.sessions);
             this.totalNumberOfSessions = this.sessions.length;
             console.log(this.totalNumberOfSessions);
+
+
+
+
             this.sessions.forEach( (session, index) => {
                 session.particpantsCompletedPreQuest = this.getNumberOfUsersCompletedPreQuestionair(session);
                 session.particpantsCompletedPostQuest = this.getNumberOfUsersCompletedPostQuestionair(session);
@@ -123,12 +127,11 @@ export class DashboardComponent implements OnInit {
                 }
                 this.totalNumberOfParticipants += session.particpantsCompletedPreQuest;
 
-                this.kimaSessionsReportArray.push("data:text/csv;charset=utf-8," +
-                    "ID/No, Registration Time , Participants Completed Pre Quest ,  Participants Completed Pre Quest , Session duration ");
 
-                let line = (index + 1 ).toString(10) + " ," +  session.timestamp + "," + session.particpantsCompletedPreQuest + "," + session.particpantsCompletedPostQuest + "," + session.engagementDuration  ;
-                this.kimaSessionsReportArray.push(line);
             });
+
+            this.formReport(this.sessions);
+
         }, error => {
 
         });
@@ -227,43 +230,56 @@ export class DashboardComponent implements OnInit {
         return session.users.filter(user => user.postQuest !== undefined).length;
     }
 
-    formUsersReport(sessions) {
+    formReport(sessions) {
+
+        this.kimaSessionsReportArray.push("data:text/csv;charset=utf-8," +
+            "ID/No, Registration Time , Participants Completed Pre Quest ,  Participants Completed post Quest , Session duration ");
+
 
         this.kimaUsersReportArray.push("data:text/csv;charset=utf-8," +
-            "Session no, Age , Gender ,  Pre-Connection , Pre-Tuning , Pre-Loneliness , Pre-Happiness ," +
+            "Participant-id, Age , Gender ,  Pre-Connection , Pre-Tuning , Pre-Loneliness , Pre-Happiness ," +
             " Post-Connection , Post-Tuning , Post-Loneliness , Post-Happiness ");
 
-        let lineCommon = " " ;
+        let particpantsIds = ['a', 'b', 'c', 'd', 'e', 'f' , 'g' , 'h'];
 
-        sessions.forEach(session => {
-            lineCommon += session._id + " , " ;
+        sessions.forEach( (session, index) => {
+
+            // sessions report
+            let sessionId = (index + 1).toString(10) ;
+            let line = sessionId + " ," +  session.timestamp + "," + session.particpantsCompletedPreQuest + "," + session.particpantsCompletedPostQuest + "," + session.engagementDuration  ;
+            this.kimaSessionsReportArray.push(line);
+
+            // users group
+            let lineCommon = " " ;
+            lineCommon += sessionId + " , " ;
+
+            function exists(user) {
+                return user.preQuest !== undefined ;
+            }
+            let users = session.users.filter(exists);
+
+            users.forEach(( user, userIndex ) => {
+                let lineUser = sessionId + "-" + particpantsIds[userIndex] + ", ";
 
 
-            session.users.forEach(user => {
-                let lineUser = " ";
+                lineUser += user.preQuest.age + ", " +
+                            user.preQuest.gender + ", " +
+                            user.preQuest.connectionWithOthersScale + ", " +
+                            user.preQuest.tuningWithPeopleScale + " , " +
+                            user.preQuest.lonelinessScale + " , " +
+                            user.preQuest.happinessScale + " , ";
 
-                if (user.preQuest === undefined) {
-                    lineUser += " , , , , , , ";
-                } else {
-                    lineUser += user.preQuest.age + ", " +
-                                user.preQuest.gender + ", " +
-                                user.preQuest.connectionWithOthersScale + ", " +
-                                user.preQuest.tuningWithPeopleScale + " , " +
-                                user.preQuest.lonelinessScale + " , " +
-                                user.preQuest.happinessScale + " , ";
-                }
 
                 if (user.postQuest === undefined)  {
                     lineUser += " , , , , ";
                 } else {
-
                     lineUser += user.postQuest.connectionWithOthersScale + ", " +
                                 user.postQuest.tuningWithPeopleScale + " , " +
                                 user.postQuest.lonelinessScale + " , " +
                                 user.postQuest.happinessScale ;
                 }
 
-                this.kimaUsersReportArray.push(lineCommon + lineUser);
+                this.kimaUsersReportArray.push(lineUser);
 
             });
 

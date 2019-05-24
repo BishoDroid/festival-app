@@ -9,13 +9,13 @@ import {Router} from "@angular/router";
     styleUrls: ['./post-questionaire.component.css', '../../app.component.css']
 })
 export class PostQuestionaireComponent implements OnInit {
-    selectedImage: number;
+    //selectedImage: number = 0;
 
     constructor(private dataSvc: DataService, private router: Router) {
     }
 
     connectednessWithOthers: any = ['11.png', '22.png', '33.png', '44.png', '55.png', '66.png', '77.png'];
-
+    selectedImage = 0;
     singingPartnerFamiliarity = 'yes';
     symbiosisRoomFamiliarity = 'one';
     tuningWithPeopleScale = 4;
@@ -47,6 +47,7 @@ export class PostQuestionaireComponent implements OnInit {
     clientId: string = "";
     private header: { "client-id": String };
     showMsg: boolean;
+
 
     onImageClick(i: number, imagePath: String) {
         this.connectionWithOthersScale = i + 1;
@@ -80,7 +81,10 @@ export class PostQuestionaireComponent implements OnInit {
             this.showMsg = true;
             setInterval(() => {
                 this.showMsg = false;
-            }, 2000);
+                if (!this.isKima()) {
+                    this.router.navigate(['pre-quest']);
+                }
+            }, 5000);
             console.log(res);
         }, error => {
             console.log(error);

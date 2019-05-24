@@ -53,13 +53,11 @@
             <ng5-slider [(value)]="happinessScale" [options]="feelingsRange" id="happinessScale"></ng5-slider>
         </div>
 
-        <button type="submit" class="btn btn-danger btn-lg waves-effect waves-light" value="sendData">Submit</button>
+        <button *ngIf="!showMsg" type="submit" class="btn btn-danger btn-lg waves-effect waves-light" value="sendData">Submit</button>
+        <div *ngIf="showMsg" class=" form-group col-md-12 col-sm-12 col-xs-12 alert alert-success text-center">
+            <p >
+                <strong>We hope you had a great time!</strong> Have a nice day
+            </p>
+        </div>
     </form>
-    <br>
-    <div class="row" *ngIf="showMsg">
-        <p class="alert alert-success">
-            <strong>We hope you had a great time!</strong> Have a nice day
-        </p>
-    </div>
-
 </div>

@@ -1,4 +1,7 @@
 .box-container-img{
+    border-style: solid;
+    border-width: 1px;
+    border-color : black;
     border-radius: 6px;
     height: 150px;
     margin: 2px;
