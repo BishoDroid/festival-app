@@ -34,10 +34,13 @@ router.route('/kima/:command')
 
         session =  sessions.findOne({ 'sessionId' : sessionId });
         console.log(session);
+       // console.log(session);
         let command = req.params.command;
 
         switch (command) {
             case 'start':
+                session.status = "recording";
+                sessions.update(session);
                 currentMicSession.value = sessionId;
                 conf.update(currentMicSession);
                 canRecord.value = true;
@@ -55,6 +58,8 @@ router.route('/kima/:command')
 
                 break;
             case 'stop':
+                session.status = "recording stopped";
+                sessions.update(session);
                 currentMicSession.value = null;
                 conf.update(currentMicSession);
                 canRecord.value = false;

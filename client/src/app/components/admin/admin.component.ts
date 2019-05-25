@@ -48,8 +48,12 @@ export class AdminComponent implements OnInit {
             .subscribe(res => {
                 this.sessions = res;
                 this.sessions.forEach(session => {
+                    console.log(session.status)
                     session.particpantsCompletedPreQuest = this.getNumberOfUsersCompletedPreQuestionair(session);
                     session.particpantsCompletedPostQuest = this.getNumberOfUsersCompletedPostQuestionair(session);
+                    if (session.status === undefined) {
+                        session.status = "ready to record";
+                    }
                     console.log(session.particpantsCompletedPreQuest);
                 });
             });

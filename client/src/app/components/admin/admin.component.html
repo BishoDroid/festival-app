@@ -57,6 +57,7 @@
                                 </button>
                                 <button class="btn btn-danger" (click)="cancelSession(session.sessionId)">delete
                                 </button>
+                                <div><span> status : </span>{{session.status }}</div>
                                 <div><span> registration time : </span>{{session.timestamp | date:'medium' }}</div>
                                 <div><span> number of participants completed the pre questionnaire : </span>{{session.particpantsCompletedPreQuest}}
                                 </div>
