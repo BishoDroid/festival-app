@@ -10,8 +10,8 @@ let db = lokiSingleton.getInstance();
 let sessions = db.getCollection('sessions');
 let config = db.getCollection('config');
 
-let numberOfKimaParticipants = 2;
-let numberOfSymbiosisParticipants = 8 ;
+const numberOfKimaParticipants = 2;
+const numberOfSymbiosisParticipants = 8 ;
 
 
 let PreQuestionnaire = require('../models/PreQuestionnaire');
@@ -25,7 +25,8 @@ router.route('/user/remove') // to remove the session by admin
         let sessionId = req.header('session-id');
 
         let session = sessions.findOne({sessionId: sessionId});
-        if (session.recordingStopTime == undefined) {
+        if (session.recordingStopTime === undefined) {
+            console.log("I am undefined");
             session.recordingStopTime = new Date();
         }
         session.active = 0;
@@ -52,15 +53,34 @@ router.route('/user/pre-quest')
         let body = req.body;
         let preQuestSchema = convertPreQuestionnaireBodyToSchema(body);
         let clientId = req.header('client-id');
+
+        if (isFreeTablet(clientId)) {
+            return res.status(500).send("this tablet is unspecified, please set this tablet from the admin page" );
+        }
+        if(!isRecognizedClientId(clientId)) {
+            return res.status(500).send("unknown tablet type" ) ;
+        }
+
+        let sessionType = getSessionType(clientId) ;
+        if (isKima(sessionType) && isKimaExitTablet(clientId)) {
+            return res.status(500).send("this tablet is an exit tablet, you can only send post- questionnaire" ) ;
+        }
+
         let session = getLatestSession('desc');
-        let sessionType = clientId.includes("entrance") ? 'kima' : 'symbiosis' ;
-        let maxNumberOfParticipants = sessionType === 'kima'  ? numberOfKimaParticipants : numberOfSymbiosisParticipants ;
+
         let userNumber = clientId.match(/\d+/)[0] ;
         let userIndex = userNumber -1 ;
 
+        if (session && session.users[userIndex].preQuest.age !== undefined) {
+            return res.status(500).send("this user already submitted the pre-quest , you cannot resubmit" ) ;
+        }
+
+
+        let maxNumberOfParticipants = sessionType === 'kima'  ? numberOfKimaParticipants : numberOfSymbiosisParticipants ;
+
         let sessionWithCompletePreQuestionair = session && session.preCompleted === 1 ;
         //check if the context has un complete session
-        if (!session || sessionWithCompletePreQuestionair ) { // very first session
+        if (!session || sessionWithCompletePreQuestionair ) {
             console.log("creating new session");
             let newSession = new ExperimentSession();
             newSession.sessionId = getNextSessionId(sessions);
@@ -100,6 +120,44 @@ let updateExistingPreQuestSession = function (session, clientId, preQuestSchema,
 function getNumberOfUsersCompletedPostQuestionair(session){
     return session.users.filter(user => user.postQuest.happinessScale ).length;
 }
+
+function isRecognizedClientId (clientId) {
+        return clientId.match(/tablet-\d+/g) || clientId.match(/tablet-entrance-\d+/g) || clientId.match(/tablet-exit-\d+/g)
+}
+function isFreeTablet(clientId){
+        console.log(clientId) ;
+        return (clientId === "free-tablet");
+}
+
+function isKimaEntranceTablet (clientId) {
+  return  clientId.includes("entrance")  ;
+}
+
+function isKimaExitTablet (clientId) {
+
+    clientId.includes("exit") ;
+}
+
+function isSymbiosis (sessionType) {
+        return sessionType === 'symbiosis' ;
+}
+
+function isKima (sessionType) {
+    return sessionType === 'kima' ;
+}
+
+function getSessionType (clientId) {
+
+        if (clientId.match(/tablet-entrance-\d+/g)   || clientId.match(/tablet-exit-\d+/g) ) {
+            return "kima";
+        }
+        else if (clientId.match(/tablet-\d+/g)) {
+            return "symbiosis"
+        }
+        else {
+            return "unknown" ;
+        }
+}
 router.route('/user/post-quest')
 
 /**
@@ -111,12 +169,37 @@ router.route('/user/post-quest')
         let postQuestSchema = convertPostQuestionnaireBodyToSchema(body);
 
         let clientId = req.header('client-id');
+
+        if  (isFreeTablet(clientId)) {
+            return res.status(500).send("this tablet is unspecified, please set this tablet from the admin page" );
+        }
+        if (!isRecognizedClientId(clientId)) {
+            return res.status(500).send("unknown tablet type" ) ;
+        }
+
+        let sessionType = getSessionType(clientId) ;
+        if (isKima(sessionType) && isKimaEntranceTablet(clientId)) {
+            return res.status(500).send("this tablet is an entrance tablet, you can only send pre- questionnaire" ) ;
+        }
+
         let session = getLatestSession('asc');
 
-        let sessionType = clientId.includes("exit") ? 'kima' : 'symbiosis' ;
-        let maxNumberOfParticipants = sessionType === 'kima'  ? numberOfKimaParticipants : numberOfSymbiosisParticipants ;
+        if (session === undefined){
+            return res.status(500).send("there is no current session for post questionnaire") ;
+        }
+
         let userNumber = clientId.match(/\d+/)[0] ;
         let userIndex = userNumber -1 ;
+
+        if (session && session.users[userIndex].postQuest.happinessScale !== undefined) {
+            return res.status(500).send("this user already submitted the post-quest , you cannot resubmit" ) ;
+        }
+
+        if (session && session.users[userIndex].preQuest.happinessScale === undefined) {
+            return res.status(500).send("this user already haven't submitted the pre-quest, you cannot submit a post quest" ) ;
+        }
+
+        let maxNumberOfParticipants = sessionType === 'kima'  ? numberOfKimaParticipants : numberOfSymbiosisParticipants ;
 
         processNewPostQuestSession(session, clientId, postQuestSchema, res,maxNumberOfParticipants,userIndex,sessionType);
 
@@ -174,6 +257,7 @@ let updateSession = function (mySession, res) {
     }
 
     if (mySession.recordingStopTime == undefined) {
+        console.log("I am undefined");
         mySession.recordingStopTime = new Date();
     }
 

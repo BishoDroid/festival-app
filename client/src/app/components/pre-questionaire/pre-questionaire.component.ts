@@ -59,7 +59,7 @@ export class PreQuestionaireComponent implements OnInit {
         happinessScale: Number,
         lonelinessScale: Number
     };
-    clientId: String = "tablet-entrance-";
+    clientId: String = "free-tablet";
     private header: { "client-id": String };
     showMsg: boolean;
     target: HTMLElement;
@@ -70,9 +70,11 @@ export class PreQuestionaireComponent implements OnInit {
 
     ngOnInit() {
         const tablet = JSON.parse(localStorage.getItem('tablet'));
-        this.clientId = tablet.tabletId;
-    }
+        if (tablet) {
+            this.clientId = tablet.tabletId;
+        }
 
+    }
     isKima() {
         console.log(this.clientId)
         return this.clientId.includes('entrance') || this.clientId.includes('exit');
@@ -99,7 +101,7 @@ export class PreQuestionaireComponent implements OnInit {
 
 
             this.isLoading = false;
-            this.showMsg = true;
+
             if (this.MyProp) {
                 this.MyProp.nativeElement.scrollIntoView({ behavior: "smooth", block: "start" });
             }
@@ -122,9 +124,11 @@ export class PreQuestionaireComponent implements OnInit {
                 }
             }, 3000);*/
 
-
+            console.log("logging result");
             console.log(res);
         }, error => {
+            this.isLoading = false;
+            console.log("logging error");
             console.log(error);
         });
     }

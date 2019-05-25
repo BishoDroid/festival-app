@@ -21,6 +21,7 @@ export class PostQuestionaireComponent implements OnInit {
     tuningWithPeopleScale = 4;
     lonelinessScale = 4;
     happinessScale = 4;
+    connectionWithOthersScale = 1;
 
     feelingsRange: Options = {
         floor: 1,
@@ -34,7 +35,6 @@ export class PostQuestionaireComponent implements OnInit {
             return '#6f2277';
         }
     };
-    private connectionWithOthersScale: number;
 
     data: {
         singingPartnerFamiliarity: string,
@@ -44,7 +44,8 @@ export class PostQuestionaireComponent implements OnInit {
         happinessScale: number,
         lonelinessScale: number
     };
-    clientId: string = "";
+    clientId: string = "free-tablet";
+   // clientId: string;
     private header: { "client-id": String };
     showMsg: boolean;
 
@@ -56,8 +57,11 @@ export class PostQuestionaireComponent implements OnInit {
 
     ngOnInit() {
         const tablet = JSON.parse(localStorage.getItem('tablet'));
-        this.clientId = tablet.tabletId;
-        console.log('Im on!!')
+        if (tablet) {
+            this.clientId = tablet.tabletId;
+        }
+
+        console.log('Im on!!');
     }
 
     isKima() {

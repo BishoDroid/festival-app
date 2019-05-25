@@ -118,6 +118,9 @@ export class DashboardComponent implements OnInit {
                 let start = (Date.parse(session.recordingStartTime));
                 if (start && stop) {
                     session.engagementDuration = Math.floor(((stop - start) / 1000) / 60);
+                    if (session.engagementDuration < 0)  {
+                        session.engagementDuration = 0;
+                    }
                 } else {
                     session.engagementDuration = 0;
                 }
