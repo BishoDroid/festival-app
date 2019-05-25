@@ -63,7 +63,7 @@ router.route('/user/pre-quest')
 
         let sessionType = getSessionType(clientId) ;
         if (isKima(sessionType) && isKimaExitTablet(clientId)) {
-            return res.status(500).send("this tablet is an exit tablet, you can only send post- questionnaire" ) ;
+            return res.status(500).send("this tablet is an exit tablet, you can only send post-questionnaire" ) ;
         }
 
         let session = getLatestSession('desc');
@@ -135,7 +135,7 @@ function isKimaEntranceTablet (clientId) {
 
 function isKimaExitTablet (clientId) {
 
-    clientId.includes("exit") ;
+    return clientId.includes("exit") ;
 }
 
 function isSymbiosis (sessionType) {

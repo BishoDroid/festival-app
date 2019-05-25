@@ -108,7 +108,7 @@
 
                 <div class="tab-pane" id="3a">
                     <h4>Chose the 8 Symbiosis tablets</h4>
-                    <ng-container class="row" *ngFor="let tablet of allTablets; let index = i">
+                    <ng-container class="row" *ngFor="let tablet of allTablets | tabletsFilter:'kima' | slice:0:8; let index = i">
                         <div class="col-md-3 col-sm-3 col-xs-3 col-lg-3 text-center">
                             <div (click)="setChoice(tablet, 'symb')" [class]="chooseClass(tablet)">
                                 <i class="fa fa-tablet fa-5x"></i>

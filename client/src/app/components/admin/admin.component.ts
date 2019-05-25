@@ -19,11 +19,13 @@ export class AdminComponent implements OnInit {
     public errorMsg: string = '';
     public data: any = [];
     public sessions: any;
+    public availableSymb = [];
+    public availableKima = [];
     public symbTablets: any = [];
     public kimaTablets: any = [];
-    public allTablets: any = [];
-    public kimaChoice: any = {};
     public symbChoice: any = {};
+    public kimaChoice: any = {};
+    public allTablets: any = [];
     public selectedTablet: any = {};
     modalRef: BsModalRef;
     public savedTablet = JSON.parse(localStorage.getItem('tablet'));
