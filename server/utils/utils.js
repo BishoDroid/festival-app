@@ -9,7 +9,7 @@ let sleepFunc = (milliseconds) => {
 };
 let createFunc = function (force) {
     if(force){
-        for (let i = 1; i <= 8; i++) {
+        for (let i = 1; i <= 12; i++) {
             let tablet = new Tablet();
             Tablet.find(function (err, doc) {
                 if (err) console.log(err);

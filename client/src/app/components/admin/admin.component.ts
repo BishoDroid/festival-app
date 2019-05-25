@@ -66,6 +66,7 @@ export class AdminComponent implements OnInit {
                 switchMap(() =>
                     this.dataSvc.getTablets(type)))
             .subscribe(res => {
+                console.log(res.data.length)
                 this.allTablets = res.data;
             });
     }
@@ -113,8 +114,14 @@ export class AdminComponent implements OnInit {
         });
     }
 
-    chooseClass(isTaken: boolean): string {
-        return isTaken ? 'box-container-disabled' : 'box-container clickable';
+    chooseClass(tablet: any): string {
+        if (tablet.isTaken && tablet.tabletId === this.savedTablet.tabletId) {
+            return 'box-container-mine';
+        } else if (tablet.isTaken) {
+            return 'box-container-disabled';
+        } else {
+            return 'box-container clickable';
+        }
     }
 
     saveChoice(param: string) {

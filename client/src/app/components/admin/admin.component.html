@@ -73,9 +73,9 @@
                     <ng-container class="row"
                                   *ngFor="let tablet of allTablets | tabletsFilter:'symb' |slice:0:4; let i = index">
                         <div class="col-md-3 col-sm-3 col-xs-3 col-lg-3 text-center">
-                            <div (click)="setChoice(tablet, 'kima')" [class]="chooseClass(tablet.isTaken)">
+                            <div (click)="setChoice(tablet, 'kima')" [class]="chooseClass(tablet)">
                                 <i class="fa fa-tablet fa-5x"></i>
-                                <p>
+                                <p style="font-size: 1.5vw;font-weight: bold;">
                                     {{tablet.tabletId}}
                                 </p>
                             </div>
@@ -110,9 +110,11 @@
                     <h4>Chose the 8 Symbiosis tablets</h4>
                     <ng-container class="row" *ngFor="let tablet of allTablets; let index = i">
                         <div class="col-md-3 col-sm-3 col-xs-3 col-lg-3 text-center">
-                            <div (click)="setChoice(tablet, 'symb')" [class]="chooseClass(tablet.isTaken)">
+                            <div (click)="setChoice(tablet, 'symb')" [class]="chooseClass(tablet)">
                                 <i class="fa fa-tablet fa-5x"></i>
-                                <p>{{tablet.tabletId}}</p>
+                                <p style="font-size: 1.5vw; font-weight: bold;">
+                                    {{tablet.tabletId}}
+                                </p>
                             </div>
                         </div>
                     </ng-container>
