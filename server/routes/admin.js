@@ -16,16 +16,16 @@ require('../db/festival-app-db');
 /**
  * Gets the avaialble tablets for the specific type
  * @param type - kima or symb
- * @param limit - 4 for kima, 8 for symb
  * @param res - the response object
  */
-let returnTablets = function (type, limit, res) {
+let returnTablets = function (type, res) {
     let query = type === 'all' ? {} : {type: type};
     Tablet.find(query, function (err, docs) {
         if (err) {
             console.log(err);
             return res.json({code: 500, status: 'ERR', msg: err});
         } else {
+            console.log(docs);
             return res.json({code: 200, status: 'OK', data: docs});
         }
     });
@@ -176,14 +176,13 @@ let updateIsFirstRun = function (value, res) {
 router.route('/admin/tablets/:type')
     .get(function (req, res) {
         let type = req.param('type');
-        let limit = type === 'kima' ? 4 : 8;
-        // console.log('Getting tablets for ' + type);
-        returnTablets(type, limit, res);
+        console.log('Getting tablets for ' + type + 'Size: '+ 12);
+        returnTablets(type, res);
     })
     .post(function (req, res) {
         let type = req.param('type');
         let tablet = createTabletFromBody(req.body);
-        let limit = type === 'kima' ? 4 : 8;
+        let limit = type === 'kima' ? 4 : 12;
         console.log('Creating tablet for ' + type);
         createTablet(tablet, type, limit, res);
     });
