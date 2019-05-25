@@ -265,7 +265,6 @@ let updateSession = function (mySession, res) {
     ExperimentSession.findOneAndUpdate({'_id': mySession._id}, mySession, {new: true, upsert: true}, function (err, doc) {
         if (err) return res.json({status: 'ERR', code: 500, msg: err});
         updateLatestSession(mySession);
-        console.log(doc);
         if (mySession.active === 0) {
             removeInactiveSession(mySession);
             stopRecordingForSession(mySession);

@@ -19,8 +19,6 @@ export class AdminComponent implements OnInit {
     public errorMsg: string = '';
     public data: any = [];
     public sessions: any;
-    public availableSymb = [];
-    public availableKima = [];
     public symbTablets: any = [];
     public kimaTablets: any = [];
     public symbChoice: any = {};
@@ -35,7 +33,22 @@ export class AdminComponent implements OnInit {
     public defaultTablet: any = {
         type: 'none', tabletId: 'free-tablet', isTaken: false
     };
-
+    public availableKima = [
+        {label: 'Entrance 1', value: 'tablet-entrance-1', taken: false},
+        {label: 'Entrance 2', value: 'tablet-entrance-2', taken: false},
+        {label: 'Exit 1', value: 'tablet-exit-1', taken: false},
+        {label: 'Exit 2', value: 'tablet-exit-2', taken: false}
+        ];
+    public availableSymb = [
+        {label: 'Tablet 1', value: 'tablet-1', taken: false},
+        {label: 'Tablet 2', value: 'tablet-2', taken: false},
+        {label: 'Tablet 3', value: 'tablet-3', taken: false},
+        {label: 'Tablet 4', value: 'tablet-4', taken: false},
+        {label: 'Tablet 5', value: 'tablet-5', taken: false},
+        {label: 'Tablet 6', value: 'tablet-6', taken: false},
+        {label: 'Tablet 7', value: 'tablet-7', taken: false},
+        {label: 'Tablet 8', value: 'tablet-8', taken: false},
+    ];
     constructor(public dataSvc: DataService, private modalService: BsModalService) {
         if (this.savedTablet === null) {
             this.savedTablet = this.defaultTablet;
@@ -68,12 +81,29 @@ export class AdminComponent implements OnInit {
                 switchMap(() =>
                     this.dataSvc.getTablets(type)))
             .subscribe(res => {
-                console.log(res.data.length)
+                console.log(res.data.length);
                 this.allTablets = res.data;
+                this.availableKima = this.availableKima.map(kima => {
+                    return {label: kima.label, value: kima.value, taken: false};
+                });
+                this.availableSymb = this.availableSymb.map(symb => {
+                    return {label: symb.label, value: symb.value, taken: false};
+                });
+                this.filterDropdown(this.availableKima);
+                this.filterDropdown(this.availableSymb);
+
             });
     }
 
-
+    filterDropdown(givenTablets) {
+        this.allTablets.forEach(tab => {
+            const index = givenTablets.findIndex(one => one.value === tab.tabletId);
+            if (index !== -1) {
+                console.log(givenTablets[index].value);
+                givenTablets[index].taken = true;
+            }
+        });
+    }
     getNumberOfUsersCompletedPreQuestionair(session) {
         return session.users.filter(user => user.preQuest !== undefined).length;
     }
@@ -202,7 +232,7 @@ export class AdminComponent implements OnInit {
         if (this.confirmPass === this.newPass) {
             this.dataSvc.updatePassword(header, {value: [currentEnc, newEnc]}).subscribe(res => {
                 console.log(res);
-            })
+            });
 
         } else {
             this.errorMsg = 'New password and current password do not match';

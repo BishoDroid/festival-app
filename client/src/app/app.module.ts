@@ -17,7 +17,8 @@ import {TabletsFilterPipe} from "./tablets.filter.pipe";
 import {FirstRunComponent} from "./components/first-run/first-run.component";
 import {VideoComponent} from "./components/video/video.component";
 import {BsModalService, ModalModule} from "ngx-bootstrap";
-import { KimaThankyouComponent } from './components/kima-thankyou/kima-thankyou.component';
+import {KimaThankyouComponent} from "./components/kima-thankyou/kima-thankyou.component";
+import {DropdownFilterPipe} from "./dropdown.filter.pipe";
 
 
 @NgModule({
@@ -30,7 +31,8 @@ import { KimaThankyouComponent } from './components/kima-thankyou/kima-thankyou.
         TabletsFilterPipe,
         FirstRunComponent,
         VideoComponent,
-        KimaThankyouComponent
+        KimaThankyouComponent,
+        DropdownFilterPipe
     ],
     imports: [
         BrowserModule,
