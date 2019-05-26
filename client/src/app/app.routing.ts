@@ -7,6 +7,7 @@ import {AdminComponent} from "./components/admin/admin.component";
 import {FirstRunComponent} from "./components/first-run/first-run.component";
 import {VideoComponent} from "./components/video/video.component";
 import {KimaThankyouComponent} from "./components/kima-thankyou/kima-thankyou.component";
+import {LoggingComponent} from "./components/logging/logging.component";
 /**
  * Created by bisho on 14/04/2019.
  */
@@ -19,6 +20,7 @@ const appRouting: Routes = [
     {path: 'first', component: FirstRunComponent},
     {path: 'waiting-video', component: VideoComponent},
     {path: 'kima-thankyou' , component: KimaThankyouComponent},
+    {path: 'logs', component: LoggingComponent},
     {path: '', redirectTo: 'pre-quest', pathMatch: 'full'}
 ];
 

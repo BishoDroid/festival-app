@@ -4,20 +4,18 @@ const router = express.Router();
 require('../db/festival-app-db');
 // in memory db for storing sessions temporarily
 const lokiSingleton = require('../db/festival-app-db-in-loki');
-
-let db = lokiSingleton.getInstance();
-
-let sessions = db.getCollection('sessions');
-let config = db.getCollection('config');
-
 const numberOfKimaParticipants = 2;
 const numberOfSymbiosisParticipants = 8 ;
 
+let db = lokiSingleton.getInstance();
+let sessions = db.getCollection('sessions');
+let config = db.getCollection('config');
 
 let PreQuestionnaire = require('../models/PreQuestionnaire');
 let PostQuestionnaire = require('../models/PostQuestionnaire');
 let ExperimentSession = require('../models/ExperimentSession');
 let User = require('../models/User');
+let log = require('../utils/logger');
 
 router.route('/user/remove') // to remove the session by admin
 
@@ -53,17 +51,21 @@ router.route('/user/pre-quest')
         let body = req.body;
         let preQuestSchema = convertPreQuestionnaireBodyToSchema(body);
         let clientId = req.header('client-id');
+        let sessionType = getSessionType(clientId) ;
 
         if (isFreeTablet(clientId)) {
-            return res.status(500).send("this tablet is unspecified, please set this tablet from the admin page" );
+            log(sessionType, 'ERROR', 'The tablet you are using is unregistered in the app, please register it in the admin page');
+            return res.status(500).send("The tablet you are using is unregistered in the app, please register it in the admin page" );
         }
         if(!isRecognizedClientId(clientId)) {
-            return res.status(500).send("unknown tablet type" ) ;
+            log(sessionType, 'ERROR', 'The tablet with id '+ clientId + 'is unknown');
+            return res.status(500).send('The tablet with id '+ clientId + 'is unknown') ;
         }
 
-        let sessionType = getSessionType(clientId) ;
+
         if (isKima(sessionType) && isKimaExitTablet(clientId)) {
-            return res.status(500).send("this tablet is an exit tablet, you can only send post-questionnaire" ) ;
+            log(sessionType, 'ERROR', 'This is an exit tablet and it can only be used to send Post Engagement questionnaire data');
+            return res.status(500).send('This is an exit tablet and it can only be used to send Post Engagement questionnaire data') ;
         }
 
         let session = getLatestSession('desc');
@@ -72,7 +74,8 @@ router.route('/user/pre-quest')
         let userIndex = userNumber -1 ;
 
         if (session && session.users[userIndex].preQuest.age !== undefined) {
-            return res.status(500).send("this user already submitted the pre-quest , you cannot resubmit" ) ;
+            log(sessionType, 'This user has already submitted Pre Engagement questionnaire, you cannot resubmit');
+            return res.status(500).send('This user has already submitted Pre Engagement questionnaire, you cannot resubmit') ;
         }
 
 

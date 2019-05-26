@@ -9,8 +9,8 @@ import {Observable} from "rxjs/index";
 export class DataService {
 
 
-     // host: string = isDevMode() ? 'http://localhost:3001' : 'http://167.99.85.162';
-   host: string = 'http://192.168.43.146:3001' ;
+    host: string = isDevMode() ? 'http://localhost:3001' : 'http://167.99.85.162';
+    // host: string = 'http://192.168.43.146:3001';
 
     constructor(private http: HttpClient) {
 
@@ -57,7 +57,7 @@ export class DataService {
     }
 
     resetTabletById(tabletId: string): Observable<any> {
-            return this.http.put(this.host + '/api/admin/tablets/reset/' + tabletId, {});
+        return this.http.put(this.host + '/api/admin/tablets/reset/' + tabletId, {});
     }
 
     updatePassword(header: any, body: any): Observable<any> {
@@ -74,5 +74,9 @@ export class DataService {
 
     isFirstRun(): Observable<any> {
         return this.http.get(this.host + '/api/admin/config/is-first-run', {headers: {"client-id": "free-tablet"}});
+    }
+
+    getLogs(filter: string): Observable<any> {
+        return this.http.get(this.host + '/api/logs?' + filter);
     }
 }
