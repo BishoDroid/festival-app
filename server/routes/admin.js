@@ -2,22 +2,102 @@
  * Created by bisho on 04/05/2019.
  */
 const express = require('express');
-const _ = require('underscore');
 const router = express.Router();
 const utils = require('../utils/utils');
-const Crypto = require('crypto-js');
 
 let Tablet = require('../models/Tablet');
 let Config = require('../models/Config');
-let encryptionKey = 'FesTiv@l-ApP';
 
 require('../db/festival-app-db');
 
-/**
- * Gets the avaialble tablets for the specific type
- * @param type - kima or symb
- * @param res - the response object
- */
+router.route('/admin/tablets/:type')
+    .get(function (req, res) {
+        let type = req.param('type');
+        console.log('Getting tablets for ' + type + 'Size: '+ 12);
+        returnTablets(type, res);
+    })
+    .post(function (req, res) {
+        let type = req.param('type');
+        let tablet = createTabletFromBody(req.body);
+        let limit = type === 'kima' ? 4 : 12;
+        console.log('Creating tablet for ' + type);
+        createTablet(tablet, type, limit, res);
+    });
+
+router.route('/admin/tablets/reset/:type')
+    .get(function (req, res) {
+        let type = req.param('type');
+        resetTablets(type, res);
+    })
+    .put(function(req, res){
+        let tabletId = req.param('type');
+        resetSingleTablet(tabletId, res);
+    });
+
+router.route('/admin/config/:key')
+    .get(function (req, res) {
+        let client = req.header('client-id');
+        let key = req.param('key');
+
+        console.log("Client ID: " + client);
+        console.log("Key: " + key);
+
+        if (client.includes('tablet')) {
+            Config.findOne({key: key}, function (err, data) {
+                if (err) {
+                    console.log(err);
+                    return res.json({code: 500, status: 'ERR', msg: err});
+                } else if(data) {
+                    return res.json({code: 200, status: 'OK', data: {value: data.value}});
+                }else{
+                    return res.json({code: 301, status: 'OK', msg: 'No Data'});
+                }
+            })
+        } else {
+            return res.json({code: 401, status: 'AuthErr', msg: 'Unauthorized. Unknown client'});
+        }
+    })
+
+    .put(function (req, res) {
+        let key = req.param('key');
+        let client = req.header('client-id');
+
+        if (client.includes('tablet')) {
+            switch (key) {
+                case 'password':
+                    updatePassword(req.body.value, res);
+                    break;
+                case 'is-first-run':
+                    updateIsFirstRun(req.body.value, res);
+                    break;
+                default:
+                    return res.json({code: 404, status: 'NOT FOUND', msg: 'Config' + key + ' Not found'});
+            }
+        } else {
+            return res.json({code: 401, status: 'AuthErr', msg: 'Unauthorized. Unknown client'});
+        }
+    })
+
+    .post(function (req, res) {
+        let client = req.header('client-id');
+        let key = req.param('key');
+        let value = req.body.value;
+        if (client.includes('tablet')) {
+            Config.findOneAndUpdate({key: key}, {$set: {value: value}}, {upsert: true}, function (err, doc) {
+                if (!err) {
+                    return res.json({
+                        code: 200,
+                        status: 'OK',
+                        msg: 'Successfully saved config ' + key + ' with value' + value
+                    });
+                } else {
+                    return res.json({code: 500, status: 'ERR', msg: 'Error: ' + err});
+                }
+            })
+        }
+    });
+
+
 let returnTablets = function (type, res) {
     let query = type === 'all' ? {} : {type: type};
     Tablet.find(query, function (err, docs) {
@@ -25,7 +105,6 @@ let returnTablets = function (type, res) {
             console.log(err);
             return res.json({code: 500, status: 'ERR', msg: err});
         } else {
-            //console.log(docs);
             return res.json({code: 200, status: 'OK', data: docs});
         }
     });

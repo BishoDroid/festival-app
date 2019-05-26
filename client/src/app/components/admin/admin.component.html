@@ -23,6 +23,9 @@
                     <li>
                         <a href="dashboard">Dashboard</a>
                     </li>
+                    <li>
+                        <a href="log"s>Logs</a>
+                    </li>
                 </ul>
             </div>
 
@@ -89,10 +92,7 @@
                             <span id="type" class="label label-primary">{{kimaChoice.type}}</span>
                             <label for="choice">Tablet: </label>
                             <select id="choice" [(ngModel)]='choice' class='form-control'>
-                                <option value='tablet-entrance-1'>Entrance 1</option>
-                                <option value='tablet-entrance-2'>Entrance 2</option>
-                                <option value='tablet-exit-1'>Exit 1</option>
-                                <option value='tablet-exit-2'>Exit 2</option>
+                                <option *ngFor="let tab of availableKima | dropdownFilter;"  value='{{tab.value}}'>{{tab.label}}</option>
                             </select>
                         </div>
                     </div>
@@ -126,14 +126,7 @@
                             <span id="type-symb" class="label label-primary">{{symbChoice.type}}</span>
                             <label for="choice-symb">Tablet: </label>
                             <select id="choice-symb" [(ngModel)]='choice' class='form-control'>
-                                <option value='tablet-1'>Tablet 1</option>
-                                <option value='tablet-2'>Tablet 2</option>
-                                <option value='tablet-3'>Tablet 3</option>
-                                <option value='tablet-4'>Tablet 4</option>
-                                <option value='tablet-5'>Tablet 5</option>
-                                <option value='tablet-6'>Tablet 6</option>
-                                <option value='tablet-7'>Tablet 7</option>
-                                <option value='tablet-8'>Tablet 8</option>
+                                <option *ngFor="let tab of availableSymb | dropdownFilter;"  value='{{tab.value}}'>{{tab.label}}</option>
                             </select>
                         </div>
                     </div>

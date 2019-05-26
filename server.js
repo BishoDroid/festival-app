@@ -14,8 +14,9 @@ const session = require('./server/routes/session');
 const kima = require('./server/routes/kima');
 const admin = require('./server/routes/admin');
 const utils = require('./server/utils/utils');
+const log = require('./server/routes/log');
 
-var env = process.env.NODE_ENV || 'dev';
+let env = process.env.NODE_ENV || 'dev';
 // NODE_ENV=production node server , then you can check if env is dev or production
 
 
@@ -31,13 +32,17 @@ const corsOptions = [
     {
         origin: 'http://167.99.85.162:80/',
         optionsSuccessStatus: 200
+    },
+    {
+        origin: 'http://192.168.43.146:4200/',
+        optionsSuccessStatus: 200
     }
 ];
 const port = 3001;
 const app = express();
 
 
-let option = process.argv[2]
+let option = process.argv[2];
 utils.createTablets(option);
 
 
@@ -50,7 +55,8 @@ app.use('/api', user);
 app.use('/api', session);
 app.use('/api', kima);
 app.use('/api', admin);
+app.use('/api', log);
 
-app.listen(port, function () {
+app.listen(port,  function () {
     console.log("Server started on port " + port);
 });

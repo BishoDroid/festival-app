@@ -57,7 +57,7 @@ export class DataService {
     }
 
     resetTabletById(tabletId: string): Observable<any> {
-            return this.http.put(this.host + '/api/admin/tablets/reset/' + tabletId, {});
+        return this.http.put(this.host + '/api/admin/tablets/reset/' + tabletId, {});
     }
 
     updatePassword(header: any, body: any): Observable<any> {
@@ -74,5 +74,9 @@ export class DataService {
 
     isFirstRun(): Observable<any> {
         return this.http.get(this.host + '/api/admin/config/is-first-run', {headers: {"client-id": "free-tablet"}});
+    }
+
+    getLogs(filter: string): Observable<any> {
+        return this.http.get(this.host + '/api/logs?' + filter);
     }
 }
