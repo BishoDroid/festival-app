@@ -202,7 +202,7 @@ router.route('/user/post-quest')
         }
 
         if (session && session.users[userIndex].preQuest.happinessScale === undefined) {
-            return res.status(500).send("this user already haven't submitted the pre-quest, you cannot submit a post quest" ) ;
+            return res.status(500).send("this user haven't submitted the pre-quest, you cannot submit a post quest" ) ;
         }
 
         let maxNumberOfParticipants = sessionType === 'kima'  ? numberOfKimaParticipants : numberOfSymbiosisParticipants ;

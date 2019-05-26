@@ -7,6 +7,7 @@ import {AdminComponent} from "./components/admin/admin.component";
 import {FirstRunComponent} from "./components/first-run/first-run.component";
 import {VideoComponent} from "./components/video/video.component";
 import {KimaThankyouComponent} from "./components/kima-thankyou/kima-thankyou.component";
+import {ThankYouComponent} from "./components/thank-you/thank-you.component";
 /**
  * Created by bisho on 14/04/2019.
  */
@@ -19,7 +20,8 @@ const appRouting: Routes = [
     {path: 'first', component: FirstRunComponent},
     {path: 'waiting-video', component: VideoComponent},
     {path: 'kima-thankyou' , component: KimaThankyouComponent},
-    {path: '', redirectTo: 'pre-quest', pathMatch: 'full'}
+    {path: '', redirectTo: 'pre-quest', pathMatch: 'full'},
+    {path: 'thank-you' , component: ThankYouComponent}
 ];
 
 @NgModule({

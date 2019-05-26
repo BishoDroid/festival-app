@@ -14,7 +14,7 @@ export class KimaThankyouComponent implements OnInit {
 
               let statyInPage = setInterval(() => {
                     this.router.navigate(['pre-quest']);
-                clearInterval (statyInPage);
+                    clearInterval (statyInPage);
             }, 15000);
 
   }
