@@ -70,7 +70,7 @@ router.route('/user/pre-quest')
             return res.status(500).send("this tablet is an exit tablet, you can only send post-questionnaire" ) ;
         }
 
-        let session = getLatestSession('desc');
+        let session = getLatestSession('desc',sessionType);
 
         let userNumber = clientId.match(/\d+/)[0] ;
         let userIndex = userNumber -1 ;
@@ -188,7 +188,7 @@ router.route('/user/post-quest')
             return res.status(500).send("this tablet is an entrance tablet, you can only send pre- questionnaire" ) ;
         }
 
-        let session = getLatestSession('asc');
+        let session = getLatestSession('asc',sessionType);
 
         if (session === undefined){
             return res.status(500).send("there is no current session for post questionnaire") ;
@@ -251,15 +251,35 @@ let processNewPostQuestSession = function (session, clientId, postQuestSchema, r
 
 };
 
-let getLatestSession = function (sorting) {
+let getLatestSession = function (sorting,sessionType) {
     if (!sessions.data) return null;
-    return sorting === 'asc' ? sessions.data[0] : sessions.data[sessions.count() - 1];
+  //  return sorting === 'asc' ? sessions.data[0] : sessions.data[sessions.count() - 1];
+    if (sorting === 'asc' ){
+
+        for (let index = 0 ; index < sessions.data.length ; index++){
+            if (sessions.data[index].sessionType === sessionType )
+            {
+                return sessions.data[index];
+            }
+        }
+    } else {
+        for (let index = sessions.count() - 1 ; index >= 0 ; index--){
+            if (sessions.data[index].sessionType === sessionType )
+            {
+                return sessions.data[index];
+            }
+        }
+    }
+
+    return null; // just in case
 
 };
 
 let updateSession = function (mySession, res) {
 
-    if(mySession.preCompleted === 1 && mySession.postCompleted === 1){
+   let allParticipantsSubmitted = getNumberOfUsersCompletedPostQuestionair(mySession) === getNumberOfUsersCompletedPreQuestionair(mySession);
+   let preAndPostQuestCompleted =  mySession.preCompleted === 1 && mySession.postCompleted === 1
+    if(allParticipantsSubmitted || preAndPostQuestCompleted){
         mySession.active = 0;
     }
 
