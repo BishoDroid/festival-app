@@ -82,13 +82,7 @@ export class PostQuestionaireComponent implements OnInit {
         this.header = {"client-id": this.clientId};
         this.dataSvc.sendPostQuestionnair(this.data, this.header).subscribe(res => {
             console.log(res);
-            this.showMsg = true;
-            setInterval(() => {
-                this.showMsg = false;
-                if (!this.isKima()) {
-                    this.router.navigate(['pre-quest']);
-                }
-            }, 5000);
+            this.router.navigate(['thank-you']);
             console.log(res);
         }, error => {
             console.log(error);

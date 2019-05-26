@@ -8,3 +8,10 @@
     padding: 30px 15px 15px;
     color: #ffffff;
 }
+
+.img {
+    max-width: 80%;
+    margin-left: 10%;
+    height: 200px;
+    vertical-align: middle;
+}

@@ -79,7 +79,7 @@ export class DashboardComponent implements OnInit {
 
 
             let data = this.getAgeOfParticpantsData(this.sessions);
-            console.log(data);
+            //console.log(data);
             let ctx = document.getElementById("ageChart");
             this.ageChart = new Chart(ctx, {
                 type: 'bar',
@@ -102,7 +102,7 @@ export class DashboardComponent implements OnInit {
                 }
             });
 
-            console.log(this.sessions);
+            //console.log(this.sessions);
             this.totalNumberOfSessions = this.sessions.length;
             console.log(this.totalNumberOfSessions);
 

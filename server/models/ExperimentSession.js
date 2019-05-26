@@ -33,9 +33,10 @@ let user = {
 };
 
 module.exports = mongoose.model('ExperimentSession', {
-    type : String,
+    sessionType : String,
     recordingStartTime : Date,
     recordingStopTime : Date,
+    status : String ,
     sessionId: String,
     users : [user],
     sessionData: [{
