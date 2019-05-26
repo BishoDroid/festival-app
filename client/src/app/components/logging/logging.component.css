@@ -1,0 +1,21 @@
+.navbar-custom {
+    background-color: #6f2277;
+    color: #fff;
+}
+
+.log-box {
+    margin: 15px;
+    padding: 20px;
+    background-color: #2e183a;
+    color: #cecece;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 5px;
+    overflow-y: scroll;
+    max-height: 550px;
+}
+
+.label-small{
+    vertical-align: super;
+    font-size: smaller;
+}
