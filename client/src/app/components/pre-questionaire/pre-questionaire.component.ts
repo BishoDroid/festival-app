@@ -107,7 +107,7 @@ export class PreQuestionaireComponent implements OnInit {
             }
 
             if (this.isKima()) {
-                this.router.navigate(['kima-thankyou']);
+                this.router.navigate(['thank-you']);
             }
 
             console.log("logging result");
