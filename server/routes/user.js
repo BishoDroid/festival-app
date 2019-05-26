@@ -31,11 +31,15 @@ router.route('/user/remove') // to remove the session by admin
         }
         session.active = 0;
 
+
+
+
         ExperimentSession.findOneAndUpdate({'_id': session._id}, session, {new: true}, function (err, doc) {
             if (err) return res.json({status: 'ERR', code: 500, msg: err});
 
-            removeInactiveSession(session);
             stopRecordingForSession(session);
+            removeInactiveSession(session);
+
             console.log("session: " + session.sessionId + " is removed");
             return res.json({status: 'OK', code: 200, msg: 'Saved data'});
 
@@ -70,21 +74,23 @@ router.route('/user/pre-quest')
 
         let userNumber = clientId.match(/\d+/)[0] ;
         let userIndex = userNumber -1 ;
+        let sessionWithCompletePreQuestionair = session && session.preCompleted === 1 ;
 
-        if (session && session.users[userIndex].preQuest.age !== undefined) {
+
+        if (session && !sessionWithCompletePreQuestionair && session.users[userIndex].preQuest.age !== undefined ) {
             return res.status(500).send("this user already submitted the pre-quest , you cannot resubmit" ) ;
         }
 
 
         let maxNumberOfParticipants = sessionType === 'kima'  ? numberOfKimaParticipants : numberOfSymbiosisParticipants ;
 
-        let sessionWithCompletePreQuestionair = session && session.preCompleted === 1 ;
+
         //check if the context has un complete session
         if (!session || sessionWithCompletePreQuestionair ) {
             console.log("creating new session");
             let newSession = new ExperimentSession();
             newSession.sessionId = getNextSessionId(sessions);
-            processNewPreQuestSession(newSession, clientId, preQuestSchema, res,maxNumberOfParticipants,userIndex);
+            processNewPreQuestSession(newSession, clientId, preQuestSchema, res,maxNumberOfParticipants,userIndex,sessionType);
         }
 
         else if (session && session.preCompleted === 0) {
@@ -217,8 +223,9 @@ let processNewPreQuestSession = function (session, clientId, preQuestSchema, res
     }
 
     user.preQuest = preQuestSchema ;
-    session.type = sessionType;
-
+    console.log(sessionType) ;
+    session.sessionType = sessionType;
+    session.status = "ready";
     session.users[userIndex] = user ;
 
     session.timestamp = new Date();
@@ -267,8 +274,8 @@ let updateSession = function (mySession, res) {
         updateLatestSession(mySession);
         console.log(doc);
         if (mySession.active === 0) {
-            removeInactiveSession(mySession);
             stopRecordingForSession(mySession);
+            removeInactiveSession(mySession);
 
         }
         return res.json({status: 'OK', code: 200, msg: 'Saved data'});
@@ -285,15 +292,9 @@ let removeInactiveSession = function (mySession) {
 };
 
 let stopRecordingForSession = function (session) {
-    let canRecord = config.findOne({type: 'canRecord'});
-    let currentMicSession = config.findOne({type: 'currentMicSession'});
-
-    if (currentMicSession.value == session.sessionId && canRecord.value == true) {
-        currentMicSession.value = null;
-        config.update(currentMicSession);
-        canRecord.value = false;
-        config.update(canRecord);
-    }
+    session.status = "stopped";
+    console.log(session);
+    sessions.update(session);
 
 };
 

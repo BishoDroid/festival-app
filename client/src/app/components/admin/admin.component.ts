@@ -33,6 +33,7 @@ export class AdminComponent implements OnInit {
     public defaultTablet: any = {
         type: 'none', tabletId: 'free-tablet', isTaken: false
     };
+    public showStart = true;
 
     constructor(public dataSvc: DataService, private modalService: BsModalService) {
         if (this.savedTablet === null) {
@@ -47,14 +48,20 @@ export class AdminComponent implements OnInit {
                 switchMap(() => this.dataSvc.getActiveSessions()))
             .subscribe(res => {
                 this.sessions = res;
+                let numberOfRecordingKimaSessions = this.getNumberOfRecordingKimaSessions(this.sessions);
+                let numberOfRecordingSymbiosisSessions = this.getNumberOfRecordingSymbiosisSessions(this.sessions);
+                console.log(numberOfRecordingKimaSessions);
+                console.log(numberOfRecordingSymbiosisSessions);
                 this.sessions.forEach(session => {
-                    console.log(session.status)
+                   // console.log(session.status);
                     session.particpantsCompletedPreQuest = this.getNumberOfUsersCompletedPreQuestionair(session);
                     session.particpantsCompletedPostQuest = this.getNumberOfUsersCompletedPostQuestionair(session);
                     if (session.status === undefined) {
-                        session.status = "ready to record";
+                        session.status = "ready";
                     }
-                    console.log(session.particpantsCompletedPreQuest);
+                    session.showStart = session.status === "ready" || session.status === "stopped" ;
+                    session.disableStart = (session.sessionType === "kima" && numberOfRecordingKimaSessions > 0 ) || (session.sessionType === "symbiosis" && numberOfRecordingSymbiosisSessions > 0 );
+                    // console.log(session.particpantsCompletedPreQuest);
                 });
             });
 
@@ -62,6 +69,14 @@ export class AdminComponent implements OnInit {
 
     }
 
+    private getNumberOfRecordingKimaSessions(sessions: any) {
+
+     return   sessions.filter(session => session.sessionType === "kima" && session.status === "recording").length;
+    }
+
+    private  getNumberOfRecordingSymbiosisSessions(sessions: any) {
+        return   sessions.filter(session => session.sessionType === "symbiosis" && session.status === "recording").length;
+    }
 
     getData(type: string) {
         interval(3000)
@@ -70,7 +85,7 @@ export class AdminComponent implements OnInit {
                 switchMap(() =>
                     this.dataSvc.getTablets(type)))
             .subscribe(res => {
-                console.log(res.data.length)
+                //console.log(res.data.length)
                 this.allTablets = res.data;
             });
     }
@@ -85,31 +100,34 @@ export class AdminComponent implements OnInit {
     }
 
 
-    startRecording(_id: string) {
-        console.log(_id);
-        const headers = {'session-id': _id};
+    startRecording(session: any) {
+
+        console.log(session.sessionId);
+        const headers = {'session-id': session.sessionId};
 
         this.dataSvc.startRecording(headers).subscribe(res => {
             console.log(res);
+            this.showStart = false;
         }, error => {
             console.log(error);
         });
     }
 
-    stopRecording(_id: string) {
-        console.log(_id);
-        const headers = {'session-id': _id};
+    stopRecording(session: any) {
+        console.log(session.sessionId);
+        const headers = {'session-id': session.sessionId};
 
         this.dataSvc.stopRecording(headers).subscribe(res => {
             console.log(res);
+            this.showStart = true;
         }, error => {
             console.log(error);
         });
     }
 
-    cancelSession(_id: string) {
-        console.log(_id);
-        const headers = {'session-id': _id};
+    cancelSession(session: any) {
+        console.log(session.sessionId);
+        const headers = {'session-id': session.sessionId};
 
         this.dataSvc.removeSession(headers).subscribe(res => {
             console.log(res);

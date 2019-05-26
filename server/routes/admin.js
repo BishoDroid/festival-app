@@ -25,7 +25,7 @@ let returnTablets = function (type, res) {
             console.log(err);
             return res.json({code: 500, status: 'ERR', msg: err});
         } else {
-            console.log(docs);
+            //console.log(docs);
             return res.json({code: 200, status: 'OK', data: docs});
         }
     });
@@ -33,7 +33,7 @@ let returnTablets = function (type, res) {
 
 let createTabletFromBody = function (body) {
     let tablet = new Tablet();
-    console.log(body);
+    //console.log(body);
     tablet.type = body.type;
     tablet.tabletId = body.tabletId;
     tablet.isTaken = true;
@@ -176,7 +176,7 @@ let updateIsFirstRun = function (value, res) {
 router.route('/admin/tablets/:type')
     .get(function (req, res) {
         let type = req.param('type');
-        console.log('Getting tablets for ' + type + 'Size: '+ 12);
+       // console.log('Getting tablets for ' + type + 'Size: '+ 12);
         returnTablets(type, res);
     })
     .post(function (req, res) {

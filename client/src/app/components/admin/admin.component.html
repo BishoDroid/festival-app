@@ -51,13 +51,14 @@
                             <li>
                                 <div>{{session.sessionId}} : <span></span></div>
                                 <!----><i class="fa fa-user"></i>
-                                <button class="btn btn-primary" (click)="startRecording(session.sessionId)">start
+                                <button type="button" *ngIf="session.showStart" placement="top" ngbTooltip="only one session can record at a time" [disabled]="session.disableStart"  class="btn btn-primary mr2 clickable" (click)="startRecording(session)">start
                                 </button>
-                                <button class="btn btn-default" (click)="stopRecording(session.sessionId)">pause
+                                <button *ngIf="!session.showStart" class="btn btn-default clickable" (click)="stopRecording(session)">pause
                                 </button>
-                                <button class="btn btn-danger" (click)="cancelSession(session.sessionId)">delete
+                                <button class="btn btn-danger" (click)="cancelSession(session)">delete
                                 </button>
                                 <div><span> status : </span>{{session.status }}</div>
+                                <div><span> type : </span>{{session.sessionType }}</div>
                                 <div><span> registration time : </span>{{session.timestamp | date:'medium' }}</div>
                                 <div><span> number of participants completed the pre questionnaire : </span>{{session.particpantsCompletedPreQuest}}
                                 </div>
