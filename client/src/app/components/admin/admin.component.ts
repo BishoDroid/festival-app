@@ -33,7 +33,7 @@ export class AdminComponent implements OnInit {
     public defaultTablet: any = {
         type: 'none', tabletId: 'free-tablet', isTaken: false
     };
-    public availableKima = [
+   /* public availableKima = [
         {label: 'Entrance 1', value: 'tablet-entrance-1', taken: false},
         {label: 'Entrance 2', value: 'tablet-entrance-2', taken: false},
         {label: 'Exit 1', value: 'tablet-exit-1', taken: false},
@@ -48,7 +48,7 @@ export class AdminComponent implements OnInit {
         {label: 'Tablet 6', value: 'tablet-6', taken: false},
         {label: 'Tablet 7', value: 'tablet-7', taken: false},
         {label: 'Tablet 8', value: 'tablet-8', taken: false},
-    ];
+    ];*/
     public showStart = true;
 
     constructor(public dataSvc: DataService, private modalService: BsModalService) {
@@ -103,19 +103,19 @@ export class AdminComponent implements OnInit {
             .subscribe(res => {
                 //console.log(res.data.length)
                 this.allTablets = res.data;
-                this.availableKima = this.availableKima.map(kima => {
+                /*this.availableKima = this.availableKima.map(kima => {
                     return {label: kima.label, value: kima.value, taken: false};
                 });
                 this.availableSymb = this.availableSymb.map(symb => {
                     return {label: symb.label, value: symb.value, taken: false};
                 });
                 this.filterDropdown(this.availableKima);
-                this.filterDropdown(this.availableSymb);
+                this.filterDropdown(this.availableSymb);*/
 
             });
     }
 
-    filterDropdown(givenTablets) {
+  /*  filterDropdown(givenTablets) {
         this.allTablets.forEach(tab => {
             const index = givenTablets.findIndex(one => one.value === tab.tabletId);
             if (index !== -1) {
@@ -123,7 +123,8 @@ export class AdminComponent implements OnInit {
                 givenTablets[index].taken = true;
             }
         });
-    }
+    } */
+
     getNumberOfUsersCompletedPreQuestionair(session) {
         return session.users.filter(user => user.preQuest !== undefined).length;
     }

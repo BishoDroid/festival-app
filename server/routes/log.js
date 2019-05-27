@@ -33,6 +33,7 @@ router.route('/logs')
 let validate = function (status, type) {
 
     if (status === 'undefined') {
+
         console.log('status is undefined');
     } else {
         query['status'] = status;

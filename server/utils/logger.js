@@ -27,7 +27,7 @@ let log = function (type, status, message) {
 
 
 let areInputsValid = function (type, status, message) {
-    return (type === 'kima' || type === 'symb') && (status === 'OK' || status === 'ERROR') && (message.length > 0);
+    return (type === 'kima' || type === 'symbiosis') && (status === 'OK' || status === 'ERROR') && (message.length > 0);
 };
 
 module.exports = log;

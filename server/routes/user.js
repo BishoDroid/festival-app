@@ -27,10 +27,8 @@ router.route('/user/remove') // to remove the session by admin
             console.log("I am undefined");
             session.recordingStopTime = new Date();
         }
+
         session.active = 0;
-
-
-
 
         ExperimentSession.findOneAndUpdate({'_id': session._id}, session, {new: true}, function (err, doc) {
             if (err) return res.json({status: 'ERR', code: 500, msg: err});
@@ -40,7 +38,7 @@ router.route('/user/remove') // to remove the session by admin
 
             console.log("session: " + session.sessionId + " is removed");
             return res.json({status: 'OK', code: 200, msg: 'Saved data'});
-
+            log(session.sessionType,'OK', "session " + session.sessionId  + " has been removed");
         });
     });
 
@@ -80,7 +78,7 @@ router.route('/user/pre-quest')
 
 
         if (session && session.users[userIndex].preQuest.age !== undefined) {
-            log(sessionType, 'This user has already submitted Pre Engagement questionnaire, you cannot resubmit');
+            log(sessionType, "ERROR",'This user has already submitted Pre Engagement questionnaire, you cannot resubmit');
             return res.status(500).send('This user has already submitted Pre Engagement questionnaire, you cannot resubmit') ;
 
         }
@@ -106,7 +104,15 @@ router.route('/user/pre-quest')
 let updateExistingPreQuestSession = function (session, clientId, preQuestSchema, res,maxNumberOfParticipants,userIndex) {
 
     session.users[userIndex].preQuest = preQuestSchema;
+    log(session.sessionType,'OK', "session " + session.sessionId  +  ", user : " + (userIndex+1).toString(10) + " has submitted pre questionnaire" );
+
     session.preCompleted = getNumberOfUsersCompletedPreQuestionair(session) == maxNumberOfParticipants ? 1 : 0;
+
+    if (session.preCompleted) {
+        log(session.sessionType,'OK', "session " + session.sessionId  +  "all " + maxNumberOfParticipants + " user have submitted pre questionnaire" );
+
+    }
+
     updateSession(session, res);
 
 
@@ -239,6 +245,8 @@ let processNewPreQuestSession = function (session, clientId, preQuestSchema, res
         console.log('saving');
         if (err) return res.json({status: 'ERR', code: 500, msg: err});
         sessions.insert(session); // in memory database
+        log(session.sessionType,'OK', "session " + session.sessionId  + " has been created");
+        log(session.sessionType,'OK', "session " + session.sessionId  +  ", user : " + (userIndex+1).toString(10) + " has submitted pre questionnaire" );
         console.log('Successfully created new session');
         return res.json({status: 'OK', code: 200, msg: 'Saved data'});
     });
@@ -249,8 +257,17 @@ let processNewPreQuestSession = function (session, clientId, preQuestSchema, res
 let processNewPostQuestSession = function (session, clientId, postQuestSchema, res,maxNumberOfParticipants,userIndex) {
 
     session.users[userIndex].postQuest = postQuestSchema;
-    console.log("completed post questionair" + getNumberOfUsersCompletedPostQuestionair(session));
+    console.log("completed post questionnaire" + getNumberOfUsersCompletedPostQuestionair(session));
+    log(session.sessionType,'OK', "session " + session.sessionId  +  ", user : " + (userIndex+1).toString(10) + " has submitted post questionnaire" );
+
     session.postCompleted = getNumberOfUsersCompletedPostQuestionair(session) == maxNumberOfParticipants ? 1 : 0;
+
+    if (session.postCompleted){
+        log(session.sessionType,'OK', "session " + session.sessionId  +  "all " + maxNumberOfParticipants + " user have submitted post questionnaire" );
+
+    }
+
+
     updateSession(session, res);
 
 };
@@ -282,9 +299,12 @@ let getLatestSession = function (sorting,sessionType) {
 let updateSession = function (mySession, res) {
 
    let allParticipantsSubmitted = getNumberOfUsersCompletedPostQuestionair(mySession) === getNumberOfUsersCompletedPreQuestionair(mySession);
-   let preAndPostQuestCompleted =  mySession.preCompleted === 1 && mySession.postCompleted === 1
+   let preAndPostQuestCompleted =  mySession.preCompleted === 1 && mySession.postCompleted === 1;
+
     if(allParticipantsSubmitted || preAndPostQuestCompleted){
         mySession.active = 0;
+        log(session.sessionType,'OK', "session " + session.sessionId  +  "is inactive " );
+
     }
 
     if (mySession.recordingStopTime == undefined) {
@@ -299,7 +319,6 @@ let updateSession = function (mySession, res) {
         if (mySession.active === 0) {
             stopRecordingForSession(mySession);
             removeInactiveSession(mySession);
-
         }
         return res.json({status: 'OK', code: 200, msg: 'Saved data'});
     });
@@ -318,6 +337,8 @@ let stopRecordingForSession = function (session) {
     session.status = "stopped";
     console.log(session);
     sessions.update(session);
+    log(session.sessionType,'OK', "session " + session.sessionId  +  " stopped recording " );
+
 
 };
 

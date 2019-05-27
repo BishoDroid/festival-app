@@ -21,15 +21,16 @@ require('../db/festival-app-db');
 let ExperimentSession = require('../models/ExperimentSession');
 let SensorData = require('../models/SensorData');
 let User = require('../models/User');
+let log = require('../utils/logger');
 let kimaUdpPort = new osc.UDPPort({
-   localAddress: "127.0.0.1",
-   // localAddress :  "167.99.85.162",
+  // localAddress: "127.0.0.1",
+   localAddress :  "167.99.85.162",
     localPort: 5000
 });
 
 let symbiosisUdpPort = new osc.UDPPort({
-    localAddress: "127.0.0.1",
-    // localAddress :  "167.99.85.162",
+  //  localAddress: "127.0.0.1",
+     localAddress :  "167.99.85.162",
     localPort: 5001
 });
 
@@ -45,6 +46,7 @@ router.route('/kima/:command')
         }else if (session.sessionType === "symbiosis") {
             activeSymbiosisSession = session;
         }
+
 
         console.log(session);
 
@@ -66,7 +68,7 @@ router.route('/kima/:command')
                 if (session.recordingStartTime == undefined) {
                     session.recordingStartTime = new Date();
                 }
-
+                log(session.sessionType,'OK', "session " + session.sessionId  + " started recording");
                 return res.json({
                     code: 200,
                     status: 'OK',
@@ -81,6 +83,7 @@ router.route('/kima/:command')
                 console.log("start recording for session : " + session.sessionId);
                 session.recordingStopTime = new Date();
                 updateSession(session);
+                log(session.sessionType,'OK', "session " + session.sessionId  + " stopped recording");
                 return res.json({
                     code: 200,
                     status: 'OK',
@@ -160,6 +163,10 @@ kimaUdpPort.on("message", function (oscMessage) {
         }
 
         session.users[userIndex].data.push(data);
+        if (session.users[userIndex].data.length %10 === 0 )
+        {
+            log(session.sessionType,'OK', "session " + session.sessionId  + " saved " + session.users[userIndex].data.length + " record for user : " + userNumber );
+        }
     }
     else {
 
@@ -167,6 +174,10 @@ kimaUdpPort.on("message", function (oscMessage) {
             session.sessionData = [];
         }
         session.sessionData.push(data);
+        if (session.sessionData.data.length %10 === 0 )
+        {
+            log(session.sessionType,'OK', "session " + session.sessionId  + " saved " + session.sessionData.data.length + " record for session" );
+        }
 
     }
 

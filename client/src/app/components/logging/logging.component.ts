@@ -12,9 +12,13 @@ export class LoggingComponent implements OnInit {
 
     private maxLimit = 500;
     private limit = 25;
-    public type = 'kima';
-    public status = 'ERROR';
-    public order = 'desc';
+/*    public type = 'kima';
+    public status = 'OK';
+    public order = 'desc';*/
+
+    public type = 'undefined';
+    public status = 'undefined' ;
+    public order;
 
     public logs = [];
 

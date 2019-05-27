@@ -76,7 +76,7 @@
                 <div class="tab-pane" id="2a">
                     <h4>Chose the 4 kima tablets</h4>
                     <ng-container class="row"
-                                  *ngFor="let tablet of allTablets | tabletsFilter:'symb' |slice:0:4; let i = index">
+                                  *ngFor="let tablet of allTablets | tabletsFilter:'symb' | slice:0:4; let i = index">
                         <div class="col-md-3 col-sm-3 col-xs-3 col-lg-3 text-center">
                             <div (click)="setChoice(tablet, 'kima')" [class]="chooseClass(tablet)">
                                 <i class="fa fa-tablet fa-5x"></i>
@@ -92,7 +92,10 @@
                             <span id="type" class="label label-primary">{{kimaChoice.type}}</span>
                             <label for="choice">Tablet: </label>
                             <select id="choice" [(ngModel)]='choice' class='form-control'>
-                                <option *ngFor="let tab of availableKima | dropdownFilter;"  value='{{tab.value}}'>{{tab.label}}</option>
+                                <option value='tablet-entrance-1'>Entrance 1</option>
+                                <option value='tablet-entrance-2'>Entrance 2</option>
+                                <option value='tablet-exit-1'>Exit 1</option>
+                                <option value='tablet-exit-2'>Exit 2</option>
                             </select>
                         </div>
                     </div>
@@ -126,7 +129,14 @@
                             <span id="type-symb" class="label label-primary">{{symbChoice.type}}</span>
                             <label for="choice-symb">Tablet: </label>
                             <select id="choice-symb" [(ngModel)]='choice' class='form-control'>
-                                <option *ngFor="let tab of availableSymb | dropdownFilter;"  value='{{tab.value}}'>{{tab.label}}</option>
+                                <option value='tablet-1'>Tablet 1</option>
+                                <option value='tablet-2'>Tablet 2</option>
+                                <option value='tablet-3'>Tablet 3</option>
+                                <option value='tablet-4'>Tablet 4</option>
+                                <option value='tablet-5'>Tablet 5</option>
+                                <option value='tablet-6'>Tablet 6</option>
+                                <option value='tablet-7'>Tablet 7</option>
+                                <option value='tablet-8'>Tablet 8</option>
                             </select>
                         </div>
                     </div>
