@@ -26,6 +26,9 @@ export class LoggingComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.status = 'undefined';
+        this.type = 'undefined';
+
         this.getData();
     }
 

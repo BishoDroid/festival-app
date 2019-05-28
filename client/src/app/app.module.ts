@@ -20,7 +20,6 @@ import {BsModalService, ModalModule} from "ngx-bootstrap";
 import {KimaThankyouComponent} from "./components/kima-thankyou/kima-thankyou.component";
 import {DropdownFilterPipe} from "./dropdown.filter.pipe";
 import { LoggingComponent } from './components/logging/logging.component';
-import { KimaThankyouComponent } from './components/kima-thankyou/kima-thankyou.component';
 import { ThankYouComponent } from './components/thank-you/thank-you.component';
 
 

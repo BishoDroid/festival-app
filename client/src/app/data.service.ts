@@ -9,8 +9,8 @@ import {Observable} from "rxjs/index";
 export class DataService {
 
 
-     host: string = isDevMode() ? 'http://localhost:3001' : 'http://167.99.85.162';
-   // host: string = 'http://localhost:3001' ;
+     // host: string = isDevMode() ? 'http://localhost:3001' : 'http://167.99.85.162';
+   host: string = 'http://192.168.43.146:3001' ;
 
     constructor(private http: HttpClient) {
 
@@ -70,6 +70,11 @@ export class DataService {
 
     savePassword(header: any, password64: any): Observable<any> {
         return this.http.post(this.host + '/api/admin/config/password', password64, {headers: header});
+    }
+
+    adminAuth(password64: any): Observable<any> {
+        const header = {password: password64};
+        return  this.http.get(this.host + '/api/admin/auth', {headers: header});
     }
 
     isFirstRun(): Observable<any> {
