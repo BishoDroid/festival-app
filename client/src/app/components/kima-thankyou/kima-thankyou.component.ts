@@ -9,7 +9,7 @@ import {Router} from "@angular/router";
 export class KimaThankyouComponent implements OnInit {
 
   constructor( private router: Router) { }
-
+// dirt fix , kima pre quest thank you.
   ngOnInit() {
 
               let statyInPage = setInterval(() => {

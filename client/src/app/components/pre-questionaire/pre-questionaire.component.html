@@ -44,7 +44,7 @@
   </div>
   <button *ngIf="!showMsg"  type="submit" style="background: #FF4081;" class="btn btn-success btn-lg waves-effect waves-light" value="sendData">Submit</button>
   <img width="45" height="45" src="assets/images/loading.gif" *ngIf="isLoading && !showMsg" class="text-center">
-  <div *ngIf="showMsg" class="col-md-12 col-sm-12 col-xs-12 text-center" ngClass="isError ? alert alert-danger : alert alert-success">
+  <div *ngIf="isError" class="col-md-12 col-sm-12 col-xs-12 text-center" ngClass="isError ? alert alert-danger : alert alert-success">
     <p >
       {{msg}}
     </p>

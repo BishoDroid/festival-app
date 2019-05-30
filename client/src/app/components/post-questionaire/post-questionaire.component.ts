@@ -9,6 +9,8 @@ import {Router} from "@angular/router";
     styleUrls: ['./post-questionaire.component.css', '../../app.component.css']
 })
 export class PostQuestionaireComponent implements OnInit {
+    private isError: boolean;
+    private msg: string;
     //selectedImage: number = 0;
 
     constructor(private dataSvc: DataService, private router: Router) {
@@ -70,7 +72,7 @@ export class PostQuestionaireComponent implements OnInit {
     }
 
     sendData() {
-
+        this.isError = false;
         this.data = {
             "connectionWithOthersScale": this.connectionWithOthersScale,
             "singingPartnerFamiliarity": this.singingPartnerFamiliarity,
@@ -85,6 +87,11 @@ export class PostQuestionaireComponent implements OnInit {
             this.router.navigate(['thank-you']);
             console.log(res);
         }, error => {
+            this.msg = 'ERROR: ' + error.error;
+            this.isError = true;
+            this.showMsg = true;
+            console.log("logging error");
+            console.log(error);
             console.log(error);
         });
     }

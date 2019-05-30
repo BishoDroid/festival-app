@@ -54,9 +54,14 @@
         </div>
 
         <button *ngIf="!showMsg" type="submit" class="btn btn-danger btn-lg waves-effect waves-light" value="sendData">Submit</button>
-        <div *ngIf="showMsg" class=" form-group col-md-12 col-sm-12 col-xs-12 alert alert-success text-center">
+        <div *ngIf="showMsg && !isError" class=" form-group col-md-12 col-sm-12 col-xs-12 alert alert-success text-center">
             <p >
                 <strong>We hope you had a great time!</strong> Have a nice day
+            </p>
+        </div>
+        <div *ngIf="isError" class="col-md-12 col-sm-12 col-xs-12 text-center" ngClass="isError ? alert alert-danger : alert alert-success">
+            <p >
+                {{msg}}
             </p>
         </div>
     </form>

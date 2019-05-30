@@ -303,7 +303,7 @@ let updateSession = function (mySession, res) {
 
     if(allParticipantsSubmitted || preAndPostQuestCompleted){
         mySession.active = 0;
-        log(session.sessionType,'OK', "session " + session.sessionId  +  "is inactive " );
+        log(mySession.sessionType,'OK', "session " + mySession.sessionId  +  "is inactive " );
 
     }
 

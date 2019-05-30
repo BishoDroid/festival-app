@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {Router} from "@angular/router";
+import {Router, RoutesRecognized, NavigationEnd } from "@angular/router";
+
 
 @Component({
   selector: 'app-thank-you',
@@ -9,7 +10,10 @@ import {Router} from "@angular/router";
 export class ThankYouComponent implements OnInit {
   private clientId: string ;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router) {
+
+
+  }
 
   ngOnInit() {
 
@@ -18,10 +22,12 @@ export class ThankYouComponent implements OnInit {
       this.clientId = tablet.tabletId;
     }
     let statyInPage = setInterval(() => {
-      if (this.isKima()) {
-        this.router.navigate(['pre-quest']);
-      } else {
+
+      // this only gets redirected to after a post questionnire
+      if (this.isKima() ) { // coming from pre-question
         this.router.navigate(['post-quest']);
+      } else if (!this.isKima() ) { // symbiosis
+        this.router.navigate(['pre-quest']);
       }
       clearInterval (statyInPage);
     }, 15000);
