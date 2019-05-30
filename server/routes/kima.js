@@ -260,8 +260,12 @@ kimaUdpPort.on("message", function (oscMessage) {
 symbiosisUdpPort.on("message", function (oscMessage) {
     console.log(oscMessage);
 
-    if (!activeSymbiosisSession || activeSymbiosisSession.status !== "recording" || activeSymbiosisSession.status !== "waiting_summary") {
-        console.log("Im returning");
+    let recording = activeSymbiosisSession.status === "recording" ;
+    let waitingSummary  = activeSymbiosisSession.status === "waiting_summary" ;
+
+
+    if (!activeSymbiosisSession || ( !recording && !waitingSummary ) ) {
+      
         return ;
     }
 
