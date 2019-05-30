@@ -18,7 +18,12 @@ let user = {
     },
     data: [{
         readingType: String,
-        value: Number,
+        value: String,
+        timestamp: Date
+    }],
+    summaryData: [{
+        readingType: String,
+        value: String,
         timestamp: Date
     }],
     postQuest: {
@@ -41,7 +46,12 @@ module.exports = mongoose.model('ExperimentSession', {
     users : [user],
     sessionData: [{
         readingType: String,
-        value: Number,
+        value: String,
+        timestamp: Date
+    }],
+    summaryData: [{
+        readingType: String,
+        value: String,
         timestamp: Date
     }],
     timestamp: Date,

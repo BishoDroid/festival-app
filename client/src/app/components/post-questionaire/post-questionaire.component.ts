@@ -9,8 +9,8 @@ import {Router} from "@angular/router";
     styleUrls: ['./post-questionaire.component.css', '../../app.component.css']
 })
 export class PostQuestionaireComponent implements OnInit {
-    private isError: boolean;
-    private msg: string;
+     isError: boolean;
+     msg: string;
     //selectedImage: number = 0;
 
     constructor(private dataSvc: DataService, private router: Router) {

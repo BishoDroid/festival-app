@@ -184,8 +184,8 @@ symbiosisUdpPort.on("ready", function () {
 
         }
         let dateTime =formMessage("/server/clock","i",  + new Date() );
-        symbiosisUdpPort.send( dateTime );
-        symbiosisUdpPort.send( _message );
+       // symbiosisUdpPort.send( dateTime );
+       // symbiosisUdpPort.send( _message );
 
     }, 2000);
 
@@ -265,7 +265,10 @@ symbiosisUdpPort.on("message", function (oscMessage) {
     data.timestamp = new Date();
 
     let isAttachedToUser = hasNumber(oscMessage.address) ;
+    let isSummaryData = oscMessage.address.includes("summary");
+
     if (isAttachedToUser) {
+
 
         let userNumber = oscMessage.address.match(/\d+/)[0] ;
         let userIndex = userNumber -1 ;
@@ -274,15 +277,34 @@ symbiosisUdpPort.on("message", function (oscMessage) {
             session.users[userIndex].data = [];
         }
 
-        session.users[userIndex].data.push(data);
+        if (!session.users[userIndex].summaryData || session.users[userIndex].summaryData.length === 0) {
+            session.users[userIndex].summaryData = [];
+        }
+
+        if (isSummaryData) {
+            session.users[userIndex].summaryData.push(data);
+        }else {
+            session.users[userIndex].data.push(data);
+        }
+
     }
     else {
 
         if (!session.sessionData || session.sessionData.length === 0) {
             session.sessionData = [];
         }
-        session.sessionData.push(data);
 
+        if (!session.summaryData || session.summaryData.length === 0) {
+            session.summaryData = [];
+        }
+
+        if (isSummaryData) {
+            session.summaryData.push(data);
+        }else {
+            session.sessionData.push(data);
+        }
+
+        
     }
 
     //  updateSession(session);
