@@ -22,16 +22,22 @@ let ExperimentSession = require('../models/ExperimentSession');
 let SensorData = require('../models/SensorData');
 let User = require('../models/User');
 let log = require('../utils/logger');
+
 let kimaUdpPort = new osc.UDPPort({
-  // localAddress: "127.0.0.1",
-   localAddress :  "167.99.85.162",
+   //  localAddress: "115.132.45.109" ,
+    localAddress: "127.0.0.1",
+   // localAddress :  "167.99.85.162",
     localPort: 5000
 });
 
 let symbiosisUdpPort = new osc.UDPPort({
-  //  localAddress: "127.0.0.1",
+
+   // localAddress: "127.0.0.1",
      localAddress :  "167.99.85.162",
-    localPort: 5001
+     localPort: 5001,
+    remoteAddress : "127.0.0.1",
+   // remoteAddress : "to change",
+    remotePort : 5000
 });
 
 
@@ -126,14 +132,69 @@ kimaUdpPort.on("ready", function () {
     });
 });
 
+
+function formMessage( _address ,_type,_value) {
+
+    message = {
+        address: _address,
+        args : [
+            {
+                type: _type,
+                value: _value
+            }
+        ]
+    }
+
+    return message;
+
+}
+
 symbiosisUdpPort.on("ready", function () {
     let ipAddresses = getIPAddresses();
 
-    console.log("Listening for OSC over UDP.");
+    console.log("Listening for OSC over UDP symbiosis.");
     ipAddresses.forEach(function (address) {
         console.log(" Host:", address + ", Port:", symbiosisUdpPort.options.localPort);
     });
+
+
+    let _message;
+    let sendOscStatusAndTime = setInterval(() => {
+
+        let latestSymbiosisSession =  getLatestSession('desc',"symbiosis");
+
+        if (!latestSymbiosisSession) {
+            _message = formMessage("/server/session","i",0);
+        }
+
+        if (latestSymbiosisSession) {
+
+            if (latestSymbiosisSession.status === "ready") {
+                _message = formMessage("/server/session","i",1);
+            }
+            else if(latestSymbiosisSession.status === "recording")
+            {
+                _message = formMessage("/server/session","i",2);
+            }    else if(latestSymbiosisSession.status === "stopped")
+            {
+                _message = formMessage("/server/session","i",3);
+            }
+
+        }
+        let dateTime =formMessage("/server/clock","i",  + new Date() );
+        symbiosisUdpPort.send( dateTime );
+        symbiosisUdpPort.send( _message );
+
+    }, 2000);
+
+
+
+
+
+
+
 });
+
 
 
 
@@ -142,7 +203,11 @@ function hasNumber(myString) {
 }
 
 kimaUdpPort.on("message", function (oscMessage) {
-
+   // console.log(oscMessage);
+        if (oscMessage.address === "/server/session" || oscMessage.address === "/server/clock"){
+            console.log(oscMessage);
+        }
+  //  console.log(oscMessage);
     if (!activeKimaSession || activeKimaSession.status !== "recording") {
         return ;
     }
@@ -241,5 +306,30 @@ let updateSession = function (session) {
 
         //console.log('Saved record');
     });
+};
+
+
+let getLatestSession = function (sorting,sessionType) {
+    if (!sessions.data) return null;
+    //  return sorting === 'asc' ? sessions.data[0] : sessions.data[sessions.count() - 1];
+    if (sorting === 'asc' ){
+
+        for (let index = 0 ; index < sessions.data.length ; index++){
+            if (sessions.data[index].sessionType === sessionType )
+            {
+                return sessions.data[index];
+            }
+        }
+    } else {
+        for (let index = sessions.count() - 1 ; index >= 0 ; index--){
+            if (sessions.data[index].sessionType === sessionType )
+            {
+                return sessions.data[index];
+            }
+        }
+    }
+
+    return null; // just in case
+
 };
 module.exports = router;

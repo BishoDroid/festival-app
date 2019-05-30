@@ -18,7 +18,7 @@ export class ThankYouComponent implements OnInit {
       this.clientId = tablet.tabletId;
     }
     let statyInPage = setInterval(() => {
-      if (!this.isKima()) {
+      if (this.isKima()) {
         this.router.navigate(['pre-quest']);
       } else {
         this.router.navigate(['post-quest']);

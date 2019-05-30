@@ -211,7 +211,7 @@ router.route('/user/post-quest')
             return res.status(500).send("this user already submitted the post-quest , you cannot resubmit" ) ;
         }
 
-        if (session && session.users[userIndex].preQuest.happinessScale === undefined) {
+        if ((session && session.users[userIndex].preQuest.happinessScale === undefined) || !session) {
             return res.status(500).send("this user haven't submitted the pre-quest, you cannot submit a post quest" ) ;
         }
 
