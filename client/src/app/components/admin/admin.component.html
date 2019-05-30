@@ -1,4 +1,15 @@
-<div class="container-fluid">
+<div class="container" *ngIf="!isAuthorized">
+    <form class="formLogin" style="text-align: center">
+        <h4>Please enter the password</h4>
+        <div class="form-group">
+            <label>Password</label>
+            <input class="form-control" type="password" [(ngModel)]="password" name="password">
+        </div>
+        <button class="btn btn-primary" (click)="authorize()">Authorize</button>
+        <div class="alert alert-danger" *ngIf="passError">Wrong password. You have {{tries}} tries left</div>
+    </form>
+</div>
+<div class="container-fluid" *ngIf="isAuthorized" >
 
     <div class="row">
         <nav id="mainNav" class="navbar navbar-default navbar-custom">
@@ -24,7 +35,7 @@
                         <a href="dashboard">Dashboard</a>
                     </li>
                     <li>
-                        <a href="log"s>Logs</a>
+                        <a href="logs">Logs</a>
                     </li>
                 </ul>
             </div>
@@ -181,7 +192,6 @@
         </div>
     </div>
 </div>
-
 
 <ng-template #confimration>
     <div class="modal-header">

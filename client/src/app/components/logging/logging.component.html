@@ -22,7 +22,7 @@
             <a href="dashboard">Dashboard</a>
           </li>
           <li>
-            <a href="logs">Logs</a>
+            <a href="admin">Admin</a>
           </li>
         </ul>
       </div>
@@ -32,19 +32,21 @@
   <div class="row">
     <div class="container">
         <div class="row">
-            <span style="text-size: 18xp; font-weight: bold; margin-left: 30px;">Status: </span>
+            <span style="text-size: 18xp; font-weight: bold; margin-left: 5px;">Status: </span>
             <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="status">
                 <mat-button-toggle class="text-success" value="OK"  >OK</mat-button-toggle>
                 <mat-button-toggle class="text-danger" value="ERROR">ERROR</mat-button-toggle>
+                <mat-button-toggle class="text-danger" value="ALL">All</mat-button-toggle>
             </mat-button-toggle-group>
 
-            <span style="text-size: 18xp; font-weight: bold; margin-left: 30px;">Type: </span>
+            <span style="text-size: 18xp; font-weight: bold; margin-left: 5px;">Type: </span>
             <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="type">
                 <mat-button-toggle class="text-success" value="kima"  >Kima</mat-button-toggle>
                 <mat-button-toggle class="text-danger" value="symbiosis">Symbiosis</mat-button-toggle>
+                <mat-button-toggle class="text-danger" value="ALL">All</mat-button-toggle>
             </mat-button-toggle-group>
 
-            <span style="text-size: 18xp; font-weight: bold; margin-left: 30px;">Sort by date: </span>
+            <span style="text-size: 18xp; font-weight: bold; margin-left: 5px;">Sort by date: </span>
             <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="order">
                 <mat-button-toggle class="text-success" value="desc"  >Descending</mat-button-toggle>
                 <mat-button-toggle class="text-danger" value="asc">Ascending</mat-button-toggle>

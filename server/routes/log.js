@@ -31,18 +31,15 @@ router.route('/logs')
     });
 
 let validate = function (status, type) {
-
-    if (status === 'undefined') {
-
-        console.log('status is undefined');
-    } else {
+    if (status === 'ERROR' || status === 'OK') {
         query['status'] = status;
+    }else{
+        delete query['status'];
     }
-    if (type === 'undefined') {
-        type = 'all';
-        console.log('type is undefined... Defaulting to all');
-    } else {
+    if (type === 'symbiosis' || type === 'kima') {
         query['type'] = type;
+    }else{
+        delete query['type'];
     }
 };
 
