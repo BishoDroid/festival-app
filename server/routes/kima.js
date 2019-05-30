@@ -23,19 +23,21 @@ let SensorData = require('../models/SensorData');
 let User = require('../models/User');
 let log = require('../utils/logger');
 
+let _localAddress = "167.99.85.162" ;
+//let _localAddress = "127.0.0.1" ;
+let _remoteAddress = "127.0.0.1" ;
+
 let kimaUdpPort = new osc.UDPPort({
-   //  localAddress: "115.132.45.109" ,
-    localAddress: "127.0.0.1",
-   // localAddress :  "167.99.85.162",
+    localAddress: _localAddress,
     localPort: 5000
 });
 
 let symbiosisUdpPort = new osc.UDPPort({
 
-   // localAddress: "127.0.0.1",
-     localAddress :  "167.99.85.162",
+
+     localAddress :  _localAddress,
      localPort: 5001,
-    remoteAddress : "127.0.0.1",
+    remoteAddress : _remoteAddress,
    // remoteAddress : "to change",
     remotePort : 5000
 });
