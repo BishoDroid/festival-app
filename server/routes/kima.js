@@ -65,7 +65,12 @@ router.route('/kima/:command')
         }
 
         function stopSession(session) {
-            session.status = "stopped";
+            if (session.sessionType === "symbiosis") {
+                session.status = "waiting_summary";
+            }else {
+                session.status = "stopped";
+            }
+
             sessions.update(session);
         }
         switch (command) {
@@ -255,7 +260,7 @@ kimaUdpPort.on("message", function (oscMessage) {
 symbiosisUdpPort.on("message", function (oscMessage) {
 
 
-    if (!activeSymbiosisSession || activeSymbiosisSession.status !== "recording") {
+    if (!activeSymbiosisSession || activeSymbiosisSession.status !== "recording" || activeSymbiosisSession.status !== "waiting_summary") {
         return ;
     }
 
@@ -304,7 +309,7 @@ symbiosisUdpPort.on("message", function (oscMessage) {
             session.sessionData.push(data);
         }
 
-        
+
     }
 
     //  updateSession(session);
