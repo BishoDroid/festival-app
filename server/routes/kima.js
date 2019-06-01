@@ -1,32 +1,32 @@
 
-/**
- * Created by bisho on 28/04/2019.
- */
 const express = require('express');
 
 const router = express.Router();
 const osc = require('osc');
+
+// in memory database
 const lokiSingleton = require('../db/festival-app-db-in-loki');
-
 let db = lokiSingleton.getInstance();
-
 let sessions = db.getCollection('sessions');
 let conf = db.getCollection('config');
+
+require('../db/festival-app-db');
 
 let sessionId = null;
 let session = undefined;
 let activeKimaSession = undefined;
 let activeSymbiosisSession = undefined ;
-require('../db/festival-app-db');
+
+
 let ExperimentSession = require('../models/ExperimentSession');
 let SensorData = require('../models/SensorData');
-let SymbiosisSensorData = require('../models/SymbiosisData')
-let User = require('../models/User');
+let SymbiosisSensorData = require('../models/SymbiosisSensorData');
+
 let log = require('../utils/logger');
 
 let _localAddress = "167.99.85.162" ;
 //let _localAddress = "127.0.0.1" ;
-let _remoteAddress = "127.0.0.0" ;
+let _remoteAddress = "137.74.211.12" ;
 
 let kimaUdpPort = new osc.UDPPort({
     localAddress: _localAddress,
@@ -34,54 +34,37 @@ let kimaUdpPort = new osc.UDPPort({
 });
 
 let symbiosisUdpPort = new osc.UDPPort({
-
-
      localAddress :  _localAddress,
      localPort: 5001,
-    remoteAddress : _remoteAddress,
-   // remoteAddress : "to change",
-    remotePort : 5000
+     remoteAddress : _remoteAddress,
+     // remoteAddress : "to change",
+     remotePort : 5000
 });
-
-
 
 router.route('/kima/:command')
     .get(function (req, res) {
+
         sessionId = req.header('session-id');
 
         session =  sessions.findOne({ 'sessionId' : sessionId });
+
         if (session.sessionType === "kima") {
             activeKimaSession = session;
         }else if (session.sessionType === "symbiosis") {
             activeSymbiosisSession = session;
         }
 
-
-        console.log(session);
-
         let command = req.params.command;
-        function startSession(session) {
-            session.status = "recording";
-            sessions.update(session);
-        }
-
-        function stopSession(session) {
-            if (session.sessionType === "symbiosis") {
-                session.status = "waiting_summary";
-            }else {
-                session.status = "stopped";
-            }
-
-            sessions.update(session);
-        }
         switch (command) {
             case 'start':
                 if (session.sessionType === "kima") startSession(activeKimaSession);
                 if (session.sessionType === "symbiosis") startSession(activeSymbiosisSession);
                 console.log("start recording for session : " + session.sessionId);
+
                 if (session.recordingStartTime == undefined) {
                     session.recordingStartTime = new Date();
                 }
+
                 log(session.sessionType,'OK', "session " + session.sessionId  + " started recording");
                 return res.json({
                     code: 200,
@@ -110,23 +93,20 @@ router.route('/kima/:command')
 
     });
 
-let getIPAddresses = function () {
-    let os = require('os'),
-        interfaces = os.networkInterfaces(),
-        ipAddresses = [];
+function startSession(session) {
+    session.status = "recording";
+    sessions.update(session);
+}
 
-    for (let deviceName in interfaces) {
-        let addresses = interfaces[deviceName];
-        for (let i = 0; i < addresses.length; i++) {
-            let addressInfo = addresses[i];
-            if (addressInfo.family === "IPv4" && !addressInfo.internal) {
-                ipAddresses.push(addressInfo.address);
-            }
-        }
+function stopSession(session) {
+    if (session.sessionType === "symbiosis") {
+        session.status = "waiting_summary";
+    }else {
+        session.status = "stopped";
     }
 
-    return ipAddresses;
-};
+    sessions.update(session);
+}
 
 kimaUdpPort.open();
 symbiosisUdpPort.open();
@@ -140,22 +120,6 @@ kimaUdpPort.on("ready", function () {
     });
 });
 
-
-function formMessage( _address ,_type,_value) {
-
-    message = {
-        address: _address,
-        args : [
-            {
-                type: _type,
-                value: _value
-            }
-        ]
-    }
-
-    return message;
-
-}
 
 symbiosisUdpPort.on("ready", function () {
     let ipAddresses = getIPAddresses();
@@ -195,16 +159,22 @@ symbiosisUdpPort.on("ready", function () {
 
     }, 2000);
 
-
-
-
-
-
-
 });
 
 
+function formMessage( _address ,_type,_value) {
+  let  message = {
+        address: _address,
+        args : [
+            {
+                type: _type,
+                value: _value
+            }
+        ]
+    } ;
+    return message;
 
+}
 
 function hasNumber(myString) {
     return /\d/.test(myString);
@@ -231,7 +201,7 @@ kimaUdpPort.on("message", function (oscMessage) {
         let userNumber = oscMessage.address.match(/\d+/)[0] ;
         let userIndex = userNumber -1 ;
 
-        createDataArrayIfItDoesntExist (Session.users[userIndex].data);
+        createDataArrayIfItDoesntExist (activeKimaSession.users[userIndex].data);
 
         activeKimaSession.users[userIndex].data.push(data);
 
@@ -242,7 +212,7 @@ kimaUdpPort.on("message", function (oscMessage) {
         createDataArrayIfItDoesntExist (activeKimaSession.sessionData);
         activeKimaSession.sessionData.push(data);
 
-        if (activeKimaSession.sessionData.length %10 === 0 ) {   log(activeKimaSession.sessionType,'OK', "session " + activeKimaSession.sessionId  + " saved " + activeKimaSession.sessionData.data.length + " record for session" ); }
+        if (activeKimaSession.sessionData.length %10 === 0 ) {   log(activeKimaSession.sessionType,'OK', "session " + activeKimaSession.sessionId  + " saved " + activeKimaSession.sessionData.length + " record for session" ); }
 
     }
 
@@ -263,7 +233,7 @@ symbiosisUdpPort.on("message", function (oscMessage) {
     }
 
     let symbiosisRealTimeData = new SymbiosisSensorData ();
-    symbiosisRealTimeData.sessionId = activeKimaSession.id;
+    symbiosisRealTimeData.sessionId = activeSymbiosisSession.id;
     symbiosisRealTimeData.readingType = oscMessage.address;
     symbiosisRealTimeData.value = oscMessage.args[0];
     symbiosisRealTimeData.timestamp = new Date();
@@ -303,11 +273,11 @@ symbiosisUdpPort.on("message", function (oscMessage) {
 
 
 kimaUdpPort.on("error", function (err) {
-   // console.log(err);
+   console.log(err);
 });
 
 symbiosisUdpPort.on("error", function (err) {
-    // console.log(err);
+    console.log(err);
 });
 
 let updateSession = function (session) {
@@ -370,5 +340,23 @@ let createDataArrayIfItDoesntExist = function (dataArray) {
 
 }
 
+
+let getIPAddresses = function () {
+    let os = require('os'),
+        interfaces = os.networkInterfaces(),
+        ipAddresses = [];
+
+    for (let deviceName in interfaces) {
+        let addresses = interfaces[deviceName];
+        for (let i = 0; i < addresses.length; i++) {
+            let addressInfo = addresses[i];
+            if (addressInfo.family === "IPv4" && !addressInfo.internal) {
+                ipAddresses.push(addressInfo.address);
+            }
+        }
+    }
+
+    return ipAddresses;
+};
 
 module.exports = router;
