@@ -223,12 +223,13 @@ kimaUdpPort.on("message", function (oscMessage) {
 symbiosisUdpPort.on("message", function (oscMessage) {
     console.log(oscMessage);
 
+    if (!activeSymbiosisSession ) {
+        return ;
+    }
     let recording = activeSymbiosisSession.status === "recording" ;
     let waitingSummary  = activeSymbiosisSession.status === "waiting_summary" ;
 
-
-    if (!activeSymbiosisSession || ( !recording && !waitingSummary ) ) {
-
+    if ( !recording && !waitingSummary  ) {
         return ;
     }
 
