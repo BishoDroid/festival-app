@@ -38,7 +38,7 @@ let symbiosisUdpPort = new osc.UDPPort({
      localPort: 5001,
      remoteAddress : _remoteAddress,
      // remoteAddress : "to change",
-     remotePort : 5000
+     remotePort : 5001
 });
 
 router.route('/kima/:command')
