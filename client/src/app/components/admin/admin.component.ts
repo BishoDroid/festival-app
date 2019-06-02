@@ -81,7 +81,7 @@ export class AdminComponent implements OnInit {
                     if (session.status === undefined) {
                         session.status = "ready";
                     }
-                    session.showStart = session.status === "ready" || session.status === "stopped";
+                    session.showStart = session.status === "ready" || session.status === "stopped" || session.status === "waiting_summary";
                     session.disableStart = (session.sessionType === "kima" && numberOfRecordingKimaSessions > 0 ) || (session.sessionType === "symbiosis" && numberOfRecordingSymbiosisSessions > 0 );
                     // console.log(session.particpantsCompletedPreQuest);
                 });
