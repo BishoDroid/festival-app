@@ -21,7 +21,6 @@ router.route('/user/remove') // to remove the session by admin
 
     .post(function (req, res) {
         let sessionId = req.header('session-id');
-
         let session = sessions.findOne({sessionId: sessionId});
         if (session.recordingStopTime === undefined) {
             console.log("I am undefined");

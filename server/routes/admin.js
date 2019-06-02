@@ -13,7 +13,6 @@ require('../db/festival-app-db');
 router.route('/admin/tablets/:type')
     .get(function (req, res) {
         let type = req.param('type');
-        console.log('Getting tablets for ' + type + 'Size: ' + 12);
         returnTablets(type, res);
     })
     .post(function (req, res) {
