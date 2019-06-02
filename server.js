@@ -57,6 +57,6 @@ app.use('/api', kima);
 app.use('/api', admin);
 app.use('/api', log);
 
-app.listen(port, '192.168.43.146', function () {
+app.listen(port, function () {
     console.log("Server started on port " + port);
 });
