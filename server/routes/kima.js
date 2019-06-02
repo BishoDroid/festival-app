@@ -147,16 +147,16 @@ symbiosisUdpPort.on("ready", function () {
             else if(latestSymbiosisSession.status === "recording")
             {
                 _message = formMessage("/server/session","i",2);
-            }    else if(latestSymbiosisSession.status === "stopped")
+            }    else if(latestSymbiosisSession.status === "waiting_summary")
             {
                 _message = formMessage("/server/session","i",3);
             }
 
         }
         let dateTime =formMessage("/server/clock","i",  + new Date() );
+
         symbiosisUdpPort.send( dateTime );
         symbiosisUdpPort.send( _message );
-
     }, 2000);
 
 });
@@ -203,14 +203,16 @@ kimaUdpPort.on("message", function (oscMessage) {
 
         createDataArrayIfItDoesntExist (activeKimaSession.users[userIndex].data);
 
-        activeKimaSession.users[userIndex].data.push(data);
+        addRealtimeDataToUser (activeKimaSession,data,userIndex);
+        //activeKimaSession.users[userIndex].data.push(data);
 
         if (activeKimaSession.users[userIndex].data.length %10 === 0 )  {  log(activeKimaSession.sessionType,'OK', "session " + activeKimaSession.sessionId  + " saved " + activeKimaSession.users[userIndex].data.length + " record for user : " + userNumber );  }
     }
     else { // attached to session
 
         createDataArrayIfItDoesntExist (activeKimaSession.sessionData);
-        activeKimaSession.sessionData.push(data);
+        addRealtimeSessionDataToSession (activeKimaSession,data);
+        //activeKimaSession.sessionData.push(data);
 
         if (activeKimaSession.sessionData.length %10 === 0 ) {   log(activeKimaSession.sessionType,'OK', "session " + activeKimaSession.sessionId  + " saved " + activeKimaSession.sessionData.length + " record for session" ); }
 
@@ -255,15 +257,16 @@ symbiosisUdpPort.on("message", function (oscMessage) {
         createDataArrayIfItDoesntExist(activeSymbiosisSession.users[userIndex].data);
         createDataArrayIfItDoesntExist(activeSymbiosisSession.users[userIndex].summaryData);
 
-        isSummaryData ? activeSymbiosisSession.users[userIndex].summaryData.push(data) : saveSymbiosisRealTimeData (symbiosisRealTimeData);
-
+        //isSummaryData ? activeSymbiosisSession.users[userIndex].summaryData.push(data) : saveSymbiosisRealTimeData (symbiosisRealTimeData);
+        isSummaryData ? addSummaryDataToUser(activeSymbiosisSession,data) : addRealtimeDataToUser(symbiosisRealTimeData,data,userIndex) ;
     }
     else { // is attached to session
 
         createDataArrayIfItDoesntExist (activeSymbiosisSession.sessionData);
         createDataArrayIfItDoesntExist (activeSymbiosisSession.summaryData);
 
-        isSummaryData ?  activeSymbiosisSession.summaryData.push(data) :  saveSymbiosisRealTimeData (symbiosisRealTimeData) ;
+      //  isSummaryData ?  activeSymbiosisSession.summaryData.push(data) :  saveSymbiosisRealTimeData (symbiosisRealTimeData) ;
+        isSummaryData ? addSummaryDataToSession(activeSymbiosisSession,data) :  addRealtimeSessionDataToSession(activeSymbiosisSession,data) ;
 
     }
 
@@ -337,11 +340,68 @@ let createDataArrayIfItDoesntExist = function (dataArray) {
     if (!dataArray || dataArray === 0) {
         dataArray = [];
     }
+}
 
+let addRealtimeDataToUser = function (session,data,userIndex) {
 
+    let sessionId = session._id;
+    let push = {};
+    push['users.'+userIndex+'.data'] = data ;
+    ExperimentSession.findOneAndUpdate(
+        { _id: sessionId },
+        { $push: push }, function (err, doc) {
+            if (err) {
+                console.log(err);
+            }
+            //console.log('Saved record');
+        });
 }
 
 
+let addRealtimeSessionDataToSession = function (session,data) {
+
+    let sessionId = session._id;
+    let push = {};
+    push['sessionData'] = data ;
+    ExperimentSession.findOneAndUpdate(
+        { _id: sessionId },
+        { $push: push }, function (err, doc) {
+            if (err) {
+                console.log(err);
+            }
+            //console.log('Saved record');
+        });
+}
+
+let addSummaryDataToUser = function (session,data,userIndex) {
+
+    let sessionId = session._id;
+    let push = {};
+    push['users.'+userIndex+'.summaryData'] = data ;
+    ExperimentSession.findOneAndUpdate(
+        { _id: sessionId },
+        { $push: push }, function (err, doc) {
+            if (err) {
+                console.log(err);
+            }
+            //console.log('Saved record');
+        });
+}
+
+let addSummaryDataToSession = function (session,data) {
+
+    let sessionId = session._id;
+    let push = {};
+    push['summaryData'] = data ;
+    ExperimentSession.findOneAndUpdate(
+        { _id: sessionId },
+        { $push: push }, function (err, doc) {
+            if (err) {
+                console.log(err);
+            }
+            //console.log('Saved record');
+        });
+}
 let getIPAddresses = function () {
     let os = require('os'),
         interfaces = os.networkInterfaces(),
