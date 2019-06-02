@@ -13,8 +13,6 @@
 
     <div class="row">
         <nav id="mainNav" class="navbar navbar-default navbar-custom">
-
-            <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse"
                         data-target="#bs-example-navbar-collapse-1">
@@ -44,8 +42,8 @@
     </div>
 
     <div class="row">
-        <h2 *ngIf="savedTablet.type !== 'none'">{{savedTablet.tabletId}}</h2>
         <div id="exTab1" class="container">
+            <h2 class="label label-primary label-small" *ngIf="savedTablet.type !== 'none'">{{savedTablet.tabletId}}</h2>
             <ul class="nav nav-pills">
                 <li class="active">
                     <a href="#1a" data-toggle="tab">Registered Users</a>
@@ -69,7 +67,7 @@
                                 </button>
                                 <button *ngIf="!session.showStart" class="btn btn-default clickable" (click)="stopRecording(session)">pause
                                 </button>
-                                <button class="btn btn-danger" (click)="cancelSession(session)">delete
+                                <button class="btn btn-danger" (click)="openModal(confimration, 'cancelSession', session, 'Delete session?')">delete
                                 </button>
                                 <div><span> status : </span>{{session.status }}</div>
                                 <div><span> type : </span>{{session.sessionType }}</div>
@@ -103,10 +101,7 @@
                             <span id="type" class="label label-primary">{{kimaChoice.type}}</span>
                             <label for="choice">Tablet: </label>
                             <select id="choice" [(ngModel)]='choice' class='form-control'>
-                                <option value='tablet-entrance-1'>Entrance 1</option>
-                                <option value='tablet-entrance-2'>Entrance 2</option>
-                                <option value='tablet-exit-1'>Exit 1</option>
-                                <option value='tablet-exit-2'>Exit 2</option>
+                                <option *ngFor="let tab of availableKima | dropdownFilter;"  value='{{tab.value}}'>{{tab.label}}</option>
                             </select>
                         </div>
                     </div>
@@ -140,14 +135,7 @@
                             <span id="type-symb" class="label label-primary">{{symbChoice.type}}</span>
                             <label for="choice-symb">Tablet: </label>
                             <select id="choice-symb" [(ngModel)]='choice' class='form-control'>
-                                <option value='tablet-1'>Tablet 1</option>
-                                <option value='tablet-2'>Tablet 2</option>
-                                <option value='tablet-3'>Tablet 3</option>
-                                <option value='tablet-4'>Tablet 4</option>
-                                <option value='tablet-5'>Tablet 5</option>
-                                <option value='tablet-6'>Tablet 6</option>
-                                <option value='tablet-7'>Tablet 7</option>
-                                <option value='tablet-8'>Tablet 8</option>
+                                <option *ngFor="let tab of availableSymb | dropdownFilter;"  value='{{tab.value}}'>{{tab.label}}</option>
                             </select>
                         </div>
                     </div>
@@ -156,8 +144,8 @@
                             <button class="btn btn-primary" [disabled]="savedTablet.type !== 'none'"
                                     (click)="saveChoice('symb')">Save tablet
                             </button>
-                            <button class="btn btn-warning" [disabled]="savedTablet.type === 'none'" (click)="openModal(confimration, 'resetMyTablet')">Reset this tablet</button>
-                            <button class="btn btn-danger" [disabled]="savedTablet.type === 'none'" (click)="openModal(confimration, 'resetTablets')">Reset all tablets</button>
+                            <button class="btn btn-warning" [disabled]="savedTablet.type === 'none'" (click)="openModal(confimration, 'resetMyTablet', null, 'Reset this tablet')">Reset this tablet</button>
+                            <button class="btn btn-danger" [disabled]="savedTablet.type === 'none'" (click)="openModal(confimration, 'resetTablets', null, 'Reset all Tablets')">Reset all tablets</button>
                             <img width="45" height="45" src="assets/images/loading.gif" *ngIf="inProgress" class="text-center">
                         </div>
                     </div>
@@ -171,7 +159,6 @@
                                 <input class="form-control" type="password" name="currentPass" [(ngModel)]="currentPass"
                                        placeholder="Current password">
                             </div>
-                            <hr/>
                             <br/>
                             <div class="form-group col-md-8 col-sm-8 col-xs-8">
                                 <label>New password</label>
@@ -205,7 +192,7 @@
         <img width="45" height="45" src="assets/images/loading.gif" *ngIf="inProgress" class="text-center">
     </div>
     <div class="modal-footer">
-        <button class="btn btn-success" [disabled]="inProgress" (click)="callFunction(myModal.functionName)">Yes</button>
+        <button class="btn btn-success" [disabled]="inProgress" (click)="callFunction(myModal.functionName, myModal.functionParam)">Yes</button>
         <button class="btn btn-danger" [disabled]="inProgress" (click)="modalRef.hide()">No</button>
     </div>
 </ng-template>

@@ -12,7 +12,7 @@ let sessions = db.getCollection('sessions');
 router.route('/sessions/active')
     .get(function (req, res) {
             if (sessions.data) {
-                //console.log('Found ' + sessions.data.length + ' sessions');
+                // console.log('Found ' + sessions.data.length + ' sessions');
                 return res.json(sessions.data);
             }
         }

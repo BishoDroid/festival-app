@@ -34,27 +34,27 @@ export class AdminComponent implements OnInit {
     modalRef: BsModalRef;
     public savedTablet = JSON.parse(localStorage.getItem('tablet'));
     public myModal: any = {
-        title: '', cancelLabel: 'No', submitLabel: 'Yes', content: '', functionName: ''
+        title: '', cancelLabel: 'No', submitLabel: 'Yes', content: '', functionName: '', functionParam: ''
     };
     public defaultTablet: any = {
         type: 'none', tabletId: 'free-tablet', isTaken: false
     };
-    /* public availableKima = [
-     {label: 'Entrance 1', value: 'tablet-entrance-1', taken: false},
-     {label: 'Entrance 2', value: 'tablet-entrance-2', taken: false},
-     {label: 'Exit 1', value: 'tablet-exit-1', taken: false},
-     {label: 'Exit 2', value: 'tablet-exit-2', taken: false}
-     ];
-     public availableSymb = [
-     {label: 'Tablet 1', value: 'tablet-1', taken: false},
-     {label: 'Tablet 2', value: 'tablet-2', taken: false},
-     {label: 'Tablet 3', value: 'tablet-3', taken: false},
-     {label: 'Tablet 4', value: 'tablet-4', taken: false},
-     {label: 'Tablet 5', value: 'tablet-5', taken: false},
-     {label: 'Tablet 6', value: 'tablet-6', taken: false},
-     {label: 'Tablet 7', value: 'tablet-7', taken: false},
-     {label: 'Tablet 8', value: 'tablet-8', taken: false},
-     ];*/
+    public availableKima = [
+        {label: 'Entrance 1', value: 'tablet-entrance-1', taken: false},
+        {label: 'Entrance 2', value: 'tablet-entrance-2', taken: false},
+        {label: 'Exit 1', value: 'tablet-exit-1', taken: false},
+        {label: 'Exit 2', value: 'tablet-exit-2', taken: false}
+    ];
+    public availableSymb = [
+        {label: 'Tablet 1', value: 'tablet-1', taken: false},
+        {label: 'Tablet 2', value: 'tablet-2', taken: false},
+        {label: 'Tablet 3', value: 'tablet-3', taken: false},
+        {label: 'Tablet 4', value: 'tablet-4', taken: false},
+        {label: 'Tablet 5', value: 'tablet-5', taken: false},
+        {label: 'Tablet 6', value: 'tablet-6', taken: false},
+        {label: 'Tablet 7', value: 'tablet-7', taken: false},
+        {label: 'Tablet 8', value: 'tablet-8', taken: false},
+    ];
     public showStart = true;
 
     constructor(public dataSvc: DataService, private modalService: BsModalService, private location: Location, private router: Router) {
@@ -74,8 +74,6 @@ export class AdminComponent implements OnInit {
                 this.sessions = res;
                 let numberOfRecordingKimaSessions = this.getNumberOfRecordingKimaSessions(this.sessions);
                 let numberOfRecordingSymbiosisSessions = this.getNumberOfRecordingSymbiosisSessions(this.sessions);
-                console.log(numberOfRecordingKimaSessions);
-                console.log(numberOfRecordingSymbiosisSessions);
                 this.sessions.forEach(session => {
                     // console.log(session.status);
                     session.particpantsCompletedPreQuest = this.getNumberOfUsersCompletedPreQuestionair(session);
@@ -123,15 +121,15 @@ export class AdminComponent implements OnInit {
             });
     }
 
-    /*  filterDropdown(givenTablets) {
-     this.allTablets.forEach(tab => {
-     const index = givenTablets.findIndex(one => one.value === tab.tabletId);
-     if (index !== -1) {
-     console.log(givenTablets[index].value);
-     givenTablets[index].taken = true;
-     }
-     });
-     } */
+    filterDropdown(givenTablets) {
+        this.allTablets.forEach(tab => {
+            const index = givenTablets.findIndex(one => one.value === tab.tabletId);
+            if (index !== -1) {
+                console.log(givenTablets[index].value);
+                givenTablets[index].taken = true;
+            }
+        });
+    }
 
     getNumberOfUsersCompletedPreQuestionair(session) {
         return session.users.filter(user => user.preQuest !== undefined).length;
@@ -168,13 +166,14 @@ export class AdminComponent implements OnInit {
     }
 
     cancelSession(session: any) {
-        console.log(session.sessionId);
+        console.log(session);
         const headers = {'session-id': session.sessionId};
 
         this.dataSvc.removeSession(headers).subscribe(res => {
             console.log(res);
+            this.modalRef.hide();
         }, error => {
-            console.log(error);
+            console.log("ERROR: " + error);
         });
     }
 
@@ -272,14 +271,33 @@ export class AdminComponent implements OnInit {
         }
     }
 
-    callFunction(name: string) {
-        name === 'resetMyTablet' ? this.resetMyTablet() : this.resetTablets();
+    callFunction(name: string, param: any) {
+        switch (name) {
+            case "resetMyTablet":
+                console.log("HERE: 1"+ name)
+                this.resetMyTablet();
+                break;
+            case "resetTablets":
+                console.log("HERE: 2"+ name)
+                this.resetTablets();
+                break;
+            case "cancelSession":
+                console.log("PARAM: 3"+ param)
+                console.log("HERE: 3"+ name)
+                this.cancelSession(param);
+                break;
+            default:
+                console.log(name)
+                console.log("Unknown function: " + name);
+        }
     }
 
-    openModal(template: TemplateRef<any>, name: string) {
-        this.myModal.title = 'Are you sure?';
+    openModal(template: TemplateRef<any>, name: string, param: any, title: string) {
+        this.myModal.title = title;
         this.myModal.content = 'Are you sure you want to perform this action?';
         this.myModal.functionName = name;
+        console.log(this.myModal.functionName);
+        this.myModal.functionParam = param;
         this.modalRef = this.modalService.show(template);
     }
 
