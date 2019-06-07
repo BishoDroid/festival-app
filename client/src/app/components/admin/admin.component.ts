@@ -66,7 +66,7 @@ export class AdminComponent implements OnInit {
     ngOnInit() {
         this.isAuthorized = false;
         this.tries = 3;
-        interval(3000)
+        interval(1000)
             .pipe(
                 startWith(0),
                 switchMap(() => this.dataSvc.getActiveSessions()))
@@ -148,7 +148,7 @@ export class AdminComponent implements OnInit {
         this.dataSvc.startRecording(headers).subscribe(res => {
             console.log(res);
             session.showStart = false;
-            session.status = "recording";
+            //session.status = "recording";
         }, error => {
             console.log(error);
         });
