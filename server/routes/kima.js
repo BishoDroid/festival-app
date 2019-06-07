@@ -24,8 +24,8 @@ let SymbiosisSensorData = require('../models/SymbiosisSensorData');
 
 let log = require('../utils/logger');
 
-//let _localAddress = "167.99.85.162" ;
-let _localAddress = "127.0.0.1" ;
+let _localAddress = "167.99.85.162" ;
+//let _localAddress = "127.0.0.1" ;
 let _remoteAddress = "137.74.211.12" ;
 
 let kimaUdpPort = new osc.UDPPort({
