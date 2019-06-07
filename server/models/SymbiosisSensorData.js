@@ -6,7 +6,11 @@ let SymbiosisSensorData = new Schema({
     sessionId : String,
     readingType: String,
     value: Number,
-    timestamp: Date
+    timestamp: Date,
+    sessionType : String,
+    isSummary : Number,
+    isUser : Number,
+    userNumber : Number
 });
 
 module.exports = mongoose.model('SymbiosisSensorData', SymbiosisSensorData);

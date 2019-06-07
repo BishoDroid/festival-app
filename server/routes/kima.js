@@ -24,8 +24,8 @@ let SymbiosisSensorData = require('../models/SymbiosisSensorData');
 
 let log = require('../utils/logger');
 
-let _localAddress = "167.99.85.162" ;
-//let _localAddress = "127.0.0.1" ;
+//let _localAddress = "167.99.85.162" ;
+let _localAddress = "127.0.0.1" ;
 let _remoteAddress = "137.74.211.12" ;
 
 let kimaUdpPort = new osc.UDPPort({
@@ -190,6 +190,16 @@ kimaUdpPort.on("message", function (oscMessage) {
         return ;
     }
 
+
+    let sensorData = new SymbiosisSensorData ();
+    sensorData.sessionId = activeKimaSession.id;
+    sensorData.readingType = oscMessage.address;
+    sensorData.value = oscMessage.args[0];
+    sensorData.timestamp = new Date();
+    sensorData.sessionType = "kima";
+
+
+
     let data = new SensorData();
     data.readingType = oscMessage.address;
     data.value = oscMessage.args[0];
@@ -203,16 +213,26 @@ kimaUdpPort.on("message", function (oscMessage) {
 
         createDataArrayIfItDoesntExist (activeKimaSession.users[userIndex].data);
 
-        addRealtimeDataToUser (activeKimaSession,data,userIndex);
+        sensorData.isUser =1;
+        sensorData.userNumber = userNumber;
+        sensorData.isSummary =   0;
 
+
+       // addRealtimeDataToUser (activeKimaSession,data,userIndex);
+        saveSensorData(sensorData);
 
         if (activeKimaSession.users[userIndex].data.length %10 === 0 )  {  log(activeKimaSession.sessionType,'OK', "session " + activeKimaSession.sessionId  + " saved " + activeKimaSession.users[userIndex].data.length + " record for user : " + userNumber );  }
     }
     else { // attached to session
 
         createDataArrayIfItDoesntExist (activeKimaSession.sessionData);
-        addRealtimeSessionDataToSession (activeKimaSession,data);
 
+      //  addRealtimeSessionDataToSession (activeKimaSession,data);
+
+
+        sensorData.isUser =0;
+        sensorData.isSummary =   0;
+        saveSensorData(sensorData);
         if (activeKimaSession.sessionData.length %10 === 0 ) {   log(activeKimaSession.sessionType,'OK', "session " + activeKimaSession.sessionId  + " saved " + activeKimaSession.sessionData.length + " record for session" ); }
 
     }
@@ -234,6 +254,13 @@ symbiosisUdpPort.on("message", function (oscMessage) {
         return ;
     }
 
+    let sensorData = new SymbiosisSensorData ();
+    sensorData.sessionId = activeSymbiosisSession.id;
+    sensorData.readingType = oscMessage.address;
+    sensorData.value = oscMessage.args[0];
+    sensorData.timestamp = new Date();
+    sensorData.sessionType = "symbiosis";
+
     let data = new SensorData();
     data.readingType = oscMessage.address;
     data.value = oscMessage.args[0];
@@ -250,15 +277,24 @@ symbiosisUdpPort.on("message", function (oscMessage) {
         createDataArrayIfItDoesntExist(activeSymbiosisSession.users[userIndex].data);
         createDataArrayIfItDoesntExist(activeSymbiosisSession.users[userIndex].summaryData);
 
-        isSummaryData ? addSummaryDataToUser(activeSymbiosisSession,data,userIndex) : addRealtimeDataToUser(activeSymbiosisSession,data,userIndex) ;
+        sensorData.isUser =1;
+        sensorData.userNumber = userNumber;
+        sensorData.isSummary = isSummaryData ? 1 : 0;
+
+        saveSensorData(sensorData);
+        //  isSummaryData ? addSummaryDataToUser(activeSymbiosisSession,data,userIndex) : addRealtimeDataToUser(activeSymbiosisSession,data,userIndex) ;
+
     }
     else { // is attached to session
 
         createDataArrayIfItDoesntExist (activeSymbiosisSession.sessionData);
         createDataArrayIfItDoesntExist (activeSymbiosisSession.summaryData);
 
-        isSummaryData ? addSummaryDataToSession(activeSymbiosisSession,data) :  addRealtimeSessionDataToSession(activeSymbiosisSession,data) ;
 
+        // isSummaryData ? addSummaryDataToSession(activeSymbiosisSession,data) :  addRealtimeSessionDataToSession(activeSymbiosisSession,data) ;
+        sensorData.isUser =0;
+        sensorData.isSummary = isSummaryData ? 1 : 0;
+        saveSensorData(sensorData);
     }
 
     //  updateSession(session);
@@ -393,6 +429,21 @@ let addSummaryDataToSession = function (session,data) {
             //console.log('Saved record');
         });
 }
+
+let saveSensorData = function (sensorData) {
+
+    sensorData.save(function (err) {
+        if (err){
+            console.log("error");
+        }
+        log(activeKimaSession.sessionType,'OK', "session " + activeKimaSession.sessionId  + " data has been stored");
+
+    });
+
+}
+
+
+
 let getIPAddresses = function () {
     let os = require('os'),
         interfaces = os.networkInterfaces(),
