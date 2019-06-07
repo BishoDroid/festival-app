@@ -436,7 +436,7 @@ let saveSensorData = function (sensorData) {
         if (err){
             console.log("error");
         }
-        log(activeKimaSession.sessionType,'OK', "session " + activeKimaSession.sessionId  + " data has been stored");
+      //  log(activeKimaSession.sessionType,'OK', "session " + activeKimaSession.sessionId  + " data has been stored");
 
     });
 
