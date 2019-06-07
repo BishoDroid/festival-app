@@ -66,7 +66,7 @@ export class AdminComponent implements OnInit {
     ngOnInit() {
         this.isAuthorized = false;
         this.tries = 3;
-        interval(1000)
+        interval(3000)
             .pipe(
                 startWith(0),
                 switchMap(() => this.dataSvc.getActiveSessions()))
