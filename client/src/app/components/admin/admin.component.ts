@@ -147,7 +147,8 @@ export class AdminComponent implements OnInit {
 
         this.dataSvc.startRecording(headers).subscribe(res => {
             console.log(res);
-            this.showStart = false;
+            session.showStart = false;
+            session.status = "recording";
         }, error => {
             console.log(error);
         });
@@ -159,7 +160,7 @@ export class AdminComponent implements OnInit {
 
         this.dataSvc.stopRecording(headers).subscribe(res => {
             console.log(res);
-            this.showStart = true;
+            session.showStart = true;
         }, error => {
             console.log(error);
         });
