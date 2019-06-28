@@ -57,5 +57,6 @@ module.exports = mongoose.model('ExperimentSession', {
     timestamp: Date,
     active: Number,
     preCompleted: 0,
-    postCompleted: 0
+    postCompleted: 0,
+    numberOfLoggedData : 0
 });

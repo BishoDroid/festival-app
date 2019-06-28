@@ -436,6 +436,11 @@ let saveSensorData = function (sensorData) {
         if (err){
             console.log("error");
         }
+
+        if (session.sessionType === "kima") ++activeKimaSession.numberOfLoggedData;
+        if (session.sessionType === "symbiosis") ++activeSymbiosisSession.numberOfLoggedData;
+
+
       //  log(activeKimaSession.sessionType,'OK', "session " + activeKimaSession.sessionId  + " data has been stored");
 
     });

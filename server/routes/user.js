@@ -235,6 +235,7 @@ let processNewPreQuestSession = function (session, clientId, preQuestSchema, res
     console.log(sessionType) ;
     session.sessionType = sessionType;
     session.status = "ready";
+    session.numberOfLoggedData = 0;
     session.users[userIndex] = user ;
 
     session.timestamp = new Date();
