@@ -216,7 +216,7 @@ kimaUdpPort.on("message", function (oscMessage) {
         sensorData.isUser =1;
         sensorData.userNumber = userNumber;
         sensorData.isSummary =   0;
-
+        sensorData.userId = activeKimaSession.users[userIndex]._id;
 
        // addRealtimeDataToUser (activeKimaSession,data,userIndex);
         saveSensorData(sensorData);
@@ -280,7 +280,7 @@ symbiosisUdpPort.on("message", function (oscMessage) {
         sensorData.isUser =1;
         sensorData.userNumber = userNumber;
         sensorData.isSummary = isSummaryData ? 1 : 0;
-
+        sensorData.userId = activeSymbiosisSession.users[userIndex]._id;
         saveSensorData(sensorData);
         //  isSummaryData ? addSummaryDataToUser(activeSymbiosisSession,data,userIndex) : addRealtimeDataToUser(activeSymbiosisSession,data,userIndex) ;
 
@@ -304,11 +304,11 @@ symbiosisUdpPort.on("message", function (oscMessage) {
 
 
 kimaUdpPort.on("error", function (err) {
-   console.log(err);
+  // console.log(err);
 });
 
 symbiosisUdpPort.on("error", function (err) {
-    console.log(err);
+   // console.log(err);
 });
 
 let updateSession = function (session) {

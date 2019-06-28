@@ -10,7 +10,8 @@ let SymbiosisSensorData = new Schema({
     sessionType : String,
     isSummary : Number,
     isUser : Number,
-    userNumber : Number
+    userNumber : Number,
+    userId : String
 });
 
 module.exports = mongoose.model('SymbiosisSensorData', SymbiosisSensorData);

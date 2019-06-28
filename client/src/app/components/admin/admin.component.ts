@@ -200,7 +200,8 @@ export class AdminComponent implements OnInit {
                 console.log(res.msg);
                 localStorage.setItem('tablet', JSON.stringify(body));
                 this.savedTablet = body;
-                this.kimaChoice.type = 'none';
+
+                param === 'kima' ? this.kimaChoice.type = 'none' : this.symbChoice.type = 'none';
             } else {
                 this.errorMsg = 'Something went wrong while trying to save tablet. Please try again.\n' + res.msg;
                 this.showError = true;

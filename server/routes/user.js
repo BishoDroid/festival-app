@@ -74,9 +74,9 @@ router.route('/user/pre-quest')
         let userNumber = clientId.match(/\d+/)[0] ;
         let userIndex = userNumber -1 ;
         let sessionWithCompletePreQuestionair = session && session.preCompleted === 1 ;
+        console.log(session);
 
-
-        if (session && session.users[userIndex].preQuest.age !== undefined) {
+        if (session && session.users[userIndex].preQuest.age !== undefined && !sessionWithCompletePreQuestionair) {
             log(sessionType, "ERROR",'This user has already submitted Pre Engagement questionnaire, you cannot resubmit');
             return res.status(500).send('This user has already submitted Pre Engagement questionnaire, you cannot resubmit') ;
 

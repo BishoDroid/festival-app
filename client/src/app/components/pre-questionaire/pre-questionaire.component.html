@@ -1,8 +1,10 @@
 <div class="row">
-  <img class="col-md-12 col-sm-12 col-xs-12 img" src="assets/logo.png">
+  <div class="text-center">
+  <img src="assets/logo.png" class="rounded img" >
+</div>
 </div>
 <hr style="background-color: #e31d93"/>
-<h2 class="text-center" style="color: #6f2277">Pre Engagement Questionnaire</h2>
+<h2 class="text-center" style="color: #6f2277">BEFORE</h2>
 <p class="label label-primary pull-right tablet-id">{{clientId}}</p>
 
 <form #myform="ngForm" (ngSubmit)="sendData()" class="form">
@@ -32,15 +34,21 @@
     <br/>
     <label for="tuningWithPeopleScale">I feel in tune with the people around me </label>
   <ng5-slider [(value)]="tuningWithPeopleScale" [options]="feelingsRange" id="tuningWithPeopleScale"></ng5-slider>
+    <label>1 (Not at all) 2 3 4 5 6 7 (Completely)</label>
+    <br/>
 </div>
   <div class="form-group card col-md-12 col-sm-12 col-xs-12">
     <label for="lonelinessScale">I feel lonely </label>
     <ng5-slider [(value)]="lonelinessScale" [options]="feelingsRange" id="lonelinessScale"></ng5-slider>
+    <label>1 (Not at all) 2 3 4 5 6 7 (Completely)</label>
+    <br/>
   </div>
 
   <div class="form-group card col-md-12 col-sm-12 col-xs-12">
     <label for="happinessScale">I feel happy </label>
     <ng5-slider [(value)]="happinessScale" [options]="feelingsRange" id="happinessScale"></ng5-slider>
+    <label>1 (Not at all) 2 3 4 5 6 7 (Completely)</label>
+    <br/>
   </div>
   <button *ngIf="!showMsg"  type="submit" style="background: #FF4081;" class="btn btn-success btn-lg waves-effect waves-light" value="sendData">Submit</button>
   <img width="45" height="45" src="assets/images/loading.gif" *ngIf="isLoading && !showMsg" class="text-center">
