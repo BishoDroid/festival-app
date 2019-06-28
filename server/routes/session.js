@@ -15,12 +15,25 @@
 
  router.route('/sessions/active')
  .get(function (req, res) {
+
+         let _sessionType = req.query.type ;
+         console.log( "type :   " + req.query.type)
     if (sessions.data) {
-                // console.log('Found ' + sessions.data.length + ' sessions');
-                return res.json(sessions.data);
-            }
+        if (_sessionType == 'all') {
+            return res.json(sessions.data);
+
         }
-        );
+        else if (_sessionType == 'kima' || _sessionType == 'symbiosis')
+        {
+            return res.json(  sessions.data.filter(session => session.sessionType === _sessionType)  );
+        }
+        else
+        {
+            return res.json(sessions.data);
+        }// console.log('Found ' + sessions.data.length + ' sessions');
+
+    }
+ }  );
 
 
  router.route('/sessions/all')

@@ -59,6 +59,12 @@
                 <div class="tab-pane active" id="1a">
                     <div margin="5%">
                         <h3>Registered Users </h3>
+                        <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="activeSessionsType" value="all">
+                            <mat-button-toggle class="text-danger" value="all">All</mat-button-toggle>
+                            <mat-button-toggle class="text-success" value="kima"  >Kima</mat-button-toggle>
+                            <mat-button-toggle class="text-danger" value="symbiosis">Symbiosis</mat-button-toggle>
+                        </mat-button-toggle-group>
+
                         <ul *ngFor="let session of sessions  ; let index = i">
                             <li>
                                 <div>{{session.sessionId}} : <span></span></div>

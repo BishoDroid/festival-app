@@ -24,8 +24,8 @@ export class DataService {
         return this.http.post(this.host + '/api/user/post-quest', data, {headers: header});
     }
 
-    getActiveSessions(): Observable<any> {
-        return this.http.get(this.host + '/api/sessions/active');
+    getActiveSessions(filter: string): Observable<any> {
+        return this.http.get(this.host + '/api/sessions/active?' + filter);
     }
 
     getAllSessions(): Observable<any> {

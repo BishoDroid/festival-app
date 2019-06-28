@@ -31,6 +31,7 @@ export class AdminComponent implements OnInit {
     public kimaChoice: any = {};
     public allTablets: any = [];
     public selectedTablet: any = {};
+    public activeSessionsType = 'all';
     modalRef: BsModalRef;
     public savedTablet = JSON.parse(localStorage.getItem('tablet'));
     public myModal: any = {
@@ -69,7 +70,7 @@ export class AdminComponent implements OnInit {
         interval(3000)
             .pipe(
                 startWith(0),
-                switchMap(() => this.dataSvc.getActiveSessions()))
+                switchMap(() => this.dataSvc.getActiveSessions('type=' + this.activeSessionsType )))
             .subscribe(res => {
                 this.sessions = res;
                 let numberOfRecordingKimaSessions = this.getNumberOfRecordingKimaSessions(this.sessions);
