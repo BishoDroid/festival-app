@@ -9,16 +9,16 @@ import Chart from "chart.js";
     styleUrls: ['./dashboard.component.css', '../../app.component.css']
 })
 export class DashboardComponent implements OnInit {
-     sessions: any;
-     totalNumberOfSessions: number;
-     totalNumberOfParticipants: number = 0;
-     totalEngagementTime: number = 0;
+    sessions: any;
+    totalNumberOfSessions: number;
+    totalNumberOfParticipants: number = 0;
+    totalEngagementTime: number = 0;
     currentChart = [];
     selectedChart: number;
     ageChart = [];
     feelingsChart = [];
     kimaSessionsReportArray = [];
-    kimaUsersReportArray = [] ;
+    kimaUsersReportArray = [];
 
     constructor(public dataSvc: DataService) {
     }
@@ -77,9 +77,8 @@ export class DashboardComponent implements OnInit {
             });
 
 
-
             let data = this.getAgeOfParticpantsData(this.sessions);
-            //console.log(data);
+
             let ctx = document.getElementById("ageChart");
             this.ageChart = new Chart(ctx, {
                 type: 'bar',
@@ -102,23 +101,27 @@ export class DashboardComponent implements OnInit {
                 }
             });
 
-            //console.log(this.sessions);
+
             this.totalNumberOfSessions = this.sessions.length;
-            console.log(this.totalNumberOfSessions);
 
+            // process sessions
+            this.sessions.forEach((session, index) => {
 
+                console.log ("logging data for session : " + session._id);
+                session.users.forEach((user, userIndex )  => {
+                    console.log("data for user : " + userIndex);
+                    console.log(user.userRealTimeData);
+                });
 
-
-            this.sessions.forEach( (session, index) => {
                 session.particpantsCompletedPreQuest = this.getNumberOfUsersCompletedPreQuestionair(session);
                 session.particpantsCompletedPostQuest = this.getNumberOfUsersCompletedPostQuestionair(session);
-                console.log(session.recordingStopTime);
-                console.log(session.recordingStartTime);
+
                 let stop = (Date.parse(session.recordingStopTime));
                 let start = (Date.parse(session.recordingStartTime));
                 if (start && stop) {
-                    session.engagementDuration = Math.floor(((stop - start) / 1000) / 60);
-                    if (session.engagementDuration < 0)  {
+                    session.engagementDuration = Math.floor(((stop - start) / 1000));
+
+                    if (session.engagementDuration < 0) {
                         session.engagementDuration = 0;
                     }
                 } else {
@@ -141,15 +144,15 @@ export class DashboardComponent implements OnInit {
     }
 
     getFeelingsDataDataSet(sessions) {
-        console.log(sessions);
+
         let connectionWithOthersBefore = 0;
-        let connectionWithOthersAfter = 0 ;
+        let connectionWithOthersAfter = 0;
         let tuningWithPeopleBefore = 0;
         let tuningWithPeopleAfter = 0;
         let lonelinessBefore = 0;
         let lonelinessAfter = 0;
         let happinessBefore = 0;
-        let happinessAfter = 0 ;
+        let happinessAfter = 0;
         let noOfParticipantsCompletedPreAndPostQuestionaire = 0;
 
 
@@ -159,7 +162,7 @@ export class DashboardComponent implements OnInit {
                 if (user.preQuest === undefined || user.postQuest === undefined) {
                     return;
                 }
-                console.log(user);
+
                 ++noOfParticipantsCompletedPreAndPostQuestionaire;
 
                 connectionWithOthersBefore += user.preQuest.connectionWithOthersScale;
@@ -180,37 +183,36 @@ export class DashboardComponent implements OnInit {
 
         return ([
             // tslint:disable-next-line:max-line-length
-            [connectionWithOthersBefore, tuningWithPeopleBefore , lonelinessBefore , happinessBefore].map(x => x  / noOfParticipantsCompletedPreAndPostQuestionaire ),
-            [connectionWithOthersAfter, tuningWithPeopleAfter, lonelinessAfter, happinessAfter].map(x => x  / noOfParticipantsCompletedPreAndPostQuestionaire )
-            ] );
+            [connectionWithOthersBefore, tuningWithPeopleBefore, lonelinessBefore, happinessBefore].map(x => x / noOfParticipantsCompletedPreAndPostQuestionaire),
+            [connectionWithOthersAfter, tuningWithPeopleAfter, lonelinessAfter, happinessAfter].map(x => x / noOfParticipantsCompletedPreAndPostQuestionaire)
+        ]);
     }
-
 
     getAgeOfParticpantsData(sessions) {
 
         // tslint:disable-next-line:no-unused-expression prefer-const
         let _10to20 = 0, _21to30 = 0, _31to40 = 0, _41to50 = 0, _51to70 = 0;
         let data = [_10to20, _21to30, _31to40, _41to50, _51to70];
-        console.log(sessions);
+
         sessions.forEach(session => {
             session.users.forEach(user => {
-            if (user.preQuest === undefined) {
-                return;
-            }
+                if (user.preQuest === undefined) {
+                    return;
+                }
                 switch (true) {
-                    case (user.preQuest.age >= 10 && user.preQuest.age <= 20 ):
+                    case (user.preQuest.age >= 10 && user.preQuest.age <= 20):
                         data[0] += 1;
                         break;
-                    case (user.preQuest.age >= 21 && user.preQuest.age < 31 ):
+                    case (user.preQuest.age >= 21 && user.preQuest.age < 31):
                         data[1] += 1;
                         break;
-                    case (user.preQuest.age >= 31 && user.preQuest.age < 41 ):
+                    case (user.preQuest.age >= 31 && user.preQuest.age < 41):
                         data[2] += 1;
                         break;
-                    case (user.preQuest.age >= 41 && user.preQuest.age < 51 ):
+                    case (user.preQuest.age >= 41 && user.preQuest.age < 51):
                         data[3] += 1;
                         break;
-                    case (user.preQuest.age >= 51 && user.preQuest.age < 71 ):
+                    case (user.preQuest.age >= 51 && user.preQuest.age < 71):
                         data[4] += 1;
                         break;
                     default:
@@ -243,43 +245,44 @@ export class DashboardComponent implements OnInit {
             "Participant-id, Age , Gender ,  Pre-Connection , Pre-Tuning , Pre-Loneliness , Pre-Happiness ," +
             " Post-Connection , Post-Tuning , Post-Loneliness , Post-Happiness ");
 
-        let particpantsIds = ['a', 'b', 'c', 'd', 'e', 'f' , 'g' , 'h'];
+        let particpantsIds = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
-        sessions.forEach( (session, index) => {
+        sessions.forEach((session, index) => {
 
             // sessions report
-            let sessionId = (index + 1).toString(10) ;
-            let line = sessionId + " ," +  session.timestamp + "," + session.particpantsCompletedPreQuest + "," + session.particpantsCompletedPostQuest + "," + session.engagementDuration  ;
+            let sessionId = (index + 1).toString(10);
+            let line = sessionId + " ," + session.timestamp + "," + session.particpantsCompletedPreQuest + "," + session.particpantsCompletedPostQuest + "," + session.engagementDuration;
             this.kimaSessionsReportArray.push(line);
 
             // users group
-            let lineCommon = " " ;
-            lineCommon += sessionId + " , " ;
+            let lineCommon = " ";
+            lineCommon += sessionId + " , ";
 
             function exists(user) {
-                return user.preQuest !== undefined ;
+                return user.preQuest !== undefined;
             }
+
             let users = session.users.filter(exists);
 
-            users.forEach(( user, userIndex ) => {
+            users.forEach((user, userIndex) => {
                 let lineUser = sessionId + "-" + particpantsIds[userIndex] + ", ";
 
 
                 lineUser += user.preQuest.age + ", " +
-                            user.preQuest.gender + ", " +
-                            user.preQuest.connectionWithOthersScale + ", " +
-                            user.preQuest.tuningWithPeopleScale + " , " +
-                            user.preQuest.lonelinessScale + " , " +
-                            user.preQuest.happinessScale + " , ";
+                    user.preQuest.gender + ", " +
+                    user.preQuest.connectionWithOthersScale + ", " +
+                    user.preQuest.tuningWithPeopleScale + " , " +
+                    user.preQuest.lonelinessScale + " , " +
+                    user.preQuest.happinessScale + " , ";
 
 
-                if (user.postQuest === undefined)  {
+                if (user.postQuest === undefined) {
                     lineUser += " , , , , ";
                 } else {
                     lineUser += user.postQuest.connectionWithOthersScale + ", " +
-                                user.postQuest.tuningWithPeopleScale + " , " +
-                                user.postQuest.lonelinessScale + " , " +
-                                user.postQuest.happinessScale ;
+                        user.postQuest.tuningWithPeopleScale + " , " +
+                        user.postQuest.lonelinessScale + " , " +
+                        user.postQuest.happinessScale;
                 }
 
                 this.kimaUsersReportArray.push(lineUser);
@@ -289,6 +292,7 @@ export class DashboardComponent implements OnInit {
         });
 
     }
+
     showGraph(session: any, i: number) {
 
 
@@ -306,12 +310,11 @@ export class DashboardComponent implements OnInit {
         let checkExist = setInterval(function () {
             if (canvDev != null) {
 
-                console.log("Exists!");
+
                 canvDev.appendChild(canvas);
                 clearInterval(checkExist);
                 attachGraph();
-            }
-            else {
+            } else {
                 canvDev = document.getElementById("candev");
             }
 
@@ -351,7 +354,7 @@ export class DashboardComponent implements OnInit {
 
 
             let ctx = document.getElementById("sessionToShow");
-            console.log(ctx);
+
             this.currentChart = new Chart(ctx, {
                 type: 'line',
                 lineTension: 0,
@@ -399,7 +402,7 @@ export class DashboardComponent implements OnInit {
     }
 
     downloadKimaUsers() {
-        var csvContent =  this.kimaUsersReportArray.join("\n");
+        var csvContent = this.kimaUsersReportArray.join("\n");
         var encodedUri = encodeURI(csvContent);
         var link = document.createElement("a");
         link.setAttribute("href", encodedUri);
@@ -409,11 +412,9 @@ export class DashboardComponent implements OnInit {
         link.click(); // This will download the data file named "my_data.csv".
     }
 
-
     downloadSymbiosisSessions() {
 
     }
-
 
     downloadSymbiosisUsers() {
 

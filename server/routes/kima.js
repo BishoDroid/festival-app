@@ -192,7 +192,7 @@ kimaUdpPort.on("message", function (oscMessage) {
 
 
     let sensorData = new SymbiosisSensorData ();
-    sensorData.sessionId = activeKimaSession.id;
+    sensorData.sessionId = activeKimaSession._id;
     sensorData.readingType = oscMessage.address;
     sensorData.value = oscMessage.args[0];
     sensorData.timestamp = new Date();
@@ -255,7 +255,7 @@ symbiosisUdpPort.on("message", function (oscMessage) {
     }
 
     let sensorData = new SymbiosisSensorData ();
-    sensorData.sessionId = activeSymbiosisSession.id;
+    sensorData.sessionId = activeSymbiosisSession._id;
     sensorData.readingType = oscMessage.address;
     sensorData.value = oscMessage.args[0];
     sensorData.timestamp = new Date();
