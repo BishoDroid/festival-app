@@ -42,7 +42,7 @@ router.route('/sessions/all')
             dataPromises = [];
             // loop through sessions
 
-            for (const session of sessions) {
+            sessions.forEach(session =>  {
 
                 let sessionIdString = (session._id).toString();
 
@@ -63,6 +63,7 @@ router.route('/sessions/all')
                             if (err) {
                                 return callback(err);
                             }
+                            getNumberOfHarmonies (sessionData,session);
                             session.sessionRealtimeData = sessionData;
                             callback(null, session);
                         });
@@ -87,16 +88,24 @@ router.route('/sessions/all')
                 let kimaUserRealtimeDataArgs = {sessionId: sessionIdString, isUser: 1, sessionType: 'kima'};
                 let _userNumber = 1;
                 let userIdString;
-                for (const user of session.users) {
 
+
+
+                // loop through users
+                session.users.forEach((user, kimaUserIndex) => {
+
+
+                    let index = kimaUserIndex  +1 ;
                     if (session.sessionType != 'kima') {
-                        continue;
+                        return;
                     }
-
+                    console.log("Im not user 2 " ,index );
                     userIdString = (user._id).toString();
-                    kimaUserRealtimeDataArgs = { sessionId : sessionIdString , userNumber : _userNumber, isUser: 1, sessionType: 'kima'};
+
                     console.log("userIdString" + userIdString);
                     dataPromises.push((callback) => {
+                        kimaUserRealtimeDataArgs = { sessionId : sessionIdString , userNumber : index , isUser: 1, sessionType: 'kima'};
+                        console.log(kimaUserRealtimeDataArgs);
                         SensorData.find(kimaUserRealtimeDataArgs)
                             .sort({timestamp: 'desc'})
                             .lean()
@@ -104,17 +113,19 @@ router.route('/sessions/all')
                                 if (err) {
                                     return callback(err);
                                 }
-                                user.userRealTimeData = userData;
+                                user.averageAmplitude = getAverageAmplitude(userData) ;
+
                                 callback(null, session);
                             });
                     });
 
-                    ++_userNumber;
-                    console.log("user Number :" + _userNumber);
+                    //console.log("user Number :" + _userNumber);
 
-                }
 
-            } // for sessions
+
+                });
+
+            }) // for sessions
 
             //
             async.parallel(dataPromises, function (err, result) {
@@ -122,6 +133,16 @@ router.route('/sessions/all')
                 if (err) {
                     return console.log(err);
                 }
+
+
+                sessions.forEach(session =>
+                {
+
+                });
+
+
+
+
                 return res.json({status: 'OK', code: 200, sessions: sessions});
 
             });
@@ -130,7 +151,110 @@ router.route('/sessions/all')
     })
 ;
 
+function getAverageAmplitude(userData) {
+    var avg;
+    var sum = 0;
+    if (!userData.length) return 0;
 
+    for (var i = 0; i < userData.length; i++) {
+
+        if (userData[i].readingType.includes("/amplitude")) {
+
+            sum += parseInt(userData[i].value, 10); //don't forget to add the base
+
+        }
+
+    }
+
+    avg = sum / userData.length;
+
+    console.log("average : " + avg);
+    return avg;
+
+}
+
+function getNumberOfHarmonies(sessionData, session)
+{
+    let third = sessionData.filter(data => data.readingType.includes ("third"));
+    let fifth = sessionData.filter(data => data.readingType.includes ("fifth"));
+    let octave = sessionData.filter(data => data.readingType.includes ("octave"));
+
+    let thirdTimeStamps = getHarmonyTimestamps (third);
+    let fifthTimeStamps = getHarmonyTimestamps (fifth);
+    let octaveTimeStamps = getHarmonyTimestamps (octave);
+
+    let groupedThirdHarmonies = groupHarmonies (thirdTimeStamps);
+    let groupedFifthHarmonies = groupHarmonies (fifthTimeStamps);
+    let groupedOctaveHarmonies = groupHarmonies (octaveTimeStamps);
+
+    let numberOfThirdHarmonies = groupedThirdHarmonies.length;
+    let numberOfFifthHarmonies = groupedFifthHarmonies.length;
+    let numberOfOctaveHarmonies = groupedOctaveHarmonies.length;
+
+    let durationOfAllThirdHarmonies = getDurationOfGroupedHarmonies(groupedThirdHarmonies);
+    let durationOfAllFifthHarmonies = getDurationOfGroupedHarmonies(groupedFifthHarmonies);
+    let durationOfAllOctaveHarmonies = getDurationOfGroupedHarmonies(groupedOctaveHarmonies);
+
+    let durationOfAllHarmonies = durationOfAllThirdHarmonies + durationOfAllFifthHarmonies + durationOfAllOctaveHarmonies ;
+
+
+    let _totalNumberOfHarmonies = numberOfThirdHarmonies + numberOfFifthHarmonies + numberOfOctaveHarmonies ;
+    let _averageDurationOfHarmony = durationOfAllHarmonies / _totalNumberOfHarmonies ;
+
+
+    session.totalNumberOfHarmonies = _totalNumberOfHarmonies ;
+    session.averageDurationOfHarmony = _averageDurationOfHarmony ;
+
+
+}
+
+
+function getHarmonyTimestamps (data) {
+
+    let timestamps = [];
+    let timestamp;
+    data.forEach(d => {
+        timestamp = Math.round(d.timestamp.getTime() / 1000);
+        timestamps.push(timestamp ) ;
+    });
+
+   return timestamps.sort((a, b) => a - b);
+}
+
+
+function groupHarmonies (harmoniesTimestamps)
+{
+    var result = [], temp = [];
+    let difference;
+    for (var i = 0; i < harmoniesTimestamps.length; i += 1) {
+        if (difference !== (harmoniesTimestamps[i] - i)) {
+            if (difference !== undefined) {
+                result.push(temp);
+                temp = [];
+            }
+            difference = harmoniesTimestamps[i] - i;
+        }
+        temp.push(harmoniesTimestamps[i]);
+    }
+
+    if (temp.length) {
+        result.push(temp);
+    }
+
+    return result;
+
+}
+
+
+function getDurationOfGroupedHarmonies (groupedHarmonies)
+{
+    let duration = 0 ;
+    groupedHarmonies.forEach(harmony => {
+        duration = duration + harmony.length;
+    });
+
+    return duration;
+}
 async function getSessionData(_sessionId, session) {
     let data = [];
     let kimaSessionRealtimeDataArgs = {sessionId: _sessionId, isUser: 0};

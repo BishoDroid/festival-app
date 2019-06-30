@@ -11,8 +11,8 @@ import Chart from "chart.js";
 export class DashboardComponent implements OnInit {
     sessions: any;
     totalNumberOfSessions: number;
-    totalNumberOfParticipants: number = 0;
-    totalEngagementTime: number = 0;
+    totalNumberOfParticipants = 0;
+    totalEngagementTime = 0;
     currentChart = [];
     selectedChart: number;
     ageChart = [];
@@ -29,9 +29,9 @@ export class DashboardComponent implements OnInit {
             this.sessions = res.sessions;
 
 
-            let feelingsDataFromSessions = this.getFeelingsDataDataSet(this.sessions);
+            const feelingsDataFromSessions = this.getFeelingsDataDataSet(this.sessions);
 
-            let beforeEngagement = {
+            const beforeEngagement = {
                 label: 'Before Engagement',
                 data: feelingsDataFromSessions[0],
                 backgroundColor: 'rgba(0, 99, 132, 0.6)',
@@ -39,21 +39,21 @@ export class DashboardComponent implements OnInit {
                 yAxisID: "y-axis"
             };
 
-            let afterEngagement = {
+            const afterEngagement = {
                 label: 'After Engagement',
-                //data: [3 , 3 , 3 , 3 ],
+                // data: [3 , 3 , 3 , 3 ],
                 data: feelingsDataFromSessions[1],
                 backgroundColor: 'rgba(99, 132, 0, 0.6)',
                 borderColor: 'rgba(99, 132, 0, 1)',
                 yAxisID: "y-axis"
             };
 
-            let feelingsData = {
+            const feelingsData = {
                 labels: ["Connection With Others", "In Tune With Others", "Lonely", "Happy"],
                 datasets: [beforeEngagement, afterEngagement]
             };
 
-            let chartOptions = {
+            const chartOptions = {
                 scales: {
                     xAxes: [{
                         barPercentage: 1,
@@ -70,16 +70,16 @@ export class DashboardComponent implements OnInit {
                 }
             };
 
-            let feelingsChart = new Chart('feelingsChart', {
+            const feelingsChart = new Chart('feelingsChart', {
                 type: 'bar',
                 data: feelingsData,
                 options: chartOptions
             });
 
 
-            let data = this.getAgeOfParticpantsData(this.sessions);
+            const data = this.getAgeOfParticpantsData(this.sessions);
 
-            let ctx = document.getElementById("ageChart");
+            const ctx = document.getElementById("ageChart");
             this.ageChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -116,8 +116,8 @@ export class DashboardComponent implements OnInit {
                 session.particpantsCompletedPreQuest = this.getNumberOfUsersCompletedPreQuestionair(session);
                 session.particpantsCompletedPostQuest = this.getNumberOfUsersCompletedPostQuestionair(session);
 
-                let stop = (Date.parse(session.recordingStopTime));
-                let start = (Date.parse(session.recordingStartTime));
+                const stop = (Date.parse(session.recordingStopTime));
+                const start = (Date.parse(session.recordingStartTime));
                 if (start && stop) {
                     session.engagementDuration = Math.floor(((stop - start) / 1000));
 
@@ -136,6 +136,7 @@ export class DashboardComponent implements OnInit {
 
             });
 
+            console.log(this.sessions);
             this.formReport(this.sessions);
 
         }, error => {
@@ -192,7 +193,7 @@ export class DashboardComponent implements OnInit {
 
         // tslint:disable-next-line:no-unused-expression prefer-const
         let _10to20 = 0, _21to30 = 0, _31to40 = 0, _41to50 = 0, _51to70 = 0;
-        let data = [_10to20, _21to30, _31to40, _41to50, _51to70];
+        const data = [_10to20, _21to30, _31to40, _41to50, _51to70];
 
         sessions.forEach(session => {
             session.users.forEach(user => {
@@ -243,15 +244,18 @@ export class DashboardComponent implements OnInit {
 
         this.kimaUsersReportArray.push("data:text/csv;charset=utf-8," +
             "Participant-id, Age , Gender ,  Pre-Connection , Pre-Tuning , Pre-Loneliness , Pre-Happiness ," +
-            " Post-Connection , Post-Tuning , Post-Loneliness , Post-Happiness ");
+            " Post-Connection , Post-Tuning , Post-Loneliness , Post-Happiness , know other participants , " +
+            "KIMA-engagement session duration in seconds ," +
+            "Average Amplitude (amplitude/second/session duration , Number Of Harmonies, Average Duration of harmonies per second ");
 
-        let particpantsIds = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+        const particpantsIds = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
         sessions.forEach((session, index) => {
 
             // sessions report
-            let sessionId = (index + 1).toString(10);
-            let line = sessionId + " ," + session.timestamp + "," + session.particpantsCompletedPreQuest + "," + session.particpantsCompletedPostQuest + "," + session.engagementDuration;
+            const sessionId = (index + 1).toString(10);
+            const line = sessionId + " ," + session.timestamp + "," + session.particpantsCompletedPreQuest + "," +
+                session.particpantsCompletedPostQuest + "," + session.engagementDuration;
             this.kimaSessionsReportArray.push(line);
 
             // users group
@@ -262,7 +266,7 @@ export class DashboardComponent implements OnInit {
                 return user.preQuest !== undefined;
             }
 
-            let users = session.users.filter(exists);
+            const users = session.users.filter(exists);
 
             users.forEach((user, userIndex) => {
                 let lineUser = sessionId + "-" + particpantsIds[userIndex] + ", ";
@@ -282,9 +286,14 @@ export class DashboardComponent implements OnInit {
                     lineUser += user.postQuest.connectionWithOthersScale + ", " +
                         user.postQuest.tuningWithPeopleScale + " , " +
                         user.postQuest.lonelinessScale + " , " +
-                        user.postQuest.happinessScale;
+                        user.postQuest.happinessScale + " , " +
+                        user.postQuest.singingPartnerFamiliarity  + " , " ;
                 }
 
+                lineUser += session.engagementDuration  + " , ";
+                lineUser += user.averageAmplitude + " , ";
+                lineUser += session.totalNumberOfHarmonies + " , ";
+                lineUser += session.averageDurationOfHarmony;
                 this.kimaUsersReportArray.push(lineUser);
 
             });
@@ -299,15 +308,15 @@ export class DashboardComponent implements OnInit {
         this.selectedChart = i;
         let canvDev = document.getElementById("candev");
         if (document.getElementById("sessionToShow")) {
-            let oldCanvas = document.getElementById("sessionToShow");
+            const oldCanvas = document.getElementById("sessionToShow");
             oldCanvas.parentElement.removeChild(oldCanvas);
         }
 
-        let canvas = document.createElement("canvas");
+        const canvas = document.createElement("canvas");
 
         canvas.id = "sessionToShow";
 
-        let checkExist = setInterval(function () {
+        const checkExist = setInterval(function () {
             if (canvDev != null) {
 
 
@@ -322,12 +331,12 @@ export class DashboardComponent implements OnInit {
 
 
         function attachGraph() {
-            let thirdDates = [];
-            let thirdValues = [];
-            let fifthDates = [];
-            let fifthValues = [];
-            let octaveDates = [];
-            let octaveValues = [];
+            const thirdDates = [];
+            const thirdValues = [];
+            const fifthDates = [];
+            const fifthValues = [];
+            const octaveDates = [];
+            const octaveValues = [];
             session.chart = [];
             if (!session.sessionData.length) {
                 return;
@@ -335,25 +344,25 @@ export class DashboardComponent implements OnInit {
             session.sessionData.forEach(data => {
 
                 if (data.readingType === '/third') {
-                    let jsdate = new Date(Date.parse(data.timestamp));
-                    thirdDates.push(jsdate.toLocaleTimeString('en', {hour: '2-digit', minute: '2-digit'}))
+                    const jsdate = new Date(Date.parse(data.timestamp));
+                    thirdDates.push(jsdate.toLocaleTimeString('en', {hour: '2-digit', minute: '2-digit'}));
 
                     thirdValues.push(parseInt(data.value, 10));
                 } else if (data.recordingType === '/fifth') {
-                    let jsdate = new Date(Date.parse(data.timestamp));
-                    fifthDates.push(jsdate.toLocaleTimeString('en', {hour: '2-digit', minute: '2-digit'}))
+                    const jsdate = new Date(Date.parse(data.timestamp));
+                    fifthDates.push(jsdate.toLocaleTimeString('en', {hour: '2-digit', minute: '2-digit'}));
 
                     fifthValues.push(parseInt(data.value, 10));
                 } else if (data.recordingType === '/octave') {
-                    let jsdate = new Date(Date.parse(data.timestamp));
-                    octaveDates.push(jsdate.toLocaleTimeString('en', {hour: '2-digit', minute: '2-digit'}))
+                    const jsdate = new Date(Date.parse(data.timestamp));
+                    octaveDates.push(jsdate.toLocaleTimeString('en', {hour: '2-digit', minute: '2-digit'}));
 
                     octaveValues.push(parseInt(data.value, 10));
                 }
             });
 
 
-            let ctx = document.getElementById("sessionToShow");
+            const ctx = document.getElementById("sessionToShow");
 
             this.currentChart = new Chart(ctx, {
                 type: 'line',
@@ -390,10 +399,10 @@ export class DashboardComponent implements OnInit {
 
     downloadKimaSessions() {
 
-        var csvContent = this.kimaSessionsReportArray.join("\n");
+        const csvContent = this.kimaSessionsReportArray.join("\n");
 
-        var encodedUri = encodeURI(csvContent);
-        var link = document.createElement("a");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
         link.setAttribute("download", "kima_sessions.csv");
         document.body.appendChild(link); // Required for FF
@@ -402,9 +411,9 @@ export class DashboardComponent implements OnInit {
     }
 
     downloadKimaUsers() {
-        var csvContent = this.kimaUsersReportArray.join("\n");
-        var encodedUri = encodeURI(csvContent);
-        var link = document.createElement("a");
+        const csvContent = this.kimaUsersReportArray.join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
         link.setAttribute("download", "kima_users.csv");
         document.body.appendChild(link); // Required for FF

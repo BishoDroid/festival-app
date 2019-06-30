@@ -48,7 +48,7 @@ export class PreQuestionaireComponent implements OnInit {
     };
     ageRange: Options = {
         floor: 10,
-        ceil: 70,
+        ceil: 100,
         showSelectionBar: true,
         selectionBarGradient: {
             from: 'white',
