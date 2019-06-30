@@ -35,7 +35,7 @@ router.route('/sessions/active')
 router.route('/sessions/all')
     .get(function (req, res) {
 
-        ExperimentSession.find({}).sort({timestamp: 'desc'}).lean().exec(function (err, sessions) {
+        ExperimentSession.find({ numberOfLoggedData : {$gt : 0} }).sort({timestamp: 'desc'}).lean().exec(function (err, sessions) {
             if (!sessions) {
                 return res.json({status: 'OK', code: 200, sessions: []});
             }

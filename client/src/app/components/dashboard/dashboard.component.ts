@@ -281,7 +281,7 @@ export class DashboardComponent implements OnInit {
 
 
                 if (user.postQuest === undefined) {
-                    lineUser += " , , , , ";
+                    lineUser += " , , , , ,";
                 } else {
                     lineUser += user.postQuest.connectionWithOthersScale + ", " +
                         user.postQuest.tuningWithPeopleScale + " , " +
