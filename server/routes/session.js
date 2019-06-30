@@ -46,7 +46,7 @@ router.route('/sessions/all')
 
                 let sessionIdString = (session._id).toString();
 
-                let kimaSessionRealtimeDataArgs = {sessionId: sessionIdString, isUser: 0, sessionType: 'kima'};
+                let kimaSessionRealtimeDataArgs = {sessionId: sessionIdString, isUser: 0};
                 let symbiosisSessionSumaryData = {
                     sessionId: sessionIdString,
                     isUser: 0,
@@ -64,25 +64,25 @@ router.route('/sessions/all')
                                 return callback(err);
                             }
                             getNumberOfHarmonies (sessionData,session);
-                            session.sessionRealtimeData = sessionData;
+                            //session.sessionRealtimeData = sessionData;
                             callback(null, session);
                         });
                 });
 
                 // summary data for symbiosis
-                dataPromises.push((callback) => {
-                    SensorData.find(symbiosisSessionSumaryData)
-                        .sort({timestamp: 'desc'})
-                        .lean()
-                        .exec((err, summaryData) => {
-                            if (err) {
-                                return callback(err);
-                            }
-                            session.sessionSumaryData = summaryData;
-                            callback(null, session);
-                        });
-                });
-
+              /*  // dataPromises.push((callback) => {
+                //     SensorData.find(symbiosisSessionSumaryData)
+                //         .sort({timestamp: 'desc'})
+                //         .lean()
+                //         .exec((err, summaryData) => {
+                //             if (err) {
+                //                 return callback(err);
+                //             }
+                //             session.sessionSumaryData = summaryData;
+                //             callback(null, session);
+                //         });
+                // });
+            */
 
                 // get kima users realTimeData
                 let kimaUserRealtimeDataArgs = {sessionId: sessionIdString, isUser: 1, sessionType: 'kima'};
@@ -104,8 +104,7 @@ router.route('/sessions/all')
 
                     console.log("userIdString" + userIdString);
                     dataPromises.push((callback) => {
-                        kimaUserRealtimeDataArgs = { sessionId : sessionIdString , userNumber : index , isUser: 1, sessionType: 'kima'};
-                        console.log(kimaUserRealtimeDataArgs);
+                        kimaUserRealtimeDataArgs = { sessionId : sessionIdString , userNumber : index };
                         SensorData.find(kimaUserRealtimeDataArgs)
                             .sort({timestamp: 'desc'})
                             .lean()
