@@ -198,8 +198,8 @@ function getNumberOfHarmonies(sessionData, session)
 
 
     let _totalNumberOfHarmonies = numberOfThirdHarmonies + numberOfFifthHarmonies + numberOfOctaveHarmonies ;
-    let _averageDurationOfHarmony = durationOfAllHarmonies / _totalNumberOfHarmonies ;
 
+    let _averageDurationOfHarmony = _totalNumberOfHarmonies === 0 ? 0 :  durationOfAllHarmonies / _totalNumberOfHarmonies ;
 
     session.totalNumberOfHarmonies = _totalNumberOfHarmonies ;
     session.averageDurationOfHarmony = _averageDurationOfHarmony ;
